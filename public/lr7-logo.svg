@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 180" role="img" aria-labelledby="title desc">
+  <title id="title">LR7</title>
+  <desc id="desc">Logotipo vectorial angular LR7</desc>
+  <g fill="currentColor">
+    <path d="M28 28h36v91h67v33H28z"/>
+    <path fill-rule="evenodd" d="M145 28h67c30 0 49 17 49 43 0 19-10 33-28 40l38 41h-46l-31-35h-13v35h-36zm36 29v32h27c11 0 17-6 17-16s-6-16-17-16z"/>
+    <path d="M257 28h50l42 38 31-38h54l-75 73v51h-39v-51z"/>
+    <path d="M407 28h45l-48 124h-43z"/>
+  </g>
+</svg>
