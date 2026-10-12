@@ -16,7 +16,7 @@ export type OrderStatus =
   | "delivered"
   | "cancelled"
   | "refunded";
-export type PaymentProvider = "mercadopago" | "addi";
+export type PaymentProvider = "mercadopago" | "wompi" | "addi";
 export type PaymentStatus = "pending" | "approved" | "rejected" | "cancelled" | "refunded";
 
 type Table<Row, Insert, Update = Partial<Insert>> = {
@@ -178,6 +178,14 @@ export type Database = {
       newsletter_subscribers: Table<
         Timestamped & { id: string; email: string; status: "pending" | "active" | "unsubscribed"; consent_at: string; consent_source: string; confirmed_at: string | null; unsubscribed_at: string | null },
         { id?: string; email: string; status?: "pending" | "active" | "unsubscribed"; consent_at?: string; consent_source: string; confirmed_at?: string | null; unsubscribed_at?: string | null; created_at?: string; updated_at?: string }
+      >;
+      content_items: Table<
+        Timestamped & { id: string; page_key: string; content_key: string; title: string; eyebrow: string | null; body: string | null; image_path: string | null; cta_label: string | null; cta_href: string | null; configuration: Json; sort_order: number; active: boolean },
+        { id?: string; page_key: string; content_key: string; title?: string; eyebrow?: string | null; body?: string | null; image_path?: string | null; cta_label?: string | null; cta_href?: string | null; configuration?: Json; sort_order?: number; active?: boolean; created_at?: string; updated_at?: string }
+      >;
+      site_settings: Table<
+        { id: string; setting_key: string; value: Json; active: boolean; updated_at: string },
+        { id?: string; setting_key: string; value: Json; active?: boolean; updated_at?: string }
       >;
     };
     Views: Record<string, never>;

@@ -125,6 +125,31 @@ export const navigationSchema = z.object({
 export const userRoleSchema = z.enum(["CUSTOMER", "ADMIN"]);
 export const subscriberStatusSchema = z.enum(["pending", "active", "unsubscribed"]);
 
+const nullableUrl = z.preprocess(
+  (value) => (typeof value === "string" && value.trim() === "" ? null : value),
+  z.string().trim().regex(/^(\/|https:\/\/)/).max(500).nullable(),
+);
+
+export const contentItemSchema = z.object({
+  page_key: z.string().trim().toLowerCase().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).max(80),
+  content_key: z.string().trim().toLowerCase().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).max(80),
+  title: z.string().trim().max(240),
+  eyebrow: nullableText(240),
+  body: nullableText(10000),
+  image_path: nullableText(500),
+  cta_label: nullableText(120),
+  cta_href: nullableUrl,
+  configuration: z.record(z.string(), z.unknown()),
+  sort_order: z.coerce.number().int().nonnegative(),
+  active: z.boolean(),
+});
+
+export const siteSettingSchema = z.object({
+  setting_key: z.string().trim().toLowerCase().regex(/^[a-z0-9]+(?:_[a-z0-9]+)*$/).max(80),
+  value: z.union([z.record(z.string(), z.unknown()), z.array(z.unknown()), z.string(), z.number(), z.boolean()]),
+  active: z.boolean(),
+});
+
 export function checkbox(formData: FormData, key: string) {
   return formData.get(key) === "on";
 }

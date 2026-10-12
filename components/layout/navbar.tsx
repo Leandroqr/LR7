@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useStore } from "@/components/providers/store-provider";
 import { WhatsAppLink } from "@/components/commerce/whatsapp-link";
 import { getGeneralWhatsAppMessage } from "@/lib/whatsapp";
+import type { NavigationItem } from "@/lib/content";
 
 const NAV_LINKS = [
   { href: "/", label: "INICIO" },
@@ -16,7 +17,7 @@ const NAV_LINKS = [
   { href: "/personaliza", label: "PERSONALIZA" },
 ];
 
-export function Navbar() {
+export function Navbar({ navigation }: Readonly<{ navigation: NavigationItem[] }>) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -25,6 +26,7 @@ export function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const whatsappMessage = getGeneralWhatsAppMessage(pathname);
+  const navigationLinks = navigation.length ? navigation : NAV_LINKS;
 
   useEffect(() => {
     const onScroll = () => {
@@ -94,7 +96,7 @@ export function Navbar() {
           </Link>
 
           <div style={{ display: "flex", gap: "2.5rem", alignItems: "center" }} className="hidden-mobile">
-            {NAV_LINKS.map((link) => (
+            {navigationLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -225,7 +227,7 @@ export function Navbar() {
           gap: "1.75rem",
         }}
       >
-        {NAV_LINKS.map((link) => (
+        {navigationLinks.map((link) => (
           <Link key={link.href} href={link.href} className="font-display" style={{ fontSize: "2.5rem", fontWeight: 900, letterSpacing: "0.08em", color: "var(--color-primary-dark)", textDecoration: "none", textTransform: "uppercase" }}>
             {link.label}
           </Link>

@@ -9,6 +9,7 @@ import {
   updateVariant,
   uploadProductImage,
 } from "@/app/admin/actions";
+import { AdminConfirmAction } from "@/components/admin/admin-crud";
 import { AdminPage } from "@/components/admin/admin-page";
 import { ProductForm } from "@/components/admin/product-form";
 import { requireAdmin } from "@/lib/auth/admin";
@@ -58,7 +59,7 @@ export default async function ProductAdminPage({ params }: ProductAdminPageProps
         <div className="admin-media-list">
           {images.map((image) => {
             const publicUrl = supabase.storage.from("products").getPublicUrl(image.storage_path).data.publicUrl;
-            return <article key={image.id}><Image src={publicUrl} alt={image.alt_text} width={64} height={76} /><div><strong>{image.alt_text}</strong><span>{image.storage_path}</span></div><form action={deleteProductImage.bind(null, image.id, id, image.storage_path)}><button type="submit">ELIMINAR</button></form></article>;
+            return <article key={image.id}><Image src={publicUrl} alt={image.alt_text} width={64} height={76} /><div><strong>{image.alt_text}</strong><span>{image.storage_path}</span></div><AdminConfirmAction action={deleteProductImage.bind(null, image.id, id, image.storage_path)} itemName="esta imagen" /></article>;
           })}
         </div>
       </section>
@@ -75,12 +76,12 @@ export default async function ProductAdminPage({ params }: ProductAdminPageProps
           return <form key={variant.id} action={updateVariant.bind(null, variant.id, id)} className="admin-form admin-variant-form">
             <input name="sku" defaultValue={variant.sku} required aria-label="SKU" /><input name="size" defaultValue={variant.size} required aria-label="Talla" /><input name="color" defaultValue={variant.color ?? ""} aria-label="Color" />
             <input name="price_override" type="number" min="0" defaultValue={variant.price_override ?? ""} aria-label="Precio opcional" /><input name="stock" type="number" min="0" defaultValue={itemInventory?.stock ?? 0} aria-label="Stock" /><input name="low_stock_threshold" type="number" min="0" defaultValue={itemInventory?.low_stock_threshold ?? 3} aria-label="Umbral de stock bajo" />
-            <label className="admin-check-label"><input name="active" type="checkbox" defaultChecked={variant.active} /> Activa</label><button type="submit">GUARDAR</button><button type="submit" formAction={deleteVariant.bind(null, variant.id, id)} className="admin-danger-text">ELIMINAR</button>
+            <label className="admin-check-label"><input name="active" type="checkbox" defaultChecked={variant.active} /> Activa</label><button type="submit">GUARDAR</button><AdminConfirmAction action={deleteVariant.bind(null, variant.id, id)} itemName={`la variante ${variant.sku}`} />
           </form>;
         })}</div>
       </section>
 
-      <section className="admin-danger-zone"><h2>ELIMINAR PRODUCTO</h2><p>Los pedidos históricos conservan su snapshot. Esta acción no se puede deshacer.</p><form action={deleteProduct.bind(null, id)}><button type="submit">ELIMINAR DEFINITIVAMENTE</button></form></section>
+      <section className="admin-danger-zone"><h2>ELIMINAR PRODUCTO</h2><p>Los pedidos históricos conservan su snapshot. Esta acción no se puede deshacer.</p><AdminConfirmAction action={deleteProduct.bind(null, id)} label="Eliminar definitivamente" itemName={`el producto ${productResult.data.name}`} /></section>
     </AdminPage>
   );
 }

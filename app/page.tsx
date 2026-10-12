@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { HomePage } from "@/components/pages/home-page";
-import { PRODUCTS } from "@/lib/products";
+import { getPublicProducts } from "@/lib/catalog";
+import { getHomeContent } from "@/lib/content";
 import { SITE_CONFIG } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -24,8 +25,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Page() {
-  const featuredProduct = PRODUCTS.find((product) => product.slug === "seleccion-colombia") ?? PRODUCTS[0];
+export default async function Page() {
+  const [products, homeContent] = await Promise.all([getPublicProducts(), getHomeContent()]);
+  const featuredProduct = products.find((product) => product.slug === "seleccion-colombia") ?? products[0];
 
   const organizationJsonLd = {
     "@context": "https://schema.org",
@@ -74,8 +76,8 @@ export default function Page() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(featuredProductJsonLd) }} />
-      <HomePage />
+      {featuredProduct ? <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(featuredProductJsonLd) }} /> : null}
+      <HomePage products={products} homeSlides={homeContent.slides} homeSections={homeContent.sections} />
     </>
   );
 }

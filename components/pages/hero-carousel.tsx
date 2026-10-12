@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { formatCurrency } from "@/lib/products";
 import type { Product } from "@/types/ecommerce";
+import type { Database } from "@/types/database";
 
 type HeroSlide = {
   id: string;
@@ -72,8 +73,8 @@ function buildSlides(products: Product[]): HeroSlide[] {
   ].filter((slide): slide is HeroSlide => Boolean(slide));
 }
 
-export function HeroCarousel({ products }: Readonly<{ products: Product[] }>) {
-  const slides = buildSlides(products);
+export function HeroCarousel({ products, homeSlides }: Readonly<{ products: Product[]; homeSlides?: Database["public"]["Tables"]["home_slides"]["Row"][] }>) {
+  const slides = homeSlides?.length ? homeSlides.map((slide) => ({ id: slide.id, eyebrow: slide.eyebrow, title: slide.title, accent: slide.accent_text ?? "", description: slide.subtitle ?? "", cta: slide.cta_label, href: slide.cta_href, image: slide.image_path, alt: slide.title })) : buildSlides(products);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const activeSlide = slides[activeIndex];

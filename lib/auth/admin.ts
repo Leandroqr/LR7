@@ -4,9 +4,22 @@ import { cache } from "react";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
+export function isAdminPreviewEnabled() {
+  return process.env.NODE_ENV === "development" && process.env.ADMIN_PREVIEW === "true";
+}
+
 export const getAdminSession = cache(async () => {
   const supabase = await createSupabaseServerClient();
   if (!supabase) return null;
+
+  if (isAdminPreviewEnabled()) {
+    return {
+      supabase,
+      user: { id: "admin-preview", email: "preview@lr7.local" },
+      profile: { id: "admin-preview", role: "ADMIN" as const, full_name: "Vista previa" },
+      preview: true,
+    };
+  }
 
   const {
     data: { user },
@@ -23,7 +36,7 @@ export const getAdminSession = cache(async () => {
 
   if (profileError || profile?.role !== "ADMIN") return null;
 
-  return { supabase, user, profile };
+  return { supabase, user, profile, preview: false };
 });
 
 export async function requireAdmin() {

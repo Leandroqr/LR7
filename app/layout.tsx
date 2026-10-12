@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Barlow, Barlow_Condensed } from "next/font/google";
 import { AppProviders } from "@/components/providers/app-providers";
 import { SiteShell } from "@/components/layout/site-shell";
+import { getPublicNavigation } from "@/lib/content";
 import { SITE_CONFIG } from "@/lib/site";
 import "@/app/globals.css";
 
@@ -61,12 +62,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const navigation = await getPublicNavigation();
   return (
     <html lang="es" className={`${displayFont.variable} ${bodyFont.variable}`}>
       <body>
         <AppProviders>
-          <SiteShell>{children}</SiteShell>
+          <SiteShell navigation={navigation}>{children}</SiteShell>
         </AppProviders>
       </body>
     </html>

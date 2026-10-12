@@ -6,8 +6,9 @@ import { CheckoutHeader } from "@/components/layout/checkout-header";
 import { Footer } from "@/components/layout/footer";
 import { Navbar } from "@/components/layout/navbar";
 import { WhatsAppFloat } from "@/components/layout/whatsapp-float";
+import type { NavigationItem } from "@/lib/content";
 
-export function SiteShell({ children }: Readonly<{ children: ReactNode }>) {
+export function SiteShell({ children, navigation }: Readonly<{ children: ReactNode; navigation: NavigationItem[] }>) {
   const pathname = usePathname();
 
   if (pathname.startsWith("/admin")) {
@@ -26,9 +27,9 @@ export function SiteShell({ children }: Readonly<{ children: ReactNode }>) {
 
   return (
     <>
-      <Navbar />
+      <Navbar navigation={navigation.filter((item) => item.location === "header")} />
       <main>{children}</main>
-      <Footer />
+      <Footer navigation={navigation.filter((item) => item.location === "footer")} />
       <WhatsAppFloat />
     </>
   );

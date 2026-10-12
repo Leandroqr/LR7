@@ -3,9 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth/admin";
+import type { Json } from "@/types/database";
 import {
   categorySchema,
   checkbox,
+  contentItemSchema,
   homeSectionSchema,
   homeSlideSchema,
   inventorySchema,
@@ -13,6 +15,7 @@ import {
   orderStatusSchema,
   productSchema,
   subscriberStatusSchema,
+  siteSettingSchema,
   userRoleSchema,
   variantSchema,
 } from "@/lib/validation/admin";
@@ -23,6 +26,16 @@ function value(formData: FormData, key: string) {
 
 function throwMutationError(error: { message: string } | null) {
   if (error) throw new Error(error.message);
+}
+
+function jsonValue(formData: FormData, key: string): Json {
+  const raw = value(formData, key);
+  if (typeof raw !== "string" || !raw.trim()) return {};
+  try {
+    return JSON.parse(raw) as Json;
+  } catch {
+    throw new Error("La configuración debe ser JSON válido.");
+  }
 }
 
 export async function createProduct(formData: FormData) {
@@ -277,6 +290,24 @@ export async function createHomeSlide(formData: FormData) {
   revalidatePath("/admin/home");
 }
 
+export async function updateHomeSlide(id: string, formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const parsed = homeSlideSchema.parse({
+    image_path: value(formData, "image_path"),
+    eyebrow: value(formData, "eyebrow"),
+    title: value(formData, "title"),
+    accent_text: value(formData, "accent_text"),
+    subtitle: value(formData, "subtitle"),
+    cta_label: value(formData, "cta_label"),
+    cta_href: value(formData, "cta_href"),
+    sort_order: value(formData, "sort_order"),
+    active: checkbox(formData, "active"),
+  });
+  const { error } = await supabase.from("home_slides").update(parsed).eq("id", id);
+  throwMutationError(error);
+  revalidatePath("/admin/home");
+}
+
 export async function createHomeSection(formData: FormData) {
   const { supabase } = await requireAdmin();
   const parsed = homeSectionSchema.parse({
@@ -291,6 +322,24 @@ export async function createHomeSection(formData: FormData) {
     active: checkbox(formData, "active"),
   });
   const { error } = await supabase.from("home_sections").insert(parsed);
+  throwMutationError(error);
+  revalidatePath("/admin/home");
+}
+
+export async function updateHomeSection(id: string, formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const parsed = homeSectionSchema.parse({
+    section_key: value(formData, "section_key"),
+    section_type: value(formData, "section_type"),
+    title: value(formData, "title"),
+    eyebrow: value(formData, "eyebrow"),
+    subtitle: value(formData, "subtitle"),
+    cta_label: value(formData, "cta_label"),
+    cta_href: value(formData, "cta_href"),
+    sort_order: value(formData, "sort_order"),
+    active: checkbox(formData, "active"),
+  });
+  const { error } = await supabase.from("home_sections").update(parsed).eq("id", id);
   throwMutationError(error);
   revalidatePath("/admin/home");
 }
@@ -383,4 +432,39 @@ export async function deleteSubscriber(subscriberId: string) {
   const { error } = await supabase.from("newsletter_subscribers").delete().eq("id", subscriberId);
   throwMutationError(error);
   revalidatePath("/admin/newsletter");
+}
+
+export async function createContentItem(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const parsed = contentItemSchema.parse({
+    page_key: value(formData, "page_key"), content_key: value(formData, "content_key"), title: value(formData, "title"), eyebrow: value(formData, "eyebrow"), body: value(formData, "body"), image_path: value(formData, "image_path"), cta_label: value(formData, "cta_label"), cta_href: value(formData, "cta_href"), configuration: jsonValue(formData, "configuration"), sort_order: value(formData, "sort_order"), active: checkbox(formData, "active"),
+  });
+  const { error } = await supabase.from("content_items").insert({ ...parsed, configuration: parsed.configuration as Json });
+  throwMutationError(error);
+  revalidatePath("/"); revalidatePath("/preguntas-frecuentes"); revalidatePath("/envios"); revalidatePath("/cambios-y-devoluciones"); revalidatePath("/guia-de-tallas"); revalidatePath("/admin/content");
+}
+
+export async function updateContentItem(id: string, formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const parsed = contentItemSchema.parse({
+    page_key: value(formData, "page_key"), content_key: value(formData, "content_key"), title: value(formData, "title"), eyebrow: value(formData, "eyebrow"), body: value(formData, "body"), image_path: value(formData, "image_path"), cta_label: value(formData, "cta_label"), cta_href: value(formData, "cta_href"), configuration: jsonValue(formData, "configuration"), sort_order: value(formData, "sort_order"), active: checkbox(formData, "active"),
+  });
+  const { error } = await supabase.from("content_items").update({ ...parsed, configuration: parsed.configuration as Json }).eq("id", id);
+  throwMutationError(error);
+  revalidatePath("/"); revalidatePath("/preguntas-frecuentes"); revalidatePath("/envios"); revalidatePath("/cambios-y-devoluciones"); revalidatePath("/guia-de-tallas"); revalidatePath("/admin/content");
+}
+
+export async function deleteContentItem(id: string) {
+  const { supabase } = await requireAdmin();
+  const { error } = await supabase.from("content_items").delete().eq("id", id);
+  throwMutationError(error);
+  revalidatePath("/"); revalidatePath("/preguntas-frecuentes"); revalidatePath("/envios"); revalidatePath("/cambios-y-devoluciones"); revalidatePath("/guia-de-tallas"); revalidatePath("/admin/content");
+}
+
+export async function upsertSiteSetting(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const parsed = siteSettingSchema.parse({ setting_key: value(formData, "setting_key"), value: jsonValue(formData, "value"), active: checkbox(formData, "active") });
+  const { error } = await supabase.from("site_settings").upsert({ ...parsed, value: parsed.value as Json }, { onConflict: "setting_key" });
+  throwMutationError(error);
+  revalidatePath("/"); revalidatePath("/admin/content");
 }

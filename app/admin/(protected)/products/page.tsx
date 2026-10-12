@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { toggleProduct } from "@/app/admin/actions";
+import { AdminMutationForm } from "@/components/admin/admin-crud";
 import { AdminEmpty, AdminPage } from "@/components/admin/admin-page";
 import { requireAdmin } from "@/lib/auth/admin";
 
@@ -22,7 +23,7 @@ export default async function AdminProductsPage() {
               <td>{product.brand}</td><td>${product.price.toLocaleString("es-CO")}</td>
               <td>{product.featured ? "Sí" : "No"}</td>
               <td><span className={`admin-status ${product.active ? "is-active" : ""}`}>{product.active ? "ACTIVO" : "INACTIVO"}</span></td>
-              <td><div className="admin-row-actions"><Link href={`/admin/products/${product.id}`}>EDITAR</Link><form action={toggleProduct.bind(null, product.id, product.active)}><button type="submit">{product.active ? "DESACTIVAR" : "ACTIVAR"}</button></form></div></td>
+              <td><div className="admin-row-actions"><Link href={`/admin/products/${product.id}`}>VER</Link><Link href={`/admin/products/${product.id}`}>EDITAR</Link><AdminMutationForm action={toggleProduct.bind(null, product.id, product.active)} successMessage="Visibilidad actualizada."><button type="submit">{product.active ? "DESACTIVAR" : "ACTIVAR"}</button></AdminMutationForm></div></td>
             </tr>
           ))}</tbody>
         </table></div>

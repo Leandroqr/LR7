@@ -1,0 +1,7 @@
+"use client";
+
+import { useState } from "react";
+import type { ContentItem } from "@/lib/content";
+
+export function FaqList({ items }: Readonly<{ items: ContentItem[] }>) { return <>{items.map((item) => <FaqItem key={item.id} question={item.title} answer={item.body ?? ""} />)}</>; }
+function FaqItem({ question, answer }: Readonly<{ question: string; answer: string }>) { const [open, setOpen] = useState(false); return <div style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}><button onClick={() => setOpen((value) => !value)} style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "1.5rem 0", background: "none", border: "none", cursor: "pointer", textAlign: "left", gap: "1rem" }}><span className="font-display" style={{ fontWeight: 800, fontSize: "1.05rem", letterSpacing: "0.04em", textTransform: "uppercase", color: open ? "var(--color-accent)" : "#fff", lineHeight: 1.2 }}>{question}</span><span style={{ color: open ? "var(--color-accent)" : "rgba(255,255,255,0.5)" }}>{open ? "−" : "+"}</span></button><div style={{ maxHeight: open ? "300px" : "0", overflow: "hidden", transition: "max-height 0.35s ease" }}><p style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.6)", lineHeight: 1.75, fontWeight: 300, paddingBottom: "1.5rem" }}>{answer}</p></div></div>; }

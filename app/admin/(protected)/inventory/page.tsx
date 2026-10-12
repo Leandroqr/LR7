@@ -1,4 +1,5 @@
 import { updateInventory } from "@/app/admin/actions";
+import { AdminMutationForm } from "@/components/admin/admin-crud";
 import { AdminEmpty, AdminPage } from "@/components/admin/admin-page";
 import { requireAdmin } from "@/lib/auth/admin";
 
@@ -25,7 +26,7 @@ export default async function AdminInventoryPage() {
     {!variants.length ? <AdminEmpty>Crea variantes desde un producto para administrar stock.</AdminEmpty> : <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>PRODUCTO</th><th>VARIANTE</th><th>SKU</th><th>ESTADO</th><th>STOCK</th><th>UMBRAL</th><th></th></tr></thead><tbody>{variants.map((variant) => {
       const item = inventory.get(variant.id); const stock = item?.stock ?? 0; const threshold = item?.low_stock_threshold ?? 3;
       const state = getStockStatus(stock, threshold);
-      return <tr key={variant.id}><td><strong>{products.get(variant.product_id) ?? "Producto"}</strong></td><td>{variant.size}{variant.color ? ` / ${variant.color}` : ""}</td><td>{variant.sku}</td><td><span className={`admin-status ${stock > threshold ? "is-active" : "is-warning"}`}>{state}</span></td><td colSpan={3}><form action={updateInventory.bind(null, variant.id)} className="admin-inventory-form"><input name="stock" type="number" min="0" defaultValue={stock} aria-label={`Stock de ${variant.sku}`} /><input name="low_stock_threshold" type="number" min="0" defaultValue={threshold} aria-label={`Umbral de ${variant.sku}`} /><button type="submit">GUARDAR</button></form></td></tr>;
+      return <tr key={variant.id}><td><strong>{products.get(variant.product_id) ?? "Producto"}</strong></td><td>{variant.size}{variant.color ? ` / ${variant.color}` : ""}</td><td>{variant.sku}</td><td><span className={`admin-status ${stock > threshold ? "is-active" : "is-warning"}`}>{state}</span></td><td colSpan={3}><AdminMutationForm action={updateInventory.bind(null, variant.id)} successMessage="Inventario actualizado." className="admin-inventory-form"><input name="stock" type="number" min="0" defaultValue={stock} aria-label={`Stock de ${variant.sku}`} /><input name="low_stock_threshold" type="number" min="0" defaultValue={threshold} aria-label={`Umbral de ${variant.sku}`} /><button type="submit">GUARDAR</button></AdminMutationForm></td></tr>;
     })}</tbody></table></div>}
   </AdminPage>;
 }

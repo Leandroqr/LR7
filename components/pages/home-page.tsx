@@ -1,19 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Product } from "@/types/ecommerce";
-import { PRODUCTS } from "@/lib/products";
+import type { Database } from "@/types/database";
 import { HeroCarousel } from "@/components/pages/hero-carousel";
 import { BenefitsStrip, FootballCollectionSection, NewDropSection } from "@/components/pages/home-commerce-sections";
 import { FeaturedCarousel } from "@/components/product/featured-carousel";
-
-const footballProducts = PRODUCTS.filter((product) => product.brand === "FUTBOL");
-const trainingProducts = PRODUCTS.filter((product) => product.brand === "TRAINING");
-const newDropProducts = footballProducts.filter((product) => product.badge === "NUEVO");
-const retroProducts = footballProducts.filter((product) => product.category === "FUTBOL_RETRO");
-const remainingFootballProducts = footballProducts.filter(
-  (product) => product.badge !== "NUEVO" && product.category !== "FUTBOL_RETRO",
-);
-const featuredProducts = [...newDropProducts, ...retroProducts, ...remainingFootballProducts, ...trainingProducts];
 
 function TrainingSection({ product }: Readonly<{ product: Product }>) {
   return (
@@ -52,12 +43,25 @@ function TrainingSection({ product }: Readonly<{ product: Product }>) {
   );
 }
 
-export function HomePage() {
+type HomeSlide = Database["public"]["Tables"]["home_slides"]["Row"];
+type HomeSection = Database["public"]["Tables"]["home_sections"]["Row"];
+
+function ManagedHomeSections({ sections }: Readonly<{ sections: HomeSection[] }>) {
+  return <>{sections.map((section) => <section key={section.id} className="managed-home-section"><div><p className="font-display home-section-label">{section.eyebrow ?? section.section_type}</p><h2 className="font-display home-section-title">{section.title}</h2>{section.subtitle ? <p>{section.subtitle}</p> : null}{section.cta_label && section.cta_href ? <Link href={section.cta_href} className="btn-primary">{section.cta_label}</Link> : null}</div></section>)}</>;
+}
+
+export function HomePage({ products, homeSlides, homeSections }: Readonly<{ products: Product[]; homeSlides?: HomeSlide[]; homeSections?: HomeSection[] }>) {
+  const footballProducts = products.filter((product) => product.brand === "FUTBOL");
+  const trainingProducts = products.filter((product) => product.brand === "TRAINING");
+  const newDropProducts = footballProducts.filter((product) => product.badge === "NUEVO");
+  const retroProducts = footballProducts.filter((product) => product.category === "FUTBOL_RETRO");
+  const remainingFootballProducts = footballProducts.filter((product) => product.badge !== "NUEVO" && product.category !== "FUTBOL_RETRO");
+  const featuredProducts = [...newDropProducts, ...retroProducts, ...remainingFootballProducts, ...trainingProducts];
   const trainingProduct = trainingProducts[0];
 
   return (
     <>
-      <HeroCarousel products={PRODUCTS} />
+      <HeroCarousel products={products} homeSlides={homeSlides} />
       <FootballCollectionSection products={footballProducts} />
       <FeaturedCarousel
         products={featuredProducts}
@@ -69,6 +73,7 @@ export function HomePage() {
       {newDropProducts.length > 0 ? <NewDropSection products={newDropProducts} /> : null}
       <BenefitsStrip />
       {trainingProduct ? <TrainingSection product={trainingProduct} /> : null}
+      {homeSections?.length ? <ManagedHomeSections sections={homeSections} /> : null}
     </>
   );
 }
