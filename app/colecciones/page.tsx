@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { CollectionsExperience } from "@/components/pages/collections-page";
 import { getPublicProducts } from "@/lib/catalog";
+import { serializeJsonLd } from "@/lib/seo";
 import { SITE_CONFIG } from "@/lib/site";
 
 const socialImage = "https://images.unsplash.com/photo-1599204606471-32a75bc663e9?w=1600&h=900&fit=crop&auto=format";
@@ -62,7 +63,7 @@ export default async function CollectionsPage() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, String.raw`\u003c`) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }}
       />
       <CollectionsExperience products={products} />
     </>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProductPage } from "@/components/pages/product-page";
 import { getPublicProductBySlug, getPublicProducts } from "@/lib/catalog";
+import { serializeJsonLd } from "@/lib/seo";
 import { SITE_CONFIG } from "@/lib/site";
 
 type ProductRouteProps = {
@@ -43,7 +44,7 @@ export async function generateMetadata({ params }: ProductRouteProps): Promise<M
   };
 }
 
-export default async function ProductRoutePage({ params }: ProductRouteProps) {
+export default async function ProductRoutePage({ params }: Readonly<ProductRouteProps>) {
   const { slug } = await params;
   const products = await getPublicProducts();
   const product = products.find((entry) => entry.slug === slug);
@@ -101,8 +102,8 @@ export default async function ProductRoutePage({ params }: ProductRouteProps) {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(productJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }} />
       <ProductPage product={product} relatedProducts={related} />
     </>
   );

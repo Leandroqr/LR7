@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProductCard } from "@/components/product/product-card";
 import { PageHero } from "@/components/layout/page-hero";
-import { getCategoryBySlug, getProductsByCategorySlug } from "@/lib/products";
+import { getPublicProducts } from "@/lib/catalog";
+import { getCategoryBySlug, getCategoryDisplayName, getProductsByCategorySlug } from "@/lib/products";
+import { serializeJsonLd } from "@/lib/seo";
 import { SITE_CONFIG } from "@/lib/site";
 
 type CategoryPageProps = {
@@ -19,28 +21,30 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
     };
   }
 
+  const categoryName = getCategoryDisplayName(category.name);
+
   return {
-    title: `Camisetas de Futbol ${category.name}`,
+    title: categoryName,
     description: `${category.description}. Explora camisetas de futbol premium en Colombia y encuentra tu talla ideal.`,
     alternates: {
       canonical: `/categorias/${slug}`,
     },
     openGraph: {
-      title: `${category.name} | ${SITE_CONFIG.name}`,
+      title: `${categoryName} | ${SITE_CONFIG.name}`,
       description: `${category.description}. Camisetas de futbol premium en Colombia.`,
       url: `/categorias/${slug}`,
       images: [category.image.src],
     },
     twitter: {
       card: "summary_large_image",
-      title: `${category.name} | ${SITE_CONFIG.name}`,
+      title: `${categoryName} | ${SITE_CONFIG.name}`,
       description: `${category.description}. Camisetas de futbol premium en Colombia.`,
       images: [category.image.src],
     },
   };
 }
 
-export default async function CategoryPage({ params }: CategoryPageProps) {
+export default async function CategoryPage({ params }: Readonly<CategoryPageProps>) {
   const { slug } = await params;
   const category = getCategoryBySlug(slug);
 
@@ -48,7 +52,8 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     notFound();
   }
 
-  const products = getProductsByCategorySlug(slug);
+  const categoryName = getCategoryDisplayName(category.name);
+  const products = getProductsByCategorySlug(slug, await getPublicProducts());
 
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
@@ -69,7 +74,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       {
         "@type": "ListItem",
         position: 3,
-        name: category.name,
+        name: categoryName,
         item: `${SITE_CONFIG.baseUrl}/categorias/${slug}`,
       },
     ],
@@ -78,7 +83,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const itemListJsonLd = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    name: `Camisetas ${category.name}`,
+    name: categoryName,
     itemListElement: products.map((product, index) => ({
       "@type": "ListItem",
       position: index + 1,
@@ -89,17 +94,17 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
-      <PageHero label="— CATEGORIA" title={category.name} sub={category.description} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(itemListJsonLd) }} />
+      <PageHero label="— CATEGORIA" title={categoryName} sub={category.description} />
       <section style={{ padding: "4rem 0 6rem", background: "var(--color-white)" }}>
         <div style={{ maxWidth: "1440px", margin: "0 auto", padding: "0 2rem" }}>
           <p style={{ maxWidth: "860px", margin: "0 0 2rem", color: "var(--color-text-muted)", lineHeight: 1.7, fontWeight: 300 }}>
-            Explora camisetas de futbol {category.name.toLowerCase()} con diseños exclusivos, diferentes tallas y opciones para compra en Colombia.
+            Explora {categoryName.toLowerCase()} con diseños exclusivos, diferentes tallas y opciones para compra en Colombia.
           </p>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(260px, 100%), 1fr))", gap: "2px" }}>
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
+            {products.map((product, index) => (
+              <ProductCard key={product.id} product={product} imageLoading={index === 0 ? "eager" : "lazy"} />
             ))}
           </div>
         </div>

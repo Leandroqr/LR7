@@ -1,4 +1,4 @@
-import type { Category, Product } from "@/types/ecommerce";
+import type { Category, Product, ProductCategory } from "@/types/ecommerce";
 
 const brandCompany = { name: "LR7" };
 
@@ -430,6 +430,24 @@ export const COLLECTION_CATEGORY_MAP: Record<string, string> = {
   "training-conjuntos": "TRAINING_CONJUNTOS",
 };
 
+const CATEGORY_DISPLAY_NAMES: Partial<Record<ProductCategory, string>> = {
+  FUTBOL: "Fútbol",
+  FUTBOL_CAMISETAS: "Camisetas de fútbol",
+  FUTBOL_SELECCIONES: "Camisetas de selecciones",
+  FUTBOL_CLUBES: "Camisetas de clubes",
+  FUTBOL_RETRO: "Camisetas retro",
+  TRAINING: "Training",
+  TRAINING_CAMISETAS: "Camisetas de training",
+  TRAINING_CAMISILLAS: "Camisillas de training",
+  TRAINING_PANTALONETAS: "Pantalonetas de training",
+  TRAINING_BUZOS: "Buzos de training",
+  TRAINING_CONJUNTOS: "Conjuntos de training",
+};
+
+export function getCategoryDisplayName(categoryName: ProductCategory) {
+  return CATEGORY_DISPLAY_NAMES[categoryName] ?? categoryName.replaceAll("_", " ");
+}
+
 export function formatCurrency(amount: number): string {
   return amount.toLocaleString("es-CO");
 }
@@ -442,10 +460,16 @@ export function getCategoryBySlug(slug: string): Category | undefined {
   return CATEGORIES.find((category) => category.slug === slug);
 }
 
-export function getProductsByCategorySlug(slug: string): Product[] {
+export function getProductsByCategorySlug(slug: string, products: Product[] = PRODUCTS): Product[] {
   const categoryName = COLLECTION_CATEGORY_MAP[slug];
   if (!categoryName) {
     return [];
   }
-  return PRODUCTS.filter((product) => product.category === categoryName);
+  if (categoryName === "FUTBOL" || categoryName === "FUTBOL_CAMISETAS") {
+    return products.filter((product) => product.brand === "FUTBOL");
+  }
+  if (categoryName === "TRAINING") {
+    return products.filter((product) => product.brand === "TRAINING");
+  }
+  return products.filter((product) => product.category === categoryName);
 }

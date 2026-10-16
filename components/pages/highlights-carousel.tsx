@@ -246,7 +246,7 @@ export function HighlightsCarousel({ products }: HighlightsCarouselProps) {
                           src={slide.product.images[0].src}
                           alt={slide.product.images[0].alt}
                           fill
-                          priority={isActive}
+                          fetchPriority={isActive ? "high" : "auto"}
                           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 85vw"
                           style={{ objectFit: "cover" }}
                         />

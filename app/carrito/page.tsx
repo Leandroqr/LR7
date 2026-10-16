@@ -20,6 +20,13 @@ function getItemUnitPrice(item: CartItem) {
   return item.product.price.amount + customizationPrice;
 }
 
+function hasCartVariant(item: CartItem) {
+  return item.product.variants.some((variant) => {
+    if (item.variant?.sku) return variant.sku === item.variant.sku;
+    return variant.size === item.size && (!item.variant?.color || variant.color === item.variant.color);
+  });
+}
+
 export default function CartPage() {
   const { cart, hydrated, addToCart, removeFromCart, updateQty, clearCart } = useStore();
   const [removedItem, setRemovedItem] = useState<CartItem | null>(null);
@@ -33,9 +40,7 @@ export default function CartPage() {
     (sum, item) => sum + getItemUnitPrice(item) * item.quantity,
     0,
   );
-  const hasInvalidVariant = currentCart.some(
-    (item) => !item.product.variants.some((variant) => variant.size === item.size),
-  );
+  const hasInvalidVariant = currentCart.some((item) => !hasCartVariant(item));
 
   useEffect(() => {
     document.body.classList.add("cart-route");
@@ -121,10 +126,10 @@ export default function CartPage() {
             <ul className="cart-product-list">
               {currentCart.map((item, index) => {
                 const itemPrice = getItemUnitPrice(item);
-                const variantExists = item.product.variants.some((variant) => variant.size === item.size);
+                const variantExists = hasCartVariant(item);
 
                 return (
-                  <li key={`${item.product.id}-${item.size}-${item.customName}-${item.customNumber}`}>
+                  <li key={`${item.product.id}-${item.variant?.sku ?? item.size}-${item.variant?.color ?? ""}-${item.customName}-${item.customNumber}`}>
                     <article className="cart-product-card">
                       <Link href={`/productos/${item.product.slug}`} className="cart-product-image" aria-label={`Ver ${item.product.name}`}>
                         <Image
@@ -132,7 +137,7 @@ export default function CartPage() {
                           alt={item.product.images[0].alt}
                           fill
                           sizes="(max-width: 600px) 34vw, (max-width: 1000px) 180px, 220px"
-                          priority={index === 0}
+                          loading={index === 0 ? "eager" : "lazy"}
                         />
                       </Link>
                       <div className="cart-product-info">
@@ -148,6 +153,7 @@ export default function CartPage() {
 
                         <dl className="cart-product-meta">
                           <div><dt>TALLA</dt><dd>{item.size}</dd></div>
+                          {item.variant?.color ? <div><dt>COLOR</dt><dd>{item.variant.color}</dd></div> : null}
                           {item.customName ? <div><dt>NOMBRE</dt><dd>{item.customName}</dd></div> : null}
                           {item.customNumber ? <div><dt>NÚMERO</dt><dd>#{item.customNumber}</dd></div> : null}
                           {item.customization?.enabled ? <div><dt>POSICIÓN</dt><dd>ESPALDA</dd></div> : null}

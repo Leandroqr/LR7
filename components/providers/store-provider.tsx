@@ -82,6 +82,8 @@ export function StoreProvider({ children }: Readonly<{ children: ReactNode }>) {
         (entry) =>
           entry.product.id === item.product.id &&
           entry.size === item.size &&
+          entry.variant?.sku === item.variant?.sku &&
+          (entry.variant?.color ?? "") === (item.variant?.color ?? "") &&
           entry.customName === item.customName &&
           entry.customNumber === item.customNumber &&
           (entry.customization?.placement ?? "back") === (item.customization?.placement ?? "back"),

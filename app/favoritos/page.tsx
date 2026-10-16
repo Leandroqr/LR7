@@ -33,8 +33,8 @@ export default function FavoritesPage() {
                 {favoriteProducts.length} {favoriteProducts.length === 1 ? "camiseta guardada" : "camisetas guardadas"}
               </p>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(260px, 100%), 1fr))", gap: "2px" }}>
-                {favoriteProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
+                {favoriteProducts.map((product, index) => (
+                  <ProductCard key={product.id} product={product} imageLoading={index === 0 ? "eager" : "lazy"} />
                 ))}
               </div>
             </>

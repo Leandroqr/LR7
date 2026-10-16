@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ShopPage } from "@/components/pages/shop-page";
 import { getPublicProducts } from "@/lib/catalog";
+import { serializeJsonLd } from "@/lib/seo";
 import { SITE_CONFIG } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -51,7 +52,7 @@ export default async function TiendaPage({ searchParams }: Readonly<TiendaPagePr
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, String.raw`\u003c`) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }}
       />
       <ShopPage initialCategory={cat} initialBrand={brand} products={products} />
     </>

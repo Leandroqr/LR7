@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useStore } from "@/components/providers/store-provider";
 import { WhatsAppLink } from "@/components/commerce/whatsapp-link";
 import { getGeneralWhatsAppMessage } from "@/lib/whatsapp";
@@ -22,6 +22,8 @@ export function Navbar({ navigation }: Readonly<{ navigation: NavigationItem[] }
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const mobileMenuRef = useRef<HTMLElement>(null);
+  const mobileMenuButtonRef = useRef<HTMLButtonElement>(null);
   const { cartCount, favoriteCount } = useStore();
   const pathname = usePathname();
   const router = useRouter();
@@ -33,6 +35,7 @@ export function Navbar({ navigation }: Readonly<{ navigation: NavigationItem[] }
       setScrolled(window.scrollY > 60);
     };
 
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -49,10 +52,44 @@ export function Navbar({ navigation }: Readonly<{ navigation: NavigationItem[] }
     };
   }, [menuOpen]);
 
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    const menu = mobileMenuRef.current;
+    const getFocusableElements = () =>
+      Array.from(menu?.querySelectorAll<HTMLElement>('a[href], button:not([disabled])') ?? []);
+    const focusableElements = getFocusableElements();
+    focusableElements[0]?.focus();
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+        mobileMenuButtonRef.current?.focus();
+        return;
+      }
+      if (event.key !== "Tab" || focusableElements.length === 0) return;
+
+      const first = focusableElements[0];
+      const last = focusableElements.at(-1);
+      if (!first || !last) return;
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    menu?.addEventListener("keydown", onKeyDown);
+    return () => menu?.removeEventListener("keydown", onKeyDown);
+  }, [menuOpen]);
+
   const isHome = pathname === "/";
   const solid = scrolled || !isHome;
   const textColor = isHome && !scrolled ? "rgba(255,255,255,0.95)" : "var(--color-dark)";
   const iconColor = isHome && !scrolled ? "rgba(255,255,255,0.7)" : "rgba(5,6,8,0.62)";
+  const logoColor = isHome && !scrolled ? "var(--color-white)" : "var(--color-primary-dark)";
 
   const handleSearch: React.FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
@@ -90,7 +127,7 @@ export function Navbar({ navigation }: Readonly<{ navigation: NavigationItem[] }
           }}
         >
           <Link href="/" style={{ textDecoration: "none" }}>
-            <div className="font-display" style={{ fontSize: "1.7rem", fontWeight: 900, letterSpacing: "0.08em", color: "var(--color-primary-dark)" }}>
+            <div className="font-display" style={{ fontSize: "1.7rem", fontWeight: 900, letterSpacing: "0.08em", color: logoColor }}>
               LR<span style={{ color: "var(--color-accent)" }}>7</span>
             </div>
           </Link>
@@ -165,7 +202,7 @@ export function Navbar({ navigation }: Readonly<{ navigation: NavigationItem[] }
                 </span>
               ) : null}
             </Link>
-            <button type="button" onClick={() => setMenuOpen((value) => !value)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-primary-dark)", padding: "4px" }} aria-label={menuOpen ? "Cerrar menu" : "Abrir menu"}>
+            <button ref={mobileMenuButtonRef} type="button" onClick={() => setMenuOpen((value) => !value)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-primary-dark)", padding: "4px" }} aria-label={menuOpen ? "Cerrar menu" : "Abrir menu"} aria-expanded={menuOpen} aria-controls="mobile-navigation">
               {menuOpen ? (
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <line x1="18" y1="6" x2="6" y2="18" />
@@ -209,7 +246,12 @@ export function Navbar({ navigation }: Readonly<{ navigation: NavigationItem[] }
         </div>
       </nav>
 
-      <div
+      <nav
+        id="mobile-navigation"
+        ref={mobileMenuRef}
+        aria-label="Menú móvil"
+        aria-hidden={!menuOpen}
+        inert={!menuOpen}
         style={{
           position: "fixed",
           top: 0,
@@ -222,9 +264,12 @@ export function Navbar({ navigation }: Readonly<{ navigation: NavigationItem[] }
           transition: "transform 0.35s cubic-bezier(0.76,0,0.24,1)",
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center",
+          justifyContent: "flex-start",
           alignItems: "center",
-          gap: "1.75rem",
+          gap: "clamp(1rem, 3vh, 1.5rem)",
+          boxSizing: "border-box",
+          padding: "calc(5.5rem + env(safe-area-inset-top)) 1rem 1.5rem",
+          overflowY: "auto",
         }}
       >
         {navigationLinks.map((link) => (
@@ -256,7 +301,7 @@ export function Navbar({ navigation }: Readonly<{ navigation: NavigationItem[] }
         >
           HABLA CON LR7
         </WhatsAppLink>
-      </div>
+      </nav>
     </>
   );
 }

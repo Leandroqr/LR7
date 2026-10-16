@@ -280,7 +280,7 @@ export function ShopPage({ products, initialCategory, initialBrand }: Readonly<S
             {filteredProducts.length ? (
               <>
                 <div className="shop-product-grid">
-                  {filteredProducts.slice(0, visible).map((product) => <ProductCard key={product.id} product={product} />)}
+                  {filteredProducts.slice(0, visible).map((product, index) => <ProductCard key={product.id} product={product} imageLoading={index === 0 ? "eager" : "lazy"} />)}
                 </div>
                 {visible < filteredProducts.length ? (
                   <div className="shop-load-more">

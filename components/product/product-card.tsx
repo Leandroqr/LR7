@@ -27,7 +27,7 @@ function getQuickAddLabel(added: boolean, hasSelection: boolean, available: bool
   return available ? "ELIGE TALLA" : "AGOTADO";
 }
 
-export function ProductCard({ product }: Readonly<{ product: Product }>) {
+export function ProductCard({ product, imageLoading = "lazy" }: Readonly<{ product: Product; imageLoading?: "eager" | "lazy" }>) {
   const [hovered, setHovered] = useState(false);
   const [selectedSize, setSelectedSize] = useState("");
   const [added, setAdded] = useState(false);
@@ -71,6 +71,7 @@ export function ProductCard({ product }: Readonly<{ product: Product }>) {
             src={product.images[0].src}
             alt={product.images[0].alt}
             fill
+            loading={imageLoading}
             sizes="(max-width: 600px) 50vw, (max-width: 1024px) 33vw, 25vw"
             style={{ objectFit: "cover", opacity: hovered ? 0 : 1 }}
           />
@@ -79,6 +80,7 @@ export function ProductCard({ product }: Readonly<{ product: Product }>) {
             src={product.hoverImage.src}
             alt={product.hoverImage.alt}
             fill
+            loading="lazy"
             sizes="(max-width: 600px) 50vw, (max-width: 1024px) 33vw, 25vw"
             style={{ objectFit: "cover", opacity: hovered ? 1 : 0 }}
           />

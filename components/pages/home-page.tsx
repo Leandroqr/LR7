@@ -38,7 +38,7 @@ function TrainingSection({ product }: Readonly<{ product: Product }>) {
           </div>
         </div>
       </div>
-      <style>{`.editorial-grid { grid-template-columns: 1fr 1fr !important; } @media(max-width:1000px) { .editorial-grid { grid-template-columns: 1fr !important; gap: 2rem !important; } }`}</style>
+      <style>{`.editorial-grid { grid-template-columns: 1fr 1fr !important; } @media(max-width:1000px) { .editorial-grid { grid-template-columns: 1fr !important; gap: 2rem !important; } } @media(max-width:600px) { .editorial-grid > div:first-child { padding-left: 0 !important; } }`}</style>
     </section>
   );
 }

@@ -32,7 +32,6 @@ export function NewsletterPremium() {
           src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1920&h=1080&fit=crop&auto=format"
           alt="Futbolista en acción"
           fill
-          priority={false}
           sizes="100vw"
           style={{ objectFit: "cover" }}
         />

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { HomePage } from "@/components/pages/home-page";
 import { getPublicProducts } from "@/lib/catalog";
 import { getHomeContent } from "@/lib/content";
+import { serializeJsonLd } from "@/lib/seo";
 import { SITE_CONFIG } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -74,9 +75,9 @@ export default async function Page() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
-      {featuredProduct ? <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(featuredProductJsonLd) }} /> : null}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(organizationJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(websiteJsonLd) }} />
+      {featuredProduct ? <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(featuredProductJsonLd) }} /> : null}
       <HomePage products={products} homeSlides={homeContent.slides} homeSections={homeContent.sections} />
     </>
   );

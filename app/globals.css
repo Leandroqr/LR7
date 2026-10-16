@@ -5571,6 +5571,7 @@ input:disabled {
 .managed-home-section { padding: 5rem 2rem; background: var(--color-primary-dark); color: var(--color-white); }
 .managed-home-section > div { width: min(100%, 920px); margin: 0 auto; }
 .managed-home-section h2 { margin: 0 0 1rem; }
+.managed-home-section .home-section-title { color: var(--color-white); }
 .managed-home-section p:not(.home-section-label) { max-width: 620px; margin: 0 0 1.5rem; color: rgba(245, 247, 248, 0.72); line-height: 1.7; }
 
 @media (max-width: 1050px) {

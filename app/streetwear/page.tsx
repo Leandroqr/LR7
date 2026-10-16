@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { StreetwearExperience } from "@/components/pages/streetwear-page";
 import { getPublicProducts } from "@/lib/catalog";
+import { serializeJsonLd } from "@/lib/seo";
 import { SITE_CONFIG } from "@/lib/site";
 
 const socialImage = "https://images.unsplash.com/photo-1781863074773-836134430654?w=1600&h=900&fit=crop&auto=format";
@@ -60,7 +61,7 @@ export default async function StreetwearPage() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replaceAll("<", String.raw`\u003c`) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }}
       />
       <StreetwearExperience products={products} />
     </>

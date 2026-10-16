@@ -4,7 +4,7 @@ import { getPublicProducts } from "@/lib/catalog";
 import { SITE_CONFIG } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: `Fútbol - Camisetas Premium de Fútbol | ${SITE_CONFIG.name}`,
+  title: "Fútbol - Camisetas Premium de Fútbol",
   description:
     "Descubre nuestra colección de camisetas de fútbol premium. Selecciones, clubes, retro y camisetas personalizadas de alto rendimiento.",
   alternates: {
@@ -23,7 +23,7 @@ type FutbolPageProps = {
   searchParams: Promise<{ cat?: string }>;
 };
 
-export default async function FutbolPage({ searchParams }: FutbolPageProps) {
+export default async function FutbolPage({ searchParams }: Readonly<FutbolPageProps>) {
   const [{ cat }, products] = await Promise.all([searchParams, getPublicProducts()]);
   return <CatalogPage initialCategory={cat} brand="FUTBOL" products={products} />;
 }
