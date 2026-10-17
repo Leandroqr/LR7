@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PersonalizationStudio } from "@/components/pages/personalization-studio";
 import { getPublicProducts } from "@/lib/catalog";
+import { getStockedPersonalizationSkus } from "@/lib/catalog/personalization-stock";
 import { PRODUCTS } from "@/lib/products";
 import { SITE_CONFIG } from "@/lib/site";
 
@@ -32,6 +33,7 @@ export default async function PersonalizaPage({ searchParams }: Readonly<Persona
   const products = catalogProducts.length
     ? catalogProducts
     : PRODUCTS.filter((product) => product.personalizable);
+  const stockedVariantSkus = await getStockedPersonalizationSkus(products.map((product) => product.slug));
 
-  return <PersonalizationStudio products={products} initialProductSlug={producto} />;
+  return <PersonalizationStudio products={products} initialProductSlug={producto} stockedVariantSkus={stockedVariantSkus} />;
 }

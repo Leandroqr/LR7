@@ -73,7 +73,7 @@ export function HomePage({ products, homeSlides, homeSections }: Readonly<{ prod
       {newDropProducts.length > 0 ? <NewDropSection products={newDropProducts} /> : null}
       <BenefitsStrip />
       {trainingProduct ? <TrainingSection product={trainingProduct} /> : null}
-      {homeSections?.length ? <ManagedHomeSections sections={homeSections} /> : null}
+      {/* {homeSections?.length ? <ManagedHomeSections sections={homeSections} /> : null} */}
     </>
   );
 }

@@ -51,8 +51,8 @@
 }
 
 .personalizer-header {
-  min-height: 390px;
-  padding: 150px max(2rem, calc((100vw - 1376px) / 2)) 4rem;
+  min-height: 300px;
+  padding: 112px max(2rem, calc((100vw - 1376px) / 2)) 2.5rem;
   background:
     linear-gradient(rgba(245, 247, 248, 0.035) 1px, transparent 1px),
     linear-gradient(90deg, rgba(245, 247, 248, 0.035) 1px, transparent 1px),
@@ -62,7 +62,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.6fr);
   align-items: end;
-  gap: 4rem;
+  gap: 2.5rem;
 }
 
 .personalizer-header > p,
@@ -78,7 +78,7 @@
 
 .personalizer-header h1 {
   margin: 0;
-  font-size: 5.5rem;
+  font-size: 4.8rem;
   font-style: italic;
   font-weight: 900;
   line-height: 0.82;
@@ -100,19 +100,16 @@
 .personalizer-preview {
   position: sticky;
   top: 80px;
-  min-height: 760px;
+  min-height: min(760px, calc(100vh - 80px));
   padding: 1.5rem 2rem 2rem;
   overflow: hidden;
-  background:
-    radial-gradient(circle at 50% 42%, rgba(255, 106, 0, 0.09), transparent 36%),
-    var(--color-deep-navy);
+  background: linear-gradient(145deg, #0d1f38 0%, #071426 72%);
   color: var(--color-off-white);
   display: grid;
-  grid-template-rows: auto auto 1fr auto;
+  grid-template-rows: auto auto minmax(360px, 1fr) auto;
 }
 
-.personalizer-preview::before,
-.personalizer-preview::after {
+.personalizer-preview::before {
   content: "";
   position: absolute;
   pointer-events: none;
@@ -122,15 +119,6 @@
   inset: 0;
   background-image: linear-gradient(rgba(245, 247, 248, 0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(245, 247, 248, 0.035) 1px, transparent 1px);
   background-size: 56px 56px;
-}
-
-.personalizer-preview::after {
-  width: 180px;
-  height: 180px;
-  right: -90px;
-  bottom: 65px;
-  border: 1px solid rgba(255, 106, 0, 0.45);
-  border-radius: 50%;
 }
 
 .personalizer-preview-topline,
@@ -150,8 +138,13 @@
 .personalizer-view-switch button { min-width: 92px; min-height: 38px; padding: 0.5rem 0.8rem; border: 0; background: transparent; color: rgba(245, 247, 248, 0.62); font-family: var(--font-display), sans-serif; font-size: 0.66rem; font-weight: 800; letter-spacing: 0.1em; cursor: pointer; }
 .personalizer-view-switch button.is-selected { background: var(--color-off-white); color: var(--color-primary-dark); }
 
-.personalizer-jersey { min-height: 490px; display: grid; place-items: center; animation: personalizer-preview-in 180ms ease-out; }
-.personalizer-jersey svg { max-width: 470px !important; max-height: 520px; }
+.personalizer-jersey { position: relative; min-width: 0; min-height: 420px; padding: 1.25rem 0; display: grid; place-items: center; }
+.personalizer-product-photo { position: relative; width: min(100%, 520px); height: min(100%, 560px); min-height: 360px; aspect-ratio: 4 / 5; margin: 0; overflow: hidden; background: rgba(255, 255, 255, 0.04); }
+.personalizer-product-photo img { object-fit: contain !important; }
+.personalizer-product-photo figcaption { position: absolute; right: 0; bottom: 0; left: 0; padding: 0.65rem 0.8rem; background: rgba(7, 20, 38, 0.84); color: rgba(245, 247, 248, 0.78); font-family: var(--font-display), sans-serif; font-size: 0.58rem; font-weight: 700; letter-spacing: 0.07em; }
+.personalizer-schematic-wrap { position: relative; width: min(100%, 500px); height: 100%; min-height: 360px; display: grid; place-items: center; }
+.personalizer-schematic-label { position: absolute; top: 0.3rem; color: rgba(245, 247, 248, 0.62); font-family: var(--font-display), sans-serif; font-size: 0.58rem; font-weight: 800; letter-spacing: 0.1em; text-align: center; }
+.personalized-jersey-schematic { width: min(100%, 440px); max-height: 520px; overflow: visible; }
 .personalizer-preview-caption { padding-top: 1.2rem; border-top: 1px solid rgba(245, 247, 248, 0.13); display: flex; justify-content: space-between; align-items: end; gap: 2rem; }
 .personalizer-preview-caption span { display: block; margin-bottom: 0.35rem; color: var(--color-accent-orange); font-family: var(--font-display), sans-serif; font-size: 0.58rem; font-weight: 800; letter-spacing: 0.12em; }
 .personalizer-preview-caption strong { font-family: var(--font-display), sans-serif; font-size: 1.2rem; font-style: italic; text-transform: uppercase; }
@@ -162,15 +155,19 @@
 .personalizer-controls-heading > p { margin: 0 0 0.55rem; }
 .personalizer-controls-heading h2 { margin: 0; font-size: 3.6rem; font-style: italic; font-weight: 900; line-height: 0.9; }
 
-.personalizer-product-picker { min-width: 0; margin: 0 0 2.2rem; padding: 0; border: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
-.personalizer-product-picker button { min-width: 0; min-height: 74px; padding: 0.45rem; border: 1px solid #dce1e6; background: var(--color-off-white); color: var(--color-primary-dark); display: grid; grid-template-columns: 48px minmax(0, 1fr) 20px; align-items: center; gap: 0.7rem; text-align: left; cursor: pointer; transition: border-color 160ms ease, background 160ms ease; }
-.personalizer-product-picker button.is-selected { border-color: var(--color-accent-orange); background: #fff7f2; }
-.personalizer-product-picker img { width: 48px; height: 58px; object-fit: cover; }
+.personalizer-product-picker { min-width: 0; margin: 0; padding: 0; border: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.55rem; }
+.personalizer-product-picker button { min-width: 0; min-height: 94px; padding: 0.45rem 0.55rem; border: 1px solid #cbd3da; background: #fff; color: var(--color-primary-dark); display: grid; grid-template-columns: 64px minmax(0, 1fr) 18px; align-items: center; gap: 0.65rem; text-align: left; cursor: pointer; transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease; }
+.personalizer-product-picker button:hover:not(:disabled) { border-color: var(--color-accent-orange); box-shadow: 0 5px 14px rgba(7, 20, 38, 0.08); }
+.personalizer-product-picker button:focus-visible,.personalizer-view-switch button:focus-visible,.personalizer-sizes button:focus-visible,.personalizer-colors button:focus-visible { outline: 3px solid var(--color-accent-orange); outline-offset: 2px; }
+.personalizer-product-picker button.is-selected { border-color: var(--color-accent-orange); background: #fff7f2; box-shadow: inset 0 0 0 1px var(--color-accent-orange); }
+.personalizer-product-picker button:disabled { opacity: 0.52; cursor: not-allowed; }
+.personalizer-product-picker img { width: 64px; height: 80px; object-fit: contain; background: var(--color-off-white); }
 .personalizer-product-picker strong,
 .personalizer-product-picker small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .personalizer-product-picker strong { font-family: var(--font-display), sans-serif; font-size: 0.74rem; text-transform: uppercase; }
 .personalizer-product-picker small { margin-top: 0.25rem; color: #5d6671; font-size: 0.66rem; }
 .personalizer-product-picker b { color: var(--color-accent-orange-text); text-align: center; }
+.personalizer-product-picker button:not(.is-selected) b { color: transparent; }
 
 .personalizer-step { padding: 1.6rem 0 1.8rem; border-top: 1px solid #dce1e6; }
 .personalizer-step > header { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; align-items: center; gap: 0.8rem; }
@@ -184,6 +181,12 @@
 .personalizer-sizes button:hover { border-color: var(--color-accent-orange); }
 .personalizer-sizes button.is-selected { border: 2px solid var(--color-accent-orange); background: #fff7f2; color: var(--color-accent-orange-text); transform: translateY(-2px); }
 .personalizer-sizes button span { position: absolute; top: 3px; right: 5px; color: var(--color-accent-orange-text); font-size: 0.6rem; }
+.personalizer-sizes button:disabled { opacity: 0.45; cursor: not-allowed; }
+.personalizer-colors { margin: 0; padding: 0; border: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.personalizer-colors button { min-height: 44px; padding: 0.65rem 0.9rem; border: 1px solid #bfc7cf; background: #fff; color: var(--color-primary-dark); font-family: var(--font-display), sans-serif; font-size: 0.72rem; font-weight: 800; text-transform: uppercase; cursor: pointer; }
+.personalizer-colors button.is-selected { border-color: var(--color-accent-orange); background: #fff7f2; color: var(--color-accent-orange-text); }
+.personalizer-colors button:disabled { opacity: 0.45; cursor: not-allowed; }
+.personalizer-stock-note { margin: 0.7rem 0 0; color: #606b76; font-size: 0.65rem; line-height: 1.45; }
 
 .personalizer-label { display: block; margin-bottom: 0.5rem; color: #424d58; font-size: 0.66rem; font-weight: 600; }
 .personalizer-step input { width: 100%; min-height: 58px; padding: 0.8rem 1rem; border: 1px solid #bfc7cf; border-radius: 0; background: var(--color-off-white); color: var(--color-primary-dark); font-family: var(--font-display), sans-serif; font-size: 1.25rem; font-weight: 800; text-transform: uppercase; outline: none; transition: border-color 150ms ease, box-shadow 150ms ease; }
@@ -216,6 +219,7 @@
 .personalizer-purchase > button:hover { background: var(--color-accent-orange-hover); transform: translateY(-1px); }
 .personalizer-purchase > button:active { transform: translateY(1px); }
 .personalizer-purchase > button[aria-disabled="true"] { border-color: #aeb6bf; background: #d8dde2; color: #515b65; }
+.personalizer-purchase > button:focus-visible,.personalizer-mobile-dock button:focus-visible { outline: 3px solid var(--color-accent-blue); outline-offset: 3px; }
 .personalizer-purchase > button.is-added,
 .personalizer-mobile-dock button.is-added { border-color: #17652d; background: #17652d; color: #fff; }
 .personalizer-purchase > p { min-height: 18px; margin: 0.55rem 0 0; color: #59646f; font-size: 0.66rem; text-align: center; }
@@ -239,21 +243,26 @@
 }
 
 @media (max-width: 900px) {
-  .personalizer-page { padding-bottom: 84px; }
+  .personalizer-page { padding-bottom: 0; }
   body.personalizer-route .whatsapp-float { right: max(16px, env(safe-area-inset-right)); bottom: calc(92px + env(safe-area-inset-bottom)); }
   .personalizer-header { min-height: 330px; padding: 130px 1.5rem 3rem; grid-template-columns: 1fr; gap: 1.5rem; }
   .personalizer-header > p { margin-bottom: -0.5rem; }
   .personalizer-header h1 { font-size: 4rem; }
   .personalizer-header > div { max-width: 480px; }
   .personalizer-shell { display: block; }
-  .personalizer-preview { position: relative; top: 0; z-index: 4; min-height: 0; height: 390px; padding: 1rem 1.5rem; grid-template-rows: auto auto 1fr; box-shadow: 0 14px 30px rgba(7, 20, 38, 0.2); }
+  .personalizer-preview { position: relative; top: 0; z-index: 4; min-height: 0; height: 500px; padding: 1rem 1.5rem; grid-template-rows: auto auto minmax(0, 1fr) auto; box-shadow: 0 14px 30px rgba(7, 20, 38, 0.2); }
   .personalizer-view-switch { margin-top: 0.7rem; }
-  .personalizer-jersey { min-height: 0; }
-  .personalizer-jersey svg { width: auto !important; max-width: 100% !important; height: 270px; }
-  .personalizer-preview-caption { display: none; }
+  .personalizer-jersey { min-height: 0; padding: 0.7rem 0; }
+  .personalizer-product-photo { width: auto; height: 100%; min-height: 0; max-width: 100%; aspect-ratio: 4 / 5; }
+  .personalizer-product-photo figcaption { padding: 0.45rem 0.6rem; font-size: 0.52rem; }
+  .personalizer-schematic-wrap { width: 100%; min-height: 0; }
+  .personalized-jersey-schematic { width: auto; height: 100%; max-width: 100%; max-height: 350px; }
+  .personalizer-preview-caption { display: flex; padding-top: 0.7rem; gap: 0.5rem; }
+  .personalizer-preview-caption strong { font-size: 0.9rem; }
+  .personalizer-preview-caption p { display: none; }
   .personalizer-controls { padding: 3rem 1.5rem 5rem; }
   .personalizer-controls-heading h2 { font-size: 3rem; }
-  .personalizer-mobile-dock { position: fixed; z-index: 20; right: 0; bottom: 0; left: 0; min-height: 76px; padding: 0.65rem max(1rem, env(safe-area-inset-right)) calc(0.65rem + env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left)); border-top: 1px solid #dce1e6; background: rgba(245, 247, 248, 0.97); display: grid; grid-template-columns: auto minmax(190px, 1fr); align-items: center; gap: 1rem; box-shadow: 0 -10px 28px rgba(7, 20, 38, 0.12); }
+  .personalizer-mobile-dock { position: static; z-index: auto; min-height: 76px; margin: 1rem 1rem 0; padding: 0.65rem max(0.5rem, env(safe-area-inset-right)) calc(0.65rem + env(safe-area-inset-bottom)) max(0.5rem, env(safe-area-inset-left)); border-top: 1px solid #dce1e6; background: rgba(245, 247, 248, 0.97); display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 1rem; }
   .personalizer-mobile-dock div span { display: block; color: #606b76; font-size: 0.55rem; font-weight: 600; }
   .personalizer-mobile-dock div strong { display: block; margin-top: 0.15rem; color: var(--color-primary-dark); font-family: var(--font-display), sans-serif; font-size: 1.2rem; }
   .personalizer-mobile-dock button { min-height: 48px; padding: 0.6rem 0.8rem; border: 1px solid var(--color-accent-orange); background: var(--color-accent-orange); color: var(--color-primary-dark); font-family: var(--font-display), sans-serif; font-size: 0.72rem; font-weight: 900; }
@@ -263,6 +272,11 @@
 @media (max-width: 520px) {
   .personalizer-header { min-height: 290px; padding-top: 112px; }
   .personalizer-header h1 { font-size: 3.1rem; }
+  .personalizer-preview { height: 430px; padding: 0.85rem 1rem; }
+  .personalizer-product-picker { grid-template-columns: 1fr; }
+  .personalizer-product-picker button { min-height: 88px; }
+  .personalizer-sizes { grid-template-columns: repeat(5, minmax(44px, 1fr)); gap: 0.35rem; }
+  .personalizer-sizes button { min-height: 48px; }
 }
 
 /* Football-inspired streetwear collection */
@@ -5253,7 +5267,6 @@ input:disabled {
     padding: 1.5rem;
   }
 
-  .cart-summary .cart-checkout-button,
   .cart-summary .cart-checkout-status {
     display: none;
   }
