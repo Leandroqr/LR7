@@ -1,7 +1,11 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { AdminMutationForm } from "@/components/admin/admin-crud";
 import type { CategoryRow, ProductRow } from "@/types/database";
 
 type ProductFormProps = Readonly<{
-  action: (formData: FormData) => void | Promise<void>;
+  action: (formData: FormData) => unknown;
   product?: ProductRow;
   categories: CategoryRow[];
   primaryCategoryId?: string | null;
@@ -9,8 +13,18 @@ type ProductFormProps = Readonly<{
 }>;
 
 export function ProductForm({ action, product, categories, primaryCategoryId, submitLabel }: ProductFormProps) {
+  const router = useRouter();
+
   return (
-    <form action={action} className="admin-form admin-form-grid">
+    <AdminMutationForm
+      action={action}
+      successMessage={product ? "Producto actualizado." : "Producto creado."}
+      onSuccess={(result) => {
+        if (!product && typeof result === "string") router.push(`/admin/products/${encodeURIComponent(result)}`);
+        else router.refresh();
+      }}
+      className="admin-form admin-form-grid"
+    >
       <label><span>NOMBRE</span><input name="name" defaultValue={product?.name} required minLength={2} /></label>
       <label><span>SLUG</span><input name="slug" defaultValue={product?.slug} required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" /></label>
       <label><span>PRECIO COP</span><input name="price" type="number" min="0" step="1" defaultValue={product?.price} required /></label>
@@ -32,6 +46,6 @@ export function ProductForm({ action, product, categories, primaryCategoryId, su
         <label><input name="active" type="checkbox" defaultChecked={product?.active ?? true} /> Activo</label>
       </div>
       <button type="submit" className="admin-primary admin-form-full">{submitLabel}</button>
-    </form>
+    </AdminMutationForm>
   );
 }

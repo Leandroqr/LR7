@@ -157,10 +157,6 @@ export function ProductPage({ product, relatedProducts }: ProductPageProps) {
               <p className="product-price-note">Precio en COP · IVA incluido</p>
             </header>
 
-            <p className="product-description">
-              {product.description}
-            </p>
-
             <fieldset className="product-size-selector">
               <legend>
                 TALLA SELECCIONADA: <span style={{ color: "var(--color-accent)" }}>{size || "—"}</span>
@@ -289,6 +285,10 @@ export function ProductPage({ product, relatedProducts }: ProductPageProps) {
                 <Link href="/cambios-y-devoluciones">CAMBIOS</Link>
               </div>
             </section>
+
+            <p className="product-description">
+              {product.description}
+            </p>
           </section>
         </div>
 

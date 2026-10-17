@@ -15,6 +15,9 @@ type WompiCheckoutProps = Readonly<{
   amountInCents: number;
   currency: "COP";
   signature: string;
+  redirectUrl: string;
+  customerData: { email: string; fullName: string; phoneNumber: string; phoneNumberPrefix: "+57" };
+  shippingAddress: { addressLine1: string; addressLine2?: string; city: string; region: string; country: "CO"; phoneNumber: string; name: string };
   onTransaction?: (transaction: WompiTransaction) => void;
 }>;
 
@@ -24,6 +27,9 @@ type WompiWidget = new (options: {
   reference: string;
   publicKey: string;
   signature: { integrity: string };
+  redirectUrl: string;
+  customerData: { email: string; fullName: string; phoneNumber: string; phoneNumberPrefix: "+57" };
+  shippingAddress: { addressLine1: string; addressLine2?: string; city: string; region: string; country: "CO"; phoneNumber: string; name: string };
 }) => {
   open: (callback: (result: { transaction?: WompiTransaction }) => void) => void;
 };
@@ -34,15 +40,26 @@ declare global {
   }
 }
 
+function getWidgetButtonLabel(scriptReady: boolean, scriptError: boolean) {
+  if (scriptReady) return "ABRIR PAGO SEGURO";
+  if (scriptError) return "WOMPI NO DISPONIBLE";
+  return "CARGANDO WOMPI...";
+}
+
 export function WompiCheckout({
   publicKey,
   reference,
   amountInCents,
   currency,
   signature,
+  redirectUrl,
+  customerData,
+  shippingAddress,
   onTransaction,
 }: WompiCheckoutProps) {
   const [scriptReady, setScriptReady] = useState(false);
+  const [scriptError, setScriptError] = useState(false);
+  const buttonLabel = getWidgetButtonLabel(scriptReady, scriptError);
 
   const openCheckout = () => {
     if (!window.WidgetCheckout) return;
@@ -53,10 +70,13 @@ export function WompiCheckout({
       reference,
       publicKey,
       signature: { integrity: signature },
+      redirectUrl,
+      customerData,
+      shippingAddress,
     });
 
     checkout.open(({ transaction }) => {
-      if (transaction) onTransaction?.(transaction);
+      onTransaction?.(transaction ?? {});
     });
   };
 
@@ -66,10 +86,12 @@ export function WompiCheckout({
         src="https://checkout.wompi.co/widget.js"
         strategy="afterInteractive"
         onLoad={() => setScriptReady(true)}
+        onError={() => setScriptError(true)}
       />
-      <button type="button" onClick={openCheckout} disabled={!scriptReady}>
-        CONTINUAR AL PAGO <span aria-hidden="true">→</span>
+      <button type="button" className="cart-checkout-button" onClick={openCheckout} disabled={!scriptReady}>
+        {buttonLabel} <span aria-hidden="true">→</span>
       </button>
+      {scriptError ? <p className="checkout-feedback is-error" role="alert">No se pudo cargar el checkout seguro de Wompi. El pedido conserva su estado para reintentar más tarde.</p> : null}
     </>
   );
 }

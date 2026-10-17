@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start -p ${PORT:-3000}",
     "lint": "eslint app components lib types --ext .ts,.tsx",
-    "test": "node --experimental-strip-types --test tests/payments/wompi.test.mjs tests/seo.test.mjs",
+    "test": "node --experimental-strip-types --test tests/payments/wompi.test.mjs tests/payments/wompi-config.test.mjs tests/payments/wompi-transactions.test.mjs tests/payments/wompi-events.test.mjs tests/payments/wompi-api.test.mjs tests/payments/order-access.test.mjs tests/http-read-limited-body.test.mjs tests/seo.test.mjs tests/admin-mutation-guard.test.mjs tests/admin-validation.test.mjs tests/checkout-cart.test.mjs tests/product-image-validation.test.mjs tests/product-image-path.test.mjs tests/order-ownership.test.mjs",
+    "test:db": "node tests/payments/postgres.integration.mjs",
     "format": "oxfmt"
   },
   "dependencies": {

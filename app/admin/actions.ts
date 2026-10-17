@@ -2,7 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireAdmin } from "@/lib/auth/admin";
+import { isRemoteProductImagePath } from "@/lib/admin/product-images";
+import { isAdminPreviewEnabled, requireAdmin as requireAdminSession } from "@/lib/auth/admin";
+import { assertAdminMutationAllowed } from "@/lib/auth/admin-mutation-guard";
+import { getProductImageExtension } from "@/lib/validation/product-image";
 import type { Json } from "@/types/database";
 import {
   categorySchema,
@@ -12,7 +15,7 @@ import {
   homeSlideSchema,
   inventorySchema,
   navigationSchema,
-  orderStatusSchema,
+  fulfillmentStatusSchema,
   productSchema,
   subscriberStatusSchema,
   siteSettingSchema,
@@ -20,12 +23,21 @@ import {
   variantSchema,
 } from "@/lib/validation/admin";
 
+async function requireAdmin() {
+  assertAdminMutationAllowed(isAdminPreviewEnabled());
+  return requireAdminSession();
+}
+
 function value(formData: FormData, key: string) {
   return formData.get(key) ?? "";
 }
 
-function throwMutationError(error: { message: string } | null) {
-  if (error) throw new Error(error.message);
+function throwMutationError(error: { code?: string; message: string } | null) {
+  if (!error) return;
+  if (error.code === "23505") throw new Error("Ya existe un registro con esos datos.");
+  if (error.code === "23503") throw new Error("Una referencia seleccionada ya no existe.");
+  if (error.code === "23514") throw new Error("Uno de los valores no cumple las reglas del catálogo.");
+  throw new Error("No fue posible guardar los cambios. Revisa los datos e inténtalo de nuevo.");
 }
 
 function jsonValue(formData: FormData, key: string): Json {
@@ -63,11 +75,15 @@ export async function createProduct(formData: FormData) {
     const { error: categoryError } = await supabase
       .from("product_categories")
       .insert({ product_id: data.id, category_id, is_primary: true });
-    throwMutationError(categoryError);
+    if (categoryError) {
+      const { error: rollbackError } = await supabase.from("products").delete().eq("id", data.id);
+      if (rollbackError) throw new Error("No se pudo asignar la categoría ni revertir el producto. Contacta con soporte.");
+      throwMutationError(categoryError);
+    }
   }
 
   revalidatePath("/admin/products");
-  redirect(`/admin/products/${data.id}`);
+  return data.id;
 }
 
 export async function updateProduct(productId: string, formData: FormData) {
@@ -129,12 +145,13 @@ export async function uploadProductImage(productId: string, formData: FormData) 
   const rawAltText = formData.get("alt_text");
   const altText = typeof rawAltText === "string" ? rawAltText.trim() : "";
   if (!(file instanceof File) || file.size === 0) throw new Error("Selecciona una imagen.");
-  if (!file.type.startsWith("image/") || file.size > 5 * 1024 * 1024) {
+  const signature = new Uint8Array(await file.slice(0, 12).arrayBuffer());
+  const extension = getProductImageExtension(file.type, file.size, signature);
+  if (!extension) {
     throw new Error("La imagen debe ser JPEG, PNG, WebP o AVIF y pesar máximo 5 MB.");
   }
   if (!altText || altText.length > 240) throw new Error("El texto alternativo es obligatorio.");
 
-  const extension = file.name.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "") || "webp";
   const path = `${productId}/${crypto.randomUUID()}.${extension}`;
   const { error: uploadError } = await supabase.storage.from("products").upload(path, file, {
     contentType: file.type,
@@ -155,12 +172,23 @@ export async function uploadProductImage(productId: string, formData: FormData) 
   revalidatePath(`/admin/products/${productId}`);
 }
 
-export async function deleteProductImage(imageId: string, productId: string, storagePath: string) {
+export async function deleteProductImage(imageId: string, productId: string) {
   const { supabase } = await requireAdmin();
-  const { error } = await supabase.from("product_images").delete().eq("id", imageId);
+  const { data: image, error: lookupError } = await supabase
+    .from("product_images")
+    .select("product_id, storage_path")
+    .eq("id", imageId)
+    .maybeSingle();
+  throwMutationError(lookupError);
+  if (image?.product_id !== productId) throw new Error("La imagen ya no pertenece a este producto.");
+
+  if (!isRemoteProductImagePath(image.storage_path)) {
+    const { error: storageError } = await supabase.storage.from("products").remove([image.storage_path]);
+    throwMutationError(storageError);
+  }
+
+  const { error } = await supabase.from("product_images").delete().eq("id", imageId).eq("product_id", productId);
   throwMutationError(error);
-  const { error: storageError } = await supabase.storage.from("products").remove([storagePath]);
-  throwMutationError(storageError);
   revalidatePath(`/admin/products/${productId}`);
 }
 
@@ -186,7 +214,11 @@ export async function createVariant(productId: string, formData: FormData) {
   const { error: inventoryError } = await supabase
     .from("inventory")
     .insert({ variant_id: data.id, stock, low_stock_threshold });
-  throwMutationError(inventoryError);
+  if (inventoryError) {
+    const { error: rollbackError } = await supabase.from("product_variants").delete().eq("id", data.id);
+    if (rollbackError) throw new Error("No se pudo crear el inventario ni revertir la variante. Contacta con soporte.");
+    throwMutationError(inventoryError);
+  }
   revalidatePath(`/admin/products/${productId}`);
   revalidatePath("/admin/inventory");
 }
@@ -399,8 +431,11 @@ export async function deleteNavigationItem(id: string) {
 
 export async function updateOrderStatus(orderId: string, formData: FormData) {
   const { supabase } = await requireAdmin();
-  const status = orderStatusSchema.parse(value(formData, "status"));
-  const { error } = await supabase.from("orders").update({ status }).eq("id", orderId);
+  const status = fulfillmentStatusSchema.parse(value(formData, "status"));
+  const { error } = await supabase.rpc("set_order_fulfillment_status", {
+    target_order_id: orderId,
+    new_status: status,
+  });
   throwMutationError(error);
   revalidatePath("/admin/orders");
 }

@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { WhatsAppLink } from "@/components/commerce/whatsapp-link";
+import { CheckoutPanel } from "@/components/commerce/checkout-panel";
 import { type CartItem, useStore } from "@/components/providers/store-provider";
 import { CUSTOM_PRICE, formatCurrency, PRODUCTS } from "@/lib/products";
 import { isWhatsAppConfigured } from "@/lib/site";
@@ -191,14 +192,9 @@ export default function CartPage() {
               <strong>${formatCurrency(subtotal)}</strong>
             </div>
 
-            <button type="button" className="cart-checkout-button" disabled aria-describedby="checkout-status">
-              CONTINUAR AL PAGO <span aria-hidden="true">→</span>
-            </button>
-            <p id="checkout-status" className="cart-checkout-status">
-              {hasInvalidVariant
-                ? "Revisa la disponibilidad de tus productos antes de continuar."
-                : "El pago online estará disponible próximamente. Tu carrito queda guardado en este dispositivo."}
-            </p>
+            {hasInvalidVariant
+              ? <p className="cart-checkout-status" role="alert">Revisa la disponibilidad de tus productos antes de continuar.</p>
+              : <CheckoutPanel cart={currentCart} />}
 
             <Link href="/tienda" className="cart-continue-shopping">SEGUIR COMPRANDO</Link>
 
@@ -226,7 +222,9 @@ export default function CartPage() {
 
         <div className="cart-mobile-checkout" aria-label="Resumen y pago">
           <div><span>TOTAL</span><strong>${formatCurrency(subtotal)}</strong></div>
-          <button type="button" disabled>CONTINUAR AL PAGO <span aria-hidden="true">→</span></button>
+          <button type="button" disabled={hasInvalidVariant} onClick={() => document.querySelector<HTMLElement>(".checkout-panel:not([hidden])")?.scrollIntoView({ behavior: "smooth", block: "center" })}>
+            CONTINUAR AL PAGO <span aria-hidden="true">→</span>
+          </button>
         </div>
       </div>
     </div>

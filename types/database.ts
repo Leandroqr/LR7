@@ -132,6 +132,15 @@ export type Database = {
           customer_name: string;
           customer_phone: string | null;
           shipping_information: Json;
+          checkout_idempotency_key: string | null;
+          checkout_payload_hash: string | null;
+          public_access_token_hash: string | null;
+          reservation_expires_at: string | null;
+          fulfillment_status: "unfulfilled" | "processing" | "shipped" | "delivered" | "cancelled";
+          fulfillment_hold: boolean;
+          fulfillment_hold_reason: string | null;
+          coupon_usage_reserved: boolean;
+          coupon_redeemed_at: string | null;
         },
         {
           id?: string;
@@ -147,6 +156,15 @@ export type Database = {
           customer_name: string;
           customer_phone?: string | null;
           shipping_information: Json;
+          checkout_idempotency_key?: string | null;
+          checkout_payload_hash?: string | null;
+          public_access_token_hash?: string | null;
+          reservation_expires_at?: string | null;
+          fulfillment_status?: "unfulfilled" | "processing" | "shipped" | "delivered" | "cancelled";
+          fulfillment_hold?: boolean;
+          fulfillment_hold_reason?: string | null;
+          coupon_usage_reserved?: boolean;
+          coupon_redeemed_at?: string | null;
           created_at?: string;
           updated_at?: string;
         }
@@ -156,8 +174,16 @@ export type Database = {
         { id?: string; order_id: string; product_id?: string | null; variant_id?: string | null; product_name: string; sku: string; size?: string | null; color?: string | null; quantity: number; unit_price: number; personalization?: Json; line_total: number; created_at?: string }
       >;
       payments: Table<
-        Timestamped & { id: string; order_id: string; provider: PaymentProvider; transaction_id: string | null; status: PaymentStatus; amount: number; currency: string; metadata: Json },
-        { id?: string; order_id: string; provider: PaymentProvider; transaction_id?: string | null; status?: PaymentStatus; amount: number; currency?: string; metadata?: Json; created_at?: string; updated_at?: string }
+        Timestamped & { id: string; order_id: string; provider: PaymentProvider; transaction_id: string | null; status: PaymentStatus; amount: number; currency: string; metadata: Json; reference: string | null; environment: "sandbox" | "production" | null; attempt_idempotency_key: string | null; last_event_timestamp: number | null },
+        { id?: string; order_id: string; provider: PaymentProvider; transaction_id?: string | null; status?: PaymentStatus; amount: number; currency?: string; metadata?: Json; reference?: string | null; environment?: "sandbox" | "production" | null; attempt_idempotency_key?: string | null; last_event_timestamp?: number | null; created_at?: string; updated_at?: string }
+      >;
+      inventory_reservations: Table<
+        { order_id: string; variant_id: string; quantity: number; state: "reserved" | "committed" | "released"; expires_at: string; created_at: string; updated_at: string },
+        { order_id: string; variant_id: string; quantity: number; state: "reserved" | "committed" | "released"; expires_at: string; created_at?: string; updated_at?: string }
+      >;
+      wompi_event_receipts: Table<
+        { event_key: string; source: "webhook" | "reconciliation"; payment_reference: string | null; transaction_id: string | null; wompi_status: string | null; event_timestamp: number | null; result: string; received_at: string; processed_at: string | null },
+        { event_key: string; source: "webhook" | "reconciliation"; payment_reference?: string | null; transaction_id?: string | null; wompi_status?: string | null; event_timestamp?: number | null; result?: string; received_at?: string; processed_at?: string | null }
       >;
       coupons: Table<
         Timestamped & { id: string; code: string; discount_type: "percent" | "fixed"; discount_value: number; minimum_order: number; maximum_discount: number | null; usage_limit: number | null; usage_count: number; starts_at: string | null; ends_at: string | null; active: boolean },
@@ -192,6 +218,11 @@ export type Database = {
     Functions: {
       is_admin: { Args: never; Returns: boolean };
       set_user_role: { Args: { target_user_id: string; new_role: UserRole }; Returns: undefined };
+      start_wompi_checkout: { Args: { p_idempotency_key: string; p_payload_hash: string; p_access_token_hash: string; p_attempt_idempotency_key: string; p_user_id: string | null; p_customer_email: string; p_customer_name: string; p_customer_phone: string; p_shipping_information: Json; p_items: Json; p_coupon_code: string | null; p_environment: string }; Returns: Json };
+      apply_wompi_transaction: { Args: { p_event_key: string; p_source: "webhook" | "reconciliation"; p_reference: string; p_transaction_id: string; p_wompi_status: string; p_amount_in_cents: number; p_currency: string; p_environment: string; p_event_timestamp: number }; Returns: Json };
+      expire_wompi_checkout_reservations: { Args: { batch_size?: number }; Returns: number };
+      expire_wompi_checkout_order: { Args: { target_order_id: string }; Returns: boolean };
+      set_order_fulfillment_status: { Args: { target_order_id: string; new_status: string }; Returns: undefined };
     };
     Enums: {
       user_role: UserRole;

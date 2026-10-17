@@ -1,240 +1,71 @@
+import { createHash } from "node:crypto";
 import { NextResponse } from "next/server";
+import { readLimitedRequestBody, RequestBodyTooLargeError } from "@/lib/http/read-limited-request-body";
+import { parseWompiTransactionEvent } from "@/lib/payments/wompi-events";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import {
-  getWompiConfig,
-  shouldApplyWompiStatus,
-  verifyWompiEventSignature,
-  type WompiEvent,
-} from "@/lib/payments/wompi";
-import type { OrderStatus, PaymentStatus } from "@/types/database";
+import { getWompiConfig, verifyWompiEventSignature, type WompiEvent } from "@/lib/payments/wompi";
 
 export const runtime = "nodejs";
 
-const STATUS_MAP: Record<string, { order: OrderStatus; payment: PaymentStatus }> = {
-  APPROVED: { order: "paid", payment: "approved" },
-  DECLINED: { order: "payment_pending", payment: "rejected" },
-  ERROR: { order: "payment_pending", payment: "rejected" },
-  PENDING: { order: "payment_pending", payment: "pending" },
-  VOIDED: { order: "cancelled", payment: "cancelled" },
-};
-
-type ValidatedTransaction = {
-  id: string;
-  reference: string;
-  status: keyof typeof STATUS_MAP;
-  amount_in_cents: number;
-  currency: "COP";
-};
-
-type ParsedTransactionEvent =
-  | { kind: "ignored" }
-  | { kind: "invalid" }
-  | { kind: "transaction"; transaction: ValidatedTransaction; status: (typeof STATUS_MAP)[string] };
-
-function parseTransactionEvent(event: WompiEvent): ParsedTransactionEvent {
-  if (event.event !== "transaction.updated") return { kind: "ignored" };
-
-  const transaction = event.data?.transaction;
-  const status = transaction?.status ? STATUS_MAP[transaction.status] : undefined;
-  if (
-    typeof transaction?.id !== "string" ||
-    typeof transaction.reference !== "string" ||
-    transaction.reference.length === 0 || transaction.reference.length > 255 ||
-    !Number.isSafeInteger(transaction.amount_in_cents) || transaction.amount_in_cents! <= 0 ||
-    transaction.currency !== "COP" ||
-    !status
-  ) {
-    return { kind: "invalid" };
+async function readVerifiedEvent(request: Request, eventsSecret: string, environment: "sandbox" | "production") {
+  let rawBody: string;
+  try {
+    rawBody = await readLimitedRequestBody(request, 65536);
+  } catch (error) {
+    const status = error instanceof RequestBodyTooLargeError ? 413 : 400;
+    return { response: NextResponse.json({ error: status === 413 ? "El evento excede el tamaño permitido." : "El cuerpo debe ser JSON válido." }, { status }) };
   }
-
-  return {
-    kind: "transaction",
-    transaction: {
-      id: transaction.id,
-      reference: transaction.reference,
-      status: transaction.status as keyof typeof STATUS_MAP,
-      amount_in_cents: transaction.amount_in_cents!,
-      currency: "COP",
-    },
-    status,
-  };
-}
-
-async function readVerifiedEvent(request: Request, eventsSecret: string) {
-  const rawBody = await request.text();
-  if (rawBody.length > 65536) {
-    return { response: NextResponse.json({ error: "El evento excede el tamaño permitido." }, { status: 413 }) };
-  }
-
   let payload: Record<string, unknown>;
   try {
-    const parsed: unknown = JSON.parse(rawBody);
-    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
-      throw new Error("El evento debe ser un objeto JSON.");
-    }
-    payload = parsed as Record<string, unknown>;
+    const value: unknown = JSON.parse(rawBody);
+    if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("Invalid payload");
+    payload = value as Record<string, unknown>;
   } catch {
     return { response: NextResponse.json({ error: "El cuerpo debe ser JSON válido." }, { status: 400 }) };
   }
 
   const event = payload as WompiEvent;
-  if (!verifyWompiEventSignature(event, payload, eventsSecret)) {
+  const checksumHeader = request.headers.get("x-event-checksum");
+  if (!verifyWompiEventSignature(event, payload, eventsSecret, checksumHeader)) {
     return { response: NextResponse.json({ error: "Firma de evento inválida." }, { status: 401 }) };
   }
-  if (event.environment !== "test") {
-    return { response: NextResponse.json({ error: "El evento pertenece a otro entorno." }, { status: 401 }) };
+  const expectedEventEnvironment = environment === "sandbox" ? "test" : "prod";
+  if (event.environment !== expectedEventEnvironment) {
+    return { response: NextResponse.json({ error: "El evento pertenece a otro ambiente." }, { status: 401 }) };
   }
-
-  return { event };
-}
-
-function matchesExpectedPayment(
-  order: { total: number; currency: string },
-  payment: { amount: number; currency: string },
-  transaction: ValidatedTransaction,
-) {
-  return Number.isSafeInteger(order.total * 100) &&
-    payment.amount === order.total &&
-    payment.currency === order.currency &&
-    order.currency === transaction.currency &&
-    order.total * 100 === transaction.amount_in_cents;
-}
-
-function getEligibleOrderStatuses(paymentStatus: PaymentStatus): OrderStatus[] {
-  if (paymentStatus === "cancelled") return ["pending", "payment_pending", "paid"];
-  if (paymentStatus === "approved") return ["pending", "payment_pending", "cancelled"];
-  return ["pending", "payment_pending"];
-}
-
-async function updatePaymentStatus(
-  supabase: ReturnType<typeof createSupabaseAdminClient>,
-  payment: {
-    id: string;
-    status: PaymentStatus;
-    transaction_id: string | null;
-  },
-  transaction: NonNullable<WompiEvent["data"]>["transaction"],
-  nextStatus: { order: OrderStatus; payment: PaymentStatus },
-  event: WompiEvent,
-  reference: string,
-  environment: string,
-) {
-  if (!transaction?.id || !transaction.status) return "conflict" as const;
-  if (payment.transaction_id && payment.transaction_id !== transaction.id) return "conflict" as const;
-  if (!shouldApplyWompiStatus(payment.status, transaction.status)) return "stale" as const;
-
-  let updateQuery = supabase
-    .from("payments")
-    .update({
-      transaction_id: transaction.id,
-      status: nextStatus.payment,
-      metadata: {
-        reference,
-        environment,
-        event: event.event ?? null,
-        wompi_status: transaction.status,
-        timestamp: event.timestamp ?? null,
-      },
-    })
-    .eq("id", payment.id)
-    .eq("status", payment.status);
-  updateQuery = payment.transaction_id
-    ? updateQuery.eq("transaction_id", payment.transaction_id)
-    : updateQuery.is("transaction_id", null);
-
-  const { data, error } = await updateQuery.select("id").maybeSingle();
-  if (error) throw new Error("No fue posible guardar el estado del pago.");
-  if (data) return "updated" as const;
-
-  const { data: latestPayment, error: latestError } = await supabase
-    .from("payments")
-    .select("status, transaction_id")
-    .eq("id", payment.id)
-    .maybeSingle();
-  if (latestError) throw new Error("No fue posible consultar el estado del pago.");
-  if (!latestPayment || (latestPayment.transaction_id && latestPayment.transaction_id !== transaction.id)) {
-    return "conflict" as const;
-  }
-  return shouldApplyWompiStatus(latestPayment.status, transaction.status) ? "retry" as const : "stale" as const;
-}
-
-async function processTransaction(
-  event: WompiEvent,
-  environment: string,
-  transaction: ValidatedTransaction,
-  status: (typeof STATUS_MAP)[string],
-) {
-  const supabase = createSupabaseAdminClient();
-  const { data: payment, error: paymentLookupError } = await supabase
-    .from("payments")
-    .select("id, order_id, transaction_id, status, amount, currency")
-    .eq("provider", "wompi")
-    .contains("metadata", { reference: transaction.reference })
-    .maybeSingle();
-  if (paymentLookupError) throw new Error("No fue posible consultar el pago.");
-  if (!payment) return NextResponse.json({ error: "Referencia de pago desconocida." }, { status: 404 });
-
-  const { data: order, error: orderError } = await supabase
-    .from("orders")
-    .select("id, total, currency")
-    .eq("id", payment.order_id)
-    .maybeSingle();
-  if (orderError) throw new Error("No fue posible consultar el pedido.");
-  if (!order) return NextResponse.json({ error: "Pedido asociado no encontrado." }, { status: 404 });
-  if (!matchesExpectedPayment(order, payment, transaction)) {
-    return NextResponse.json({ error: "El monto o la moneda no coinciden con el pedido." }, { status: 409 });
-  }
-
-  const paymentResult = await updatePaymentStatus(
-    supabase,
-    payment,
-    transaction,
-    status,
-    event,
-    transaction.reference,
-    environment,
-  );
-  if (paymentResult === "conflict") {
-    return NextResponse.json({ error: "El pago tiene una transacción diferente." }, { status: 409 });
-  }
-  if (paymentResult === "retry") {
-    return NextResponse.json({ error: "Actualización concurrente; Wompi puede reintentar." }, { status: 503 });
-  }
-  if (paymentResult === "stale") return NextResponse.json({ received: true, ignored: true });
-
-  const { error: updateError } = await supabase
-    .from("orders")
-    .update({ status: status.order })
-    .eq("id", order.id)
-    .in("status", getEligibleOrderStatuses(status.payment));
-  if (updateError) throw new Error("No fue posible guardar el estado del pedido.");
-  return NextResponse.json({ received: true });
+  return { event, checksum: (event.signature?.checksum ?? checksumHeader ?? "").toLowerCase() };
 }
 
 export async function POST(request: Request) {
   const config = getWompiConfig();
-  if (!config) return NextResponse.json({ error: "Wompi no está configurado en Sandbox." }, { status: 503 });
+  if (!config) return NextResponse.json({ error: "Wompi no está configurado para este ambiente." }, { status: 503 });
 
-  const verified = await readVerifiedEvent(request, config.eventsSecret);
+  const verified = await readVerifiedEvent(request, config.eventsSecret, config.environment);
   if ("response" in verified) return verified.response;
-  if (verified.event.event !== "transaction.updated") {
-    return NextResponse.json({ received: true, ignored: true });
-  }
-
-  const parsed = parseTransactionEvent(verified.event);
+  const parsed = parseWompiTransactionEvent(verified.event, config.publicKey);
   if (parsed.kind === "ignored") return NextResponse.json({ received: true, ignored: true });
-  if (parsed.kind === "invalid") {
-    return NextResponse.json({ error: "Evento de transacción incompleto o no soportado." }, { status: 400 });
-  }
+  if (parsed.kind === "invalid" || !Number.isSafeInteger(verified.event.timestamp)) return NextResponse.json({ error: "Evento de transacción incompleto o no soportado." }, { status: 400 });
+  const transaction = parsed.transaction;
 
   try {
-    return await processTransaction(
-      verified.event,
-      "test",
-      parsed.transaction,
-      parsed.status,
-    );
+    const eventKey = createHash("sha256")
+      .update(`${config.environment}\u0000${verified.checksum}\u0000${verified.event.timestamp}`)
+      .digest("hex");
+    const supabase = createSupabaseAdminClient();
+    const { error } = await supabase.rpc("apply_wompi_transaction", {
+      p_event_key: eventKey,
+      p_source: "webhook",
+      p_reference: transaction.reference,
+      p_transaction_id: transaction.id,
+      p_wompi_status: transaction.status,
+      p_amount_in_cents: transaction.amountInCents,
+      p_currency: transaction.currency,
+      p_environment: config.environment,
+      p_event_timestamp: verified.event.timestamp!,
+    });
+    if (error) return NextResponse.json({ error: "El evento se reintentará." }, { status: 503 });
+    return NextResponse.json({ received: true });
   } catch {
-    return NextResponse.json({ error: "No fue posible procesar el evento." }, { status: 500 });
+    return NextResponse.json({ error: "El evento se reintentará." }, { status: 503 });
   }
 }

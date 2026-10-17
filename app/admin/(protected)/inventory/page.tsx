@@ -10,7 +10,10 @@ function getStockStatus(stock: number, threshold: number) {
 }
 
 export default async function AdminInventoryPage() {
-  const { supabase } = await requireAdmin();
+  const { supabase, preview } = await requireAdmin();
+  if (preview) {
+    return <AdminPage title="Inventario" description="Stock real por talla, color y SKU."><AdminEmpty>El inventario está protegido por RLS y no se puede consultar en modo preview. Inicia sesión ADMIN para ver el stock real.</AdminEmpty></AdminPage>;
+  }
   const [variantResult, productResult, inventoryResult] = await Promise.all([
     supabase.from("product_variants").select("id, product_id, sku, size, color, active").order("sku"),
     supabase.from("products").select("id, name"),

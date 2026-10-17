@@ -87,6 +87,8 @@ export const orderStatusSchema = z.enum([
   "refunded",
 ]);
 
+export const fulfillmentStatusSchema = z.enum(["processing", "shipped", "delivered"]);
+
 export const homeSlideSchema = z.object({
   image_path: z.string().trim().min(1).max(500),
   eyebrow: z.string().trim().min(1).max(120),

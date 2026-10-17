@@ -29,7 +29,14 @@ export function AdminShell({ children, email, preview = false }: Readonly<{ chil
           {preview ? null : <form action={logoutAdmin}><button type="submit">CERRAR SESIÓN</button></form>}
         </div>
       </aside>
-      <div className="admin-content">{children}</div>
+      <div className="admin-content">
+        {preview ? <p className="admin-preview-notice" role="note">Vista previa sin sesión real: RLS puede ocultar datos administrativos. Inicia sesión con una cuenta ADMIN para consultar y modificar datos.</p> : null}
+        {preview ? (
+          <fieldset className="admin-preview-fieldset" disabled aria-label="Administración en modo de solo lectura">
+            {children}
+          </fieldset>
+        ) : children}
+      </div>
     </div>
   );
 }

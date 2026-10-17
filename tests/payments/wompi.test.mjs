@@ -51,6 +51,15 @@ test("rejects invalid checksums and malformed signature properties", () => {
   assert.equal(verifyWompiEventSignature(invalidProperty, invalidProperty, "test_events_secret"), false);
 });
 
+test("accepts the documented checksum header when the body copy is absent and rejects disagreement", () => {
+  const event = createSignedEvent("test_events_secret");
+  const checksum = event.signature.checksum;
+  delete event.signature.checksum;
+  assert.equal(verifyWompiEventSignature(event, event, "test_events_secret", checksum), true);
+  event.signature.checksum = checksum;
+  assert.equal(verifyWompiEventSignature(event, event, "test_events_secret", "0".repeat(64)), false);
+});
+
 test("creates unique references with a 96-bit hexadecimal suffix", () => {
   const first = createWompiReference("LR7-20261016-000001");
   const second = createWompiReference("LR7-20261016-000001");
@@ -70,6 +79,9 @@ test("creates the integrity signature from reference, cents, currency, and secre
 test("does not let stale events roll back terminal payment states", () => {
   assert.equal(shouldApplyWompiStatus("APPROVED", "PENDING"), false);
   assert.equal(shouldApplyWompiStatus("DECLINED", "PENDING"), false);
+  assert.equal(shouldApplyWompiStatus("DECLINED", "ERROR"), false);
+  assert.equal(shouldApplyWompiStatus("DECLINED", "DECLINED"), false);
+  assert.equal(shouldApplyWompiStatus("APPROVED", "APPROVED"), false);
   assert.equal(shouldApplyWompiStatus("PENDING", "APPROVED"), true);
   assert.equal(shouldApplyWompiStatus("APPROVED", "VOIDED"), true);
   assert.equal(shouldApplyWompiStatus("VOIDED", "APPROVED"), false);

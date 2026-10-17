@@ -10,6 +10,7 @@ export type WompiEvent = {
       status?: string;
       amount_in_cents?: number;
       currency?: string;
+      merchant?: { id?: string };
     };
   };
   signature?: {
@@ -30,7 +31,10 @@ const STATUS_PRIORITY: Record<string, number> = {
 export function shouldApplyWompiStatus(currentStatus: string, incomingStatus: string) {
   const currentPriority = STATUS_PRIORITY[currentStatus];
   const incomingPriority = STATUS_PRIORITY[incomingStatus];
-  return incomingPriority !== undefined && (currentPriority === undefined || incomingPriority >= currentPriority);
+  return incomingPriority !== undefined && (
+    currentPriority === undefined ||
+    incomingPriority > currentPriority
+  );
 }
 
 export function createWompiReference(orderNumber: string) {
@@ -53,8 +57,9 @@ export function verifyWompiEventSignature(
   event: WompiEvent,
   rawPayload: Record<string, unknown>,
   eventsSecret: string,
+  checksumHeader?: string | null,
 ) {
-  const checksum = event.signature?.checksum;
+  const checksum = event.signature?.checksum ?? checksumHeader;
   const properties = event.signature?.properties;
   const timestamp = event.timestamp;
   if (
@@ -70,6 +75,7 @@ export function verifyWompiEventSignature(
   ) {
     return false;
   }
+  if (checksumHeader && event.signature?.checksum && checksumHeader.toLowerCase() !== event.signature.checksum.toLowerCase()) return false;
 
   const eventData = getNestedValue(rawPayload, "data");
   if (!eventData || typeof eventData !== "object") return false;
