@@ -51,17 +51,17 @@ Estados: Pendiente de verificar, Confirmado, En corrección, Corregido, Validado
 | LR7-043 | Navegación y listados | Sidebar sin sección activa; en móvil 4 filas de enlaces; productos sin búsqueda y con VER/EDITAR al mismo destino; pedidos con un `select` de una sola opción y estados en inglés; inventario sin filtro. | UX / media | Corregido; navegación validada en navegador. | `AdminNav` con `aria-current` y tira horizontal en móvil; filtros GET (`AdminFilters`) en productos, pedidos e inventario con búsqueda saneada (`lib/admin/search.ts`); "Ver en tienda"; botón explícito de siguiente estado y etiquetas en español en pedidos. | Chrome headless a 1280/768/390: sección activa marcada, sin overflow. 3 tests de saneado/slug. Filtros pendientes con datos reales. |
 | LR7-044 | Detalles de formularios y estados | Variantes sin labels visibles; clave de ajuste editable (creaba otro ajuste); la UI ofrecía quitarse el propio rol; sin `error.tsx`/`loading.tsx` del admin (un fallo mostraba "IR AL CATÁLOGO"); destinos `//host` aceptados; precio anterior ≤ precio aceptado; objetivos táctiles de 42 px. | Accesibilidad/UX / baja | Corregido; error boundary validado en navegador. | Labels visibles, clave en solo lectura, rol propio bloqueado (UI + acción), `app/admin/(protected)/error.tsx` y `loading.tsx`, `SAFE_HREF`, regla de precio anterior, slug automático desde el nombre, 44 px y botón de login con estado pendiente. | 4 tests nuevos de validación; captura del error boundary con shell y navegación. |
 | LR7-045 | Contenido editable sin efecto público | Las secciones de Home se editan en admin pero su render está comentado en `components/pages/home-page.tsx` (commit `182917f`); `site_settings` no tiene consumidor público (`getSiteSetting` sin uso). | Consistencia CMS / media | Confirmado; decisión pendiente. No se reactivó el render por ser un cambio deliberado reciente. | Avisos visibles en `/admin/home` y `/admin/content` para que nadie espere cambios en la tienda. Decidir: reactivar secciones (revisar LR7-006) y/o conectar ajustes, o retirarlos del admin. | — |
-| LR7-046 | Dependencia `next@16.4.0` | `next build` se detiene con aviso de seguridad; `pnpm audit --prod`: 10 avisos (2 críticos, 1 alto, 7 moderados) en `>=16.4.0 <=16.4.4`. | Seguridad / crítica | Confirmado; pendiente de aprobación. Actualizar cambia `pnpm-lock.yaml`. | Subir a `next >= 16.4.5` (fijar versión en vez de `latest`) y repetir lint/test/build. | `pnpm audit --prod` en esta revisión. |
+| LR7-046 | Dependencia `next@16.4.0` | `next build` se detenía con aviso de seguridad; `pnpm audit --prod`: 10 avisos (2 críticos RCE, 1 alto DoS, 7 moderados) en `>=16.0.0 <=16.4.4`. | Seguridad / crítica | Validado (C1, commit `678b900`). Causa: `next`, `react`, `react-dom` y `eslint-config-next` en `latest` con lockfile en 16.4.0. | `package.json` y `pnpm-lock.yaml`: `next` y `eslint-config-next` 16.4.6, `react`/`react-dom` 19.3.1, versiones exactas. | `pnpm audit --prod`: sin vulnerabilidades. lint 0 errores, `tsc` limpio, 55/55 tests, build con Next 16.4.6 (51 páginas), 23 rutas y 36 URLs del sitemap con 200/308 y consola sin errores. Queda 1 aviso moderado solo de desarrollo (`minimatch` vía ESLint). |
 
 ## Resumen de estado
 
 - Total: 46 hallazgos individuales.
-- Validado/corregido: 22 (LR7-001, LR7-005, LR7-006, LR7-009 a LR7-013, LR7-017 a LR7-022, LR7-024, LR7-028 a LR7-034).
+- Validado/corregido: 23 (LR7-001, LR7-005, LR7-006, LR7-009 a LR7-013, LR7-017 a LR7-022, LR7-024, LR7-028 a LR7-034, LR7-046).
 - No reproducible/intencional: 6 (LR7-002, LR7-003, LR7-004, LR7-007, LR7-008, LR7-023).
 - Corregido, pendiente de medición de CWV: 1 (LR7-025).
 - Corregido, pendiente de validar con Supabase/sesión ADMIN: 10 (LR7-035 a LR7-044).
-- Bloqueados o pendientes de decisión: 7 (LR7-014 a LR7-016, LR7-026, LR7-027, LR7-045, LR7-046).
-- La suma por estado es 46: 22 + 6 + 1 + 10 + 7.
+- Bloqueados o pendientes de decisión: 6 (LR7-014 a LR7-016, LR7-026, LR7-027, LR7-045).
+- La suma por estado es 46: 23 + 6 + 1 + 10 + 6.
 
 ## Regresiones y límites
 
