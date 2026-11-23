@@ -186,7 +186,7 @@ export function Navbar({ navigation }: Readonly<{ navigation: NavigationItem[] }
               ) : null}
             </Link>
             <Link href="/tienda" className="btn-primary" style={{ padding: "0.5rem 1.2rem", fontSize: "0.85rem" }}>
-              CATALOGO
+              CATÁLOGO
             </Link>
           </div>
 
@@ -235,7 +235,7 @@ export function Navbar({ navigation }: Readonly<{ navigation: NavigationItem[] }
             <input
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Buscar camiseta, equipo, seleccion..."
+              placeholder="Buscar camiseta, equipo, selección..."
               style={{ flex: 1, background: "transparent", border: "none", borderBottom: "1px solid rgba(7,20,38,0.2)", color: "var(--color-dark)", fontFamily: "'Barlow Condensed'", fontWeight: 700, fontSize: "1.1rem", letterSpacing: "0.06em", outline: "none", padding: "0.4rem 0", textTransform: "uppercase" }}
               aria-label="Buscar producto"
             />

@@ -229,7 +229,7 @@ D9 ─> A7, A8, A9, A11, M6
   - Sin consentimiento no hay peticiones a Google (pestaña Network).
 - **Dependencias:** C5 (política de cookies) y D7.
 
-### A6. Textos: tildes, idioma y códigos internos
+### A6. Textos: tildes, idioma y códigos internos ✅ Hecho lo funcional (LR7-051); copy editorial en `docs/PROPUESTA_COPY_A6.md`, pendiente de aprobación
 - **Problema:** "FUTBOL_SELECCIONES" visible, faltan tildes por todas partes y hay copy en inglés.
 - **Archivos:**
   - `components/pages/product-page.tsx`: etiqueta legible de la categoría.

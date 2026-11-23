@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FavoriteButton } from "@/components/product/favorite-button";
 import { useStore } from "@/components/providers/store-provider";
-import { formatCurrency } from "@/lib/products";
+import { formatCurrency, getBadgeDisplayName } from "@/lib/products";
 import type { Product } from "@/types/ecommerce";
 
 type StreetwearPageProps = Readonly<{
@@ -102,7 +102,7 @@ function StreetProduct({ product, index }: Readonly<{ product: Product; index: n
           />
         </Link>
         <span className="street-product-index">0{index + 1}</span>
-        {product.badge ? <span className="street-product-badge">{product.badge}</span> : null}
+        {product.badge ? <span className="street-product-badge">{getBadgeDisplayName(product.badge)}</span> : null}
         <FavoriteButton productId={product.id} />
       </div>
       <div className="street-product-info">
@@ -218,7 +218,7 @@ export function StreetwearExperience({ products }: StreetwearPageProps) {
         </div>
       </section>
 
-      <nav className="street-category-rail" aria-label="Categorias streetwear">
+      <nav className="street-category-rail" aria-label="Categorías streetwear">
         {QUICK_CATEGORIES.map((category) => (
           <Link href={category.href} key={category.label}>
             <span>{category.number}</span><strong>{category.label}</strong><i aria-hidden="true">↗</i>

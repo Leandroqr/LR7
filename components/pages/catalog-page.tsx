@@ -104,7 +104,7 @@ export function CatalogPage({
               <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
                 <div>
                   <p style={{ fontSize: "0.7rem", letterSpacing: "0.2em", color: "var(--color-text-muted)", fontFamily: "'Barlow Condensed'", fontWeight: 700, textTransform: "uppercase", marginBottom: "1rem" }}>
-                    CATEGORIA
+                    CATEGORÍA
                   </p>
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                     {availableCategories.map((category) => (

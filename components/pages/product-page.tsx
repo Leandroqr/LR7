@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { Product } from "@/types/ecommerce";
-import { CUSTOM_PRICE, formatCurrency } from "@/lib/products";
+import { CUSTOM_PRICE, formatCurrency, getBadgeDisplayName, getCategoryDisplayName } from "@/lib/products";
 import { isWhatsAppConfigured, SITE_CONFIG } from "@/lib/site";
 import { getProductWhatsAppMessage } from "@/lib/whatsapp";
 import { WhatsAppLink } from "@/components/commerce/whatsapp-link";
@@ -105,7 +105,7 @@ export function ProductPage({ product, relatedProducts }: ProductPageProps) {
           </Link>
           <span aria-hidden="true">/</span>
           <Link href="/tienda">
-            CATALOGO
+            CATÁLOGO
           </Link>
           <span className="product-breadcrumb-current" aria-hidden="true">/</span>
           <span className="product-breadcrumb-current">
@@ -119,7 +119,7 @@ export function ProductPage({ product, relatedProducts }: ProductPageProps) {
               <Image src={product.images[mainImg].src} alt={product.images[mainImg].alt} fill sizes="(max-width: 900px) 100vw, 50vw" style={{ objectFit: "cover" }} loading="eager" fetchPriority="high" />
               {product.badge ? (
                 <div className="product-badge">
-                  {product.badge}
+                  {getBadgeDisplayName(product.badge)}
                 </div>
               ) : null}
               <button
@@ -146,7 +146,7 @@ export function ProductPage({ product, relatedProducts }: ProductPageProps) {
           <section className="product-details-column" aria-labelledby="product-title">
             <header className="product-header">
               <p className="product-eyebrow">
-                {product.category} · {product.team}
+                {getCategoryDisplayName(product.category)}{product.team && product.team !== "Generica" ? ` · ${product.team}` : ""}
               </p>
               <h1 id="product-title" className="font-display">
                 {product.name}
@@ -193,7 +193,7 @@ export function ProductPage({ product, relatedProducts }: ProductPageProps) {
                     <h2 className="font-display">
                       ¿QUIERES PERSONALIZARLA?
                     </h2>
-                    <p>Nombre y numero · +${formatCurrency(customizationPrice)}</p>
+                    <p>Nombre y número · +${formatCurrency(customizationPrice)}</p>
                   </div>
                   <button type="button" onClick={() => setWantCustom(!wantCustom)} aria-label="Personalizar camiseta" aria-pressed={wantCustom} className="product-customization-toggle">
                     <span />
@@ -217,7 +217,7 @@ export function ProductPage({ product, relatedProducts }: ProductPageProps) {
                     </div>
                     <div>
                       <label htmlFor="custom-number">
-                        NUMERO
+                        NÚMERO
                       </label>
                       <input
                         id="custom-number"
@@ -296,10 +296,10 @@ export function ProductPage({ product, relatedProducts }: ProductPageProps) {
           <section style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "5rem 0" }}>
             <div style={{ maxWidth: "1440px", margin: "0 auto", padding: "0 2rem" }}>
               <p className="font-display" style={{ fontSize: "0.8rem", letterSpacing: "0.25em", color: "var(--color-accent)", textTransform: "uppercase", marginBottom: "0.5rem" }}>
-                — TAMBIEN TE PUEDE GUSTAR
+                — TAMBIÉN TE PUEDE GUSTAR
               </p>
               <h2 className="font-display" style={{ fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 900, textTransform: "uppercase", marginBottom: "2.5rem" }}>
-                MAS EN {product.category}
+                MÁS {getCategoryDisplayName(product.category)}
               </h2>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(260px, 100%), 1fr))", gap: "2px" }}>
                 {relatedProducts.map((related) => (

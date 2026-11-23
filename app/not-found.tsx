@@ -18,11 +18,11 @@ export default function NotFound() {
           NO EXISTE.
         </h1>
         <p style={{ fontSize: "1rem", color: "rgba(255,255,255,0.5)", marginBottom: "3rem", fontWeight: 300 }}>
-          Parece que la pagina que buscas salio de la cancha.
+          Parece que la página que buscas salió de la cancha.
         </p>
         <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap" }}>
           <Link href="/" className="btn-primary">VOLVER AL INICIO</Link>
-          <Link href="/tienda" className="btn-outline">VER CATALOGO</Link>
+          <Link href="/tienda" className="btn-outline">VER CATÁLOGO</Link>
         </div>
       </div>
     </div>

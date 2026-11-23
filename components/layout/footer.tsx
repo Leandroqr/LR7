@@ -6,7 +6,7 @@ const FOOTER_COLUMNS = [
   {
     title: "TIENDA",
     links: [
-      { label: "Catalogo", href: "/tienda" },
+      { label: "Catálogo", href: "/tienda" },
       { label: "Colecciones", href: "/colecciones" },
       { label: "Personaliza", href: "/personaliza" },
       { label: "Favoritos", href: "/favoritos" },
@@ -15,8 +15,8 @@ const FOOTER_COLUMNS = [
   {
     title: "AYUDA",
     links: [
-      { label: "Como comprar", href: "/contacto" },
-      { label: "Envios", href: "/envios" },
+      { label: "Cómo comprar", href: "/contacto" },
+      { label: "Envíos", href: "/envios" },
       { label: "Cambios y devoluciones", href: "/cambios-y-devoluciones" },
       { label: "Contacto", href: "/contacto" },
       { label: "Preguntas frecuentes", href: "/preguntas-frecuentes" },
@@ -26,7 +26,7 @@ const FOOTER_COLUMNS = [
     title: "LR7",
     links: [
       { label: "Nosotros", href: "/nosotros" },
-      { label: "Guia de tallas", href: "/guia-de-tallas" },
+      { label: "Guía de tallas", href: "/guia-de-tallas" },
       { label: "Preguntas frecuentes", href: "/preguntas-frecuentes" },
     ],
   },
@@ -45,7 +45,7 @@ export function Footer({ navigation }: Readonly<{ navigation: NavigationItem[] }
               </div>
             </Link>
             <p style={{ fontSize: "0.82rem", color: "var(--color-text-muted)", lineHeight: 1.7, fontWeight: 300, maxWidth: "220px" }}>
-              Camisetas deportivas premium para quienes viven el juego con pasion.
+              Camisetas deportivas premium para quienes viven el juego con pasión.
             </p>
           </div>
           {FOOTER_COLUMNS.map((column, index) => {

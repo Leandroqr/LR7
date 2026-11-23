@@ -19,22 +19,22 @@ type Section = {
 const sections: Section[] = [
   {
     label: "- NUESTRA HISTORIA",
-    title: "NACIO DEL JUEGO",
-    body: "LR7 nacio de una obsesion: encontrar camisetas de futbol que fueran tan buenas como la pasion que representan. Cansados de productos genericos y calidad mediocre, decidimos crear algo diferente. Una marca que entiende al hincha, al jugador y al coleccionista.",
+    title: "NACIÓ DEL JUEGO",
+    body: "LR7 nació de una obsesión: encontrar camisetas de fútbol que fueran tan buenas como la pasión que representan. Cansados de productos genéricos y calidad mediocre, decidimos crear algo diferente. Una marca que entiende al hincha, al jugador y al coleccionista.",
     img: "https://images.unsplash.com/photo-1599204606471-32a75bc663e9?w=800&h=1000&fit=crop&auto=format",
     reverse: false,
   },
   {
-    label: "- POR QUE EXISTIMOS",
+    label: "- POR QUÉ EXISTIMOS",
     title: "LA CAMISETA ES IDENTIDAD",
-    body: "En Colombia, el futbol no es solo un deporte. Es una forma de vida, de conectar y de pertenecer. Cada camiseta cuenta una historia: la tuya, la de tu equipo y la de tu pais. Nosotros hacemos que esa historia se sienta en cada detalle.",
+    body: "En Colombia, el fútbol no es solo un deporte. Es una forma de vida, de conectar y de pertenecer. Cada camiseta cuenta una historia: la tuya, la de tu equipo y la de tu país. Nosotros hacemos que esa historia se sienta en cada detalle.",
     img: "https://images.unsplash.com/photo-1608211070124-c747f619754f?w=800&h=1000&fit=crop&auto=format",
     reverse: true,
   },
   {
-    label: "- NUESTRA VISION",
-    title: "LA MARCA QUE EL FUTBOL MERECE",
-    body: "Queremos ser la marca de referencia para los amantes del futbol en Colombia y Latinoamerica. No como un marketplace mas, sino como una comunidad que vive el juego. Cada camiseta lleva nuestro compromiso de calidad y pasion.",
+    label: "- NUESTRA VISIÓN",
+    title: "LA MARCA QUE EL FÚTBOL MERECE",
+    body: "Queremos ser la marca de referencia para los amantes del fútbol en Colombia y Latinoamérica. No como un marketplace más, sino como una comunidad que vive el juego. Cada camiseta lleva nuestro compromiso de calidad y pasión.",
     img: "https://images.unsplash.com/photo-1671680134709-4978c22fb916?w=800&h=1000&fit=crop&auto=format",
     reverse: false,
   },
@@ -43,8 +43,8 @@ const sections: Section[] = [
 const pillars = [
   {
     icon: "*",
-    title: "PASION",
-    desc: "Cada camiseta nace de una pasion genuina por el futbol. No hacemos solo productos: hacemos simbolos de identidad.",
+    title: "PASIÓN",
+    desc: "Cada camiseta nace de una pasión genuina por el fútbol. No hacemos solo productos: hacemos símbolos de identidad.",
   },
   {
     icon: "*",
@@ -83,7 +83,7 @@ export default function AboutPage() {
             <span style={{ color: "var(--color-accent)" }}>CAMISETAS.</span>
           </h1>
           <p style={{ fontSize: "1.1rem", color: "var(--color-text-muted)", maxWidth: "480px", lineHeight: 1.7, fontWeight: 300 }}>
-            Vendemos una forma de llevar tu pasion contigo.
+            Vendemos una forma de llevar tu pasión contigo.
           </p>
         </div>
       </section>
@@ -136,7 +136,7 @@ export default function AboutPage() {
           ENCUENTRA LA TUYA
         </h2>
         <Link href="/tienda" className="btn-primary">
-          VER CATALOGO {">"}
+          VER CATÁLOGO {">"}
         </Link>
       </section>
 

@@ -9,49 +9,49 @@ export const PRODUCTS: Product[] = [
   {
     id: 1,
     slug: "seleccion-colombia",
-    name: "Seleccion Colombia",
+    name: "Selección Colombia",
     category: "FUTBOL_SELECCIONES",
     brand: "FUTBOL",
     team: "Colombia",
     badge: "MAS VENDIDA",
     personalizable: true,
     description:
-      "La camiseta mas iconica del futbol colombiano. Tela ligera de alto rendimiento con diseno exclusivo y corte atletico premium. Perfecta para la cancha y la calle.",
+      "La camiseta más icónica del fútbol colombiano. Tela ligera de alto rendimiento con diseño exclusivo y corte atlético premium. Perfecta para la cancha y la calle.",
     price: { amount: 89000, currency: "COP" },
     brandCompany,
     images: [
-      { src: "https://images.unsplash.com/photo-1616124619460-ff4ed8f4683c?w=900&h=1100&fit=crop&auto=format", alt: "Camiseta Seleccion Colombia vista principal" },
-      { src: "https://images.unsplash.com/photo-1577212017184-80cc0da11082?w=900&h=1100&fit=crop&auto=format", alt: "Camiseta Seleccion Colombia detalle" },
-      { src: "https://images.unsplash.com/photo-1671680134709-4978c22fb916?w=900&h=1100&fit=crop&auto=format", alt: "Camiseta Seleccion Colombia lookbook" },
-      { src: "https://images.unsplash.com/photo-1759808944777-a05e2e9d0685?w=900&h=1100&fit=crop&auto=format", alt: "Camiseta Seleccion Colombia lifestyle" },
+      { src: "https://images.unsplash.com/photo-1616124619460-ff4ed8f4683c?w=900&h=1100&fit=crop&auto=format", alt: "Camiseta Selección Colombia vista principal" },
+      { src: "https://images.unsplash.com/photo-1577212017184-80cc0da11082?w=900&h=1100&fit=crop&auto=format", alt: "Camiseta Selección Colombia detalle" },
+      { src: "https://images.unsplash.com/photo-1671680134709-4978c22fb916?w=900&h=1100&fit=crop&auto=format", alt: "Camiseta Selección Colombia lookbook" },
+      { src: "https://images.unsplash.com/photo-1759808944777-a05e2e9d0685?w=900&h=1100&fit=crop&auto=format", alt: "Camiseta Selección Colombia lifestyle" },
     ],
     hoverImage: {
       src: "https://images.unsplash.com/photo-1577212017184-80cc0da11082?w=600&h=800&fit=crop&auto=format",
-      alt: "Camiseta Seleccion Colombia vista alternativa",
+      alt: "Camiseta Selección Colombia vista alternativa",
     },
     variants: [{ size: "S" }, { size: "M" }, { size: "L" }, { size: "XL" }, { size: "XXL" }],
   },
   {
     id: 2,
     slug: "clasico-europeo",
-    name: "Clasico Europeo",
+    name: "Clásico Europeo",
     category: "FUTBOL_CLUBES",
     brand: "FUTBOL",
     team: "Real Madrid",
     badge: "NUEVO",
     personalizable: true,
     description:
-      "La elegancia del futbol europeo llevada a una camiseta de coleccion. Diseno refinado, tela de alta tecnologia y acabados premium en cada detalle.",
+      "La elegancia del fútbol europeo llevada a una camiseta de colección. Diseño refinado, tela de alta tecnología y acabados premium en cada detalle.",
     price: { amount: 95000, currency: "COP" },
     brandCompany,
     images: [
-      { src: "https://images.unsplash.com/photo-1552066379-e7bfd22155c5?w=900&h=1100&fit=crop&auto=format", alt: "Clasico Europeo frontal" },
-      { src: "https://images.unsplash.com/photo-1563382563268-23859556c3f2?w=900&h=1100&fit=crop&auto=format", alt: "Clasico Europeo detalle" },
-      { src: "https://images.unsplash.com/photo-1599204606471-32a75bc663e9?w=900&h=1100&fit=crop&auto=format", alt: "Clasico Europeo lifestyle" },
+      { src: "https://images.unsplash.com/photo-1552066379-e7bfd22155c5?w=900&h=1100&fit=crop&auto=format", alt: "Clásico Europeo frontal" },
+      { src: "https://images.unsplash.com/photo-1563382563268-23859556c3f2?w=900&h=1100&fit=crop&auto=format", alt: "Clásico Europeo detalle" },
+      { src: "https://images.unsplash.com/photo-1599204606471-32a75bc663e9?w=900&h=1100&fit=crop&auto=format", alt: "Clásico Europeo lifestyle" },
     ],
     hoverImage: {
       src: "https://images.unsplash.com/photo-1563382563268-23859556c3f2?w=600&h=800&fit=crop&auto=format",
-      alt: "Clasico Europeo vista alternativa",
+      alt: "Clásico Europeo vista alternativa",
     },
     variants: [{ size: "S" }, { size: "M" }, { size: "L" }, { size: "XL" }, { size: "XXL" }],
   },
@@ -65,7 +65,7 @@ export const PRODUCTS: Product[] = [
     badge: "LIMITADA",
     personalizable: true,
     description:
-      "Un homenaje al Brasil del 82, el equipo mas bello de la historia. Edicion de coleccion con detalles retro autenticos y calidad contemporanea.",
+      "Un homenaje al Brasil del 82, el equipo más bello de la historia. Edición de colección con detalles retro auténticos y calidad contemporanea.",
     price: { amount: 85000, currency: "COP" },
     brandCompany,
     images: [
@@ -88,7 +88,7 @@ export const PRODUCTS: Product[] = [
     badge: "LIMITADA",
     personalizable: true,
     description:
-      "La historia del primer mundial argentino en una camiseta de edicion limitada. Diseno vintage que evoca la magia de un torneo legendario.",
+      "La historia del primer mundial argentino en una camiseta de edición limitada. Diseño vintage que evoca la magia de un torneo legendario.",
     price: { amount: 89000, currency: "COP" },
     brandCompany,
     images: [
@@ -107,11 +107,11 @@ export const PRODUCTS: Product[] = [
     name: "Nacional 2024",
     category: "FUTBOL_CLUBES",
     brand: "FUTBOL",
-    team: "Atletico Nacional",
+    team: "Atlético Nacional",
     badge: "NUEVO",
     personalizable: true,
     description:
-      "El orgullo verdolaga en su edicion 2024. Para los que llevan el verde en el corazon, una camiseta que representa la historia del club mas grande de Colombia.",
+      "El orgullo verdolaga en su edición 2024. Para los que llevan el verde en el corazón, una camiseta que representa la historia del club más grande de Colombia.",
     price: { amount: 79000, currency: "COP" },
     brandCompany,
     images: [
@@ -127,46 +127,46 @@ export const PRODUCTS: Product[] = [
   {
     id: 7,
     slug: "milan-clasico",
-    name: "Milan Clasico",
+    name: "Milan Clásico",
     category: "FUTBOL_CLUBES",
     brand: "FUTBOL",
     team: "AC Milan",
     badge: null,
     personalizable: true,
     description:
-      "El rojo y negro del Diavolo en una camiseta que respira historia italiana. Coleccion premium para los amantes del Calcio y el estilo europeo.",
+      "El rojo y negro del Diavolo en una camiseta que respira historia italiana. Colección premium para los amantes del Calcio y el estilo europeo.",
     price: { amount: 92000, currency: "COP" },
     brandCompany,
     images: [
-      { src: "https://images.unsplash.com/photo-1757876804347-b62e5bd391e6?w=900&h=1100&fit=crop&auto=format", alt: "Milan Clasico principal" },
-      { src: "https://images.unsplash.com/photo-1616124619460-ff4ed8f4683c?w=900&h=1100&fit=crop&auto=format", alt: "Milan Clasico detalle" },
+      { src: "https://images.unsplash.com/photo-1757876804347-b62e5bd391e6?w=900&h=1100&fit=crop&auto=format", alt: "Milan Clásico principal" },
+      { src: "https://images.unsplash.com/photo-1616124619460-ff4ed8f4683c?w=900&h=1100&fit=crop&auto=format", alt: "Milan Clásico detalle" },
     ],
     hoverImage: {
       src: "https://images.unsplash.com/photo-1616124619460-ff4ed8f4683c?w=600&h=800&fit=crop&auto=format",
-      alt: "Milan Clasico hover",
+      alt: "Milan Clásico hover",
     },
     variants: [{ size: "S" }, { size: "M" }, { size: "L" }, { size: "XL" }, { size: "XXL" }],
   },
   {
     id: 8,
     slug: "seleccion-brasil",
-    name: "Seleccion Brasil",
+    name: "Selección Brasil",
     category: "FUTBOL_SELECCIONES",
     brand: "FUTBOL",
     team: "Brasil",
     badge: null,
     personalizable: true,
     description:
-      "El amarillo canario que domina el mundo. La camiseta de la seleccion mas exitosa del futbol mundial, ahora en tu guardarropa con calidad premium.",
+      "El amarillo canario que domina el mundo. La camiseta de la selección más exitosa del fútbol mundial, ahora en tu guardarropa con calidad premium.",
     price: { amount: 89000, currency: "COP" },
     brandCompany,
     images: [
-      { src: "https://images.unsplash.com/photo-1563382563268-23859556c3f2?w=900&h=1100&fit=crop&auto=format", alt: "Seleccion Brasil principal" },
-      { src: "https://images.unsplash.com/photo-1552066379-e7bfd22155c5?w=900&h=1100&fit=crop&auto=format", alt: "Seleccion Brasil detalle" },
+      { src: "https://images.unsplash.com/photo-1563382563268-23859556c3f2?w=900&h=1100&fit=crop&auto=format", alt: "Selección Brasil principal" },
+      { src: "https://images.unsplash.com/photo-1552066379-e7bfd22155c5?w=900&h=1100&fit=crop&auto=format", alt: "Selección Brasil detalle" },
     ],
     hoverImage: {
       src: "https://images.unsplash.com/photo-1552066379-e7bfd22155c5?w=600&h=800&fit=crop&auto=format",
-      alt: "Seleccion Brasil hover",
+      alt: "Selección Brasil hover",
     },
     variants: [{ size: "S" }, { size: "M" }, { size: "L" }, { size: "XL" }, { size: "XXL" }],
   },
@@ -181,7 +181,7 @@ export const PRODUCTS: Product[] = [
     badge: null,
     personalizable: false,
     description:
-      "Camiseta deportiva disenada para el rendimiento maximo en entrenamientos. Tejido tecnico transpirable que mantiene la frescura en sesiones intensas de alto nivel.",
+      "Camiseta deportiva diseñada para el rendimiento máximo en entrenamientos. Tejido técnico transpirable que mantiene la frescura en sesiones intensas de alto nivel.",
     price: { amount: 75000, currency: "COP" },
     brandCompany,
     images: [
@@ -204,7 +204,7 @@ export const PRODUCTS: Product[] = [
     badge: "NUEVO",
     personalizable: false,
     description:
-      "Camisilla sin mangas para entrenamientos intensos y actividades deportivas. Material transpirable y ajuste perfecto para maxima libertad de movimiento.",
+      "Camisilla sin mangas para entrenamientos intensos y actividades deportivas. Material transpirable y ajuste perfecto para máxima libertad de movimiento.",
     price: { amount: 65000, currency: "COP" },
     brandCompany,
     images: [
@@ -227,7 +227,7 @@ export const PRODUCTS: Product[] = [
     badge: null,
     personalizable: false,
     description:
-      "Pantaloneta de alto rendimiento para entrenamientos de futbol, gimnasio y actividades deportivas. Tecnologia anti-humedad y secado rapido.",
+      "Pantaloneta de alto rendimiento para entrenamientos de fútbol, gimnasio y actividades deportivas. Tecnología anti-humedad y secado rápido.",
     price: { amount: 68000, currency: "COP" },
     brandCompany,
     images: [
@@ -273,7 +273,7 @@ export const PRODUCTS: Product[] = [
     badge: null,
     personalizable: false,
     description:
-      "Conjunto de entrenamiento compuesto por camiseta y pantaloneta coordinadas. Diseno deportivo con tecnologia de alto rendimiento para maximizar tu entrenamiento.",
+      "Conjunto de entrenamiento compuesto por camiseta y pantaloneta coordinadas. Diseño deportivo con tecnología de alto rendimiento para maximizar tu entrenamiento.",
     price: { amount: 138000, currency: "COP" },
     brandCompany,
     images: [
@@ -294,10 +294,10 @@ export const CATEGORIES: Category[] = [
     name: "FUTBOL",
     slug: "futbol",
     count: 7,
-    description: "Camisetas de futbol premium para vivir tu pasion por el juego",
+    description: "Camisetas de fútbol premium para vivir tu pasión por el juego",
     image: {
       src: "https://images.unsplash.com/photo-1490108474814-221f6198acc5?w=800&h=1100&fit=crop&auto=format",
-      alt: "Categoria Futbol",
+      alt: "Categoría Fútbol",
     },
     parentBrand: "FUTBOL",
   },
@@ -306,10 +306,10 @@ export const CATEGORIES: Category[] = [
     name: "FUTBOL_CAMISETAS",
     slug: "futbol-camisetas",
     count: 1,
-    description: "Camisetas de futbol premium",
+    description: "Camisetas de fútbol premium",
     image: {
       src: "https://images.unsplash.com/photo-1490108474814-221f6198acc5?w=800&h=1100&fit=crop&auto=format",
-      alt: "Camisetas de Futbol",
+      alt: "Camisetas de Fútbol",
     },
     parentBrand: "FUTBOL",
   },
@@ -317,7 +317,7 @@ export const CATEGORIES: Category[] = [
     name: "FUTBOL_SELECCIONES",
     slug: "futbol-selecciones",
     count: 2,
-    description: "Lleva tu pais en el pecho",
+    description: "Lleva tu país en el pecho",
     image: {
       src: "https://images.unsplash.com/photo-1599204606471-32a75bc663e9?w=800&h=1100&fit=crop&auto=format",
       alt: "Selecciones",
@@ -339,7 +339,7 @@ export const CATEGORIES: Category[] = [
     name: "FUTBOL_RETRO",
     slug: "futbol-retro",
     count: 2,
-    description: "Historia del futbol en tu piel",
+    description: "Historia del fútbol en tu piel",
     image: {
       src: "https://images.unsplash.com/photo-1516948900-c5137d2bf399?w=800&h=1100&fit=crop&auto=format",
       alt: "Retro",
@@ -354,7 +354,7 @@ export const CATEGORIES: Category[] = [
     description: "Ropa deportiva para entrenamientos y actividad fisica",
     image: {
       src: "https://images.unsplash.com/photo-1608211070124-c747f619754f?w=800&h=1100&fit=crop&auto=format",
-      alt: "Categoria Training",
+      alt: "Categoría Training",
     },
     parentBrand: "TRAINING",
   },
@@ -446,6 +446,17 @@ const CATEGORY_DISPLAY_NAMES: Partial<Record<ProductCategory, string>> = {
 
 export function getCategoryDisplayName(categoryName: ProductCategory) {
   return CATEGORY_DISPLAY_NAMES[categoryName] ?? categoryName.replaceAll("_", " ");
+}
+
+// Los valores de `badge` son códigos de datos (Supabase, admin, validación); aquí solo cambia lo que se muestra.
+const BADGE_DISPLAY_NAMES: Record<NonNullable<Product["badge"]>, string> = {
+  NUEVO: "NUEVO",
+  "MAS VENDIDA": "MÁS VENDIDA",
+  LIMITADA: "EDICIÓN LIMITADA",
+};
+
+export function getBadgeDisplayName(badge: Product["badge"]) {
+  return badge ? BADGE_DISPLAY_NAMES[badge] ?? badge : null;
 }
 
 export function formatCurrency(amount: number): string {

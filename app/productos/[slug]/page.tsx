@@ -24,13 +24,13 @@ export async function generateMetadata({ params }: ProductRouteProps): Promise<M
 
   return {
     title: product.name,
-    description: `${product.description}. Camiseta de futbol premium en Colombia con opcion de personalizacion y diferentes tallas.`,
+    description: `${product.description}. Camiseta de fútbol premium en Colombia con opción de personalización y diferentes tallas.`,
     alternates: {
       canonical: `/productos/${product.slug}`,
     },
     openGraph: {
       title: `${product.name} | ${SITE_CONFIG.name}`,
-      description: `${product.description}. Compra camisetas de futbol premium en Colombia.`,
+      description: `${product.description}. Compra camisetas de fútbol premium en Colombia.`,
       images: [product.images[0].src],
       type: "website",
       url: `/productos/${product.slug}`,
@@ -38,7 +38,7 @@ export async function generateMetadata({ params }: ProductRouteProps): Promise<M
     twitter: {
       card: "summary_large_image",
       title: `${product.name} | ${SITE_CONFIG.name}`,
-      description: `${product.description}. Camisetas de futbol premium en Colombia.`,
+      description: `${product.description}. Camisetas de fútbol premium en Colombia.`,
       images: [product.images[0].src],
     },
   };

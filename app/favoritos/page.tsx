@@ -21,10 +21,10 @@ export default function FavoritesPage() {
                 TODAVIA NO TIENES FAVORITOS
               </h2>
               <p style={{ color: "var(--color-text-muted)", marginBottom: "2.5rem", fontWeight: 300 }}>
-                Guarda las camisetas que mas te gusten con el corazon en cada producto.
+                Guarda las camisetas que más te gusten con el corazón en cada producto.
               </p>
               <Link href="/tienda" className="btn-primary">
-                EXPLORAR CATALOGO
+                EXPLORAR CATÁLOGO
               </Link>
             </div>
           ) : (

@@ -4,15 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useStore } from "@/components/providers/store-provider";
-import { formatCurrency } from "@/lib/products";
+import { formatCurrency, getBadgeDisplayName } from "@/lib/products";
 import type { Product } from "@/types/ecommerce";
 import { FavoriteButton } from "@/components/product/favorite-button";
-
-const BADGE_LABELS: Record<string, string> = {
-  NUEVO: "NUEVO",
-  "MAS VENDIDA": "BEST SELLER",
-  LIMITADA: "EDICION LIMITADA",
-};
 
 function getUniqueVariants(product: Product) {
   return product.variants.filter(
@@ -88,7 +82,7 @@ export function ProductCard({ product, imageLoading = "lazy" }: Readonly<{ produ
 
         {product.badge ? (
           <span className={`shop-product-badge shop-product-badge-${product.badge.toLowerCase().replaceAll(" ", "-")}`}>
-            {BADGE_LABELS[product.badge] ?? product.badge}
+            {getBadgeDisplayName(product.badge)}
           </span>
         ) : null}
         <FavoriteButton productId={product.id} />

@@ -61,7 +61,7 @@ export function JerseySVG({ name, number, view, personType }: JerseySVGProps) {
           )}
           {!showName && !showNumber && (
             <text x="170" y="280" textAnchor="middle" fontFamily="'Barlow Condensed', sans-serif" fontWeight="700" fontSize="13" fill="rgba(255,255,255,0.18)" letterSpacing="4">
-              SIN PERSONALIZACION
+              SIN PERSONALIZACIÓN
             </text>
           )}
         </>

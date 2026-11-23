@@ -76,7 +76,7 @@ Cada afirmación lleva su nivel de certeza:
 | E1 | **Dominio equivocado en SEO:** las URLs canónicas, `og:url`, `robots.txt` y el sitemap con 36 URLs apuntan a `https://sportco.co`. Falta `NEXT_PUBLIC_SITE_URL` en Vercel y `lib/site.ts:1` tiene ese dominio por defecto. Google indexaría otro dominio | ✅ `curl /robots.txt`, `/sitemap.xml` y canonical de la ficha | Crítica |
 | E2 | **`next@16.4.0` con vulnerabilidades:** 2 críticas, 1 alta y 7 moderadas (LR7-046). El lockfile fija 16.4.0 y `package.json` usa `latest` | 🔍 `pnpm audit --prod` | Crítica |
 | E3 | **Fotos que no corresponden al producto** (LR7-014, 026 y 027): "Seleccion Colombia" muestra Manchester United y Arsenal; "Clasico Europeo" muestra la camiseta de Brasil | ✅ | Crítica (comercial) |
-| E4 | **Códigos internos visibles:** "FUTBOL_SELECCIONES · COLOMBIA" en la ficha y "MAS EN FUTBOL_SELECCIONES" en los relacionados | ✅ | Alta |
+| E4 | ✅ Resuelto en A6 (LR7-051). **Códigos internos visibles:** "FUTBOL_SELECCIONES · COLOMBIA" en la ficha y "MAS EN FUTBOL_SELECCIONES" en los relacionados | ✅ | Alta |
 | E5 | **Textos sin tildes** en catálogo, navegación, footer y CMS (Seleccion, Clasico, CATALOGO, Envios, Guia, satisfaccion, dias…), y copy en inglés en tienda y streetwear | ✅ | Alta |
 | E6 | ✅ Resuelto en A3 (LR7-049). **Render dinámico en todo el sitio:** `app/layout.tsx:66` llama a `getPublicNavigation()`, que lee `cookies()`. Todas las páginas salen `no-store` y consultan Supabase en cada visita (TTFB en frío de 2,7 s en la home) | ✅ `cache-control: private, no-store` | Alta |
 | E7 | **LCP lento en móvil:** home 3,4 s, ficha 3,7 s, tienda 5,5 s. En la tienda, el elemento LCP es el fondo de `header.shop-hero`, que no se prioriza | ✅ Lighthouse | Alta |
