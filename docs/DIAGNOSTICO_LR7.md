@@ -185,3 +185,22 @@ Cada afirmación lleva su nivel de certeza:
 **Peso transferido:** home 951 KiB, tienda 1.064 KiB.
 
 Los informes JSON están en el directorio temporal de la sesión: `/tmp/claude-1839509895/-home-lrincon-roi-webs-LR7/3ec3d2c0-3a30-4932-8fe1-3a24f7e07a7b/scratchpad/lh/`.
+
+## Rendimiento y calidad tras la primera entrega (producción, 2026-11-23, deploy `3c9ca5a`)
+
+Lighthouse 12.6.1 en móvil, 2 pasadas por página. La variación de TBT entre pasadas es ruido de medición.
+
+| Página | Performance | Accesibilidad | Buenas prácticas | SEO | LCP | TBT | CLS |
+|---|---|---|---|---|---|---|---|
+| `/` | 92 / 76 (antes 87) | 100 (antes 96) | 96 | 100 | 3,3–3,4 s (antes 3,4) | 60–610 ms | 0 |
+| `/productos/seleccion-colombia` | 93 / 90 (antes 86) | 100 (antes 96) | 100 | 100 | 3,2–3,4 s (antes 3,7) | 50–160 ms | 0 |
+| `/tienda` | 89 / 88 (antes 71) | 100 (antes 96) | 96 | 100 | 3,7 s (antes 5,5) | 70 ms | 0 |
+
+**Además:**
+- **Next:** 16.4.6, sin vulnerabilidades en las dependencias de producción.
+- **Caché:** home, ficha, envíos y streetwear con `x-vercel-cache: HIT`.
+- **Dominio:** sitemap, `robots.txt` y URLs canónicas en `lr7.vercel.app`.
+- **Accesibilidad:** axe con 0 violaciones WCAG 2.1 AA en 21 rutas × 2 anchos.
+- **CI:** en verde en GitHub.
+
+**Lo que falta para un LCP ≤ 2,5 s:** dividir el CSS (A4b) y usar fotos reales optimizadas (C3).
