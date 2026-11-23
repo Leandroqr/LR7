@@ -113,6 +113,7 @@ export function HeroCarousel({ products, homeSlides }: Readonly<{ products: Prod
                 alt={slide.alt}
                 fill
                 loading={index === 0 ? "eager" : "lazy"}
+                fetchPriority={index === 0 ? "high" : "auto"}
                 sizes="100vw"
                 style={{ objectFit: "cover" }}
               />

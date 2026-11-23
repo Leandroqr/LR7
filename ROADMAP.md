@@ -190,7 +190,7 @@ D9 ─> A7, A8, A9, A11, M6
   - Editar un producto en staging y verlo actualizado.
 - **Dependencias:** C1.
 
-### A4. LCP en móvil
+### A4. LCP en móvil 🟡 Parcial (LR7-050): imágenes LCP corregidas; falta A4b para llegar a ≤ 2,5 s simulado
 - **Problema:** LCP de 3,4 s en la home, 3,7 s en la ficha y 5,5 s en la tienda.
 - **Archivos:**
   - `components/pages/hero-carousel.tsx`, `product-page.tsx` y `shop-page.tsx`: el hero de la tienda es un fondo CSS y debe pasar a `next/image` con `priority`.
@@ -198,6 +198,19 @@ D9 ─> A7, A8, A9, A11, M6
 - **Resultado:** LCP de 2,5 s o menos en las 3 páginas (Lighthouse móvil) y Performance de 90 o más.
 - **Comprobación:** Lighthouse antes y después con la misma configuración (la línea base está en `docs/DIAGNOSTICO_LR7.md`).
 - **Dependencias:** A3. C3 cambia las imágenes, así que hay que medir de nuevo después.
+
+### A4b. Dividir el CSS global por componente (propuesta, pendiente de aprobación)
+- **Problema:** `app/globals.css` (6.436 líneas, 150 KB, 25 KB gz) se carga entero en todas las páginas y el 88 % no se usa en cada una (Lighthouse `unused-css-rules`). Bloquea el render y es la causa principal del LCP simulado alto (LR7-050).
+- **Archivos:**
+  - `app/globals.css`: dejar solo tokens, base, layout común, navbar y footer.
+  - Un `.css` por componente o página, importado desde el propio componente: streetwear, personalizador, colecciones, carrito y checkout, admin, highlights, shop, producto, etc.
+- **Resultado:** cada ruta carga solo su CSS, unos 20–40 KB en vez de 150 KB, sin ningún cambio visual.
+- **Comprobación:**
+  - Comparar los estilos calculados (`getComputedStyle`) de todos los elementos, antes y después, en las 23 rutas a 390 y 1280 px.
+  - Lighthouse móvil con LCP ≤ 2,5 s en home, ficha y tienda.
+  - Después, valorar `experimental.inlineCss`.
+- **Riesgo:** el orden de la cascada cambia entre archivos, por eso la comparación de estilos calculados es obligatoria.
+- **Dependencias:** A4.
 
 ### A5. Analítica GA4 con eventos de e-commerce y consentimiento 🔒 D7
 - **Problema:** no hay ninguna medición.

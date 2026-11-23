@@ -116,7 +116,7 @@ export function ProductPage({ product, relatedProducts }: ProductPageProps) {
         <div className="product-layout">
           <section className="product-gallery-column" aria-label={`Galeria de ${product.name}`}>
             <div className="product-main-image img-zoom">
-              <Image src={product.images[mainImg].src} alt={product.images[mainImg].alt} fill sizes="(max-width: 900px) 100vw, 50vw" style={{ objectFit: "cover" }} loading="eager" />
+              <Image src={product.images[mainImg].src} alt={product.images[mainImg].alt} fill sizes="(max-width: 900px) 100vw, 50vw" style={{ objectFit: "cover" }} loading="eager" fetchPriority="high" />
               {product.badge ? (
                 <div className="product-badge">
                   {product.badge}

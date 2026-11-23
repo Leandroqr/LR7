@@ -1,9 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ProductCard } from "@/components/product/product-card";
 import type { Product } from "@/types/ecommerce";
+
+const SHOP_HERO_IMAGE = "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1800&auto=format&fit=crop";
 
 type ShopSection = "all" | "football" | "new" | "retro" | "accessories" | "training" | "f678";
 type PriceFilter = "all" | "under-90" | "90-110" | "over-110";
@@ -191,6 +194,17 @@ export function ShopPage({ products, initialCategory, initialBrand }: Readonly<S
   return (
     <main className="shop-page">
       <header className="shop-hero">
+        <div className="shop-hero-media" aria-hidden="true">
+          <Image
+            src={SHOP_HERO_IMAGE}
+            alt=""
+            fill
+            sizes="100vw"
+            loading="eager"
+            fetchPriority="high"
+            style={{ objectFit: "cover", objectPosition: "center 44%" }}
+          />
+        </div>
         <nav aria-label="Migas de pan" className="shop-breadcrumbs">
           <Link href="/">INICIO</Link><span aria-hidden="true">/</span><span>TIENDA</span>
         </nav>
