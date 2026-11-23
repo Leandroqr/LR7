@@ -1,0 +1,63 @@
+# CI de LR7: valida cada push a main y cada pull request con los mismos gates que se
+# ejecutan en local (ROADMAP M11). No usa secretos: el build funciona sin variables de
+# entorno (catálogo de respaldo y URL local), así que nunca toca Supabase ni Wompi.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Lint, tipos, tests y build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Usa la versión de "packageManager" en package.json (pnpm@10.34.3).
+      - name: Instalar pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Instalar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Instalar dependencias (lockfile congelado)
+        run: pnpm install --frozen-lockfile
+
+      - name: Auditoría de dependencias de producción
+        run: pnpm audit --prod
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Tipos
+        run: pnpm exec tsc --noEmit
+
+      - name: Tests
+        run: pnpm test
+
+      - name: Caché de build de Next.js
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('app/**', 'components/**', 'lib/**', 'types/**', 'next.config.ts') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}-
+
+      - name: Build
+        run: pnpm build

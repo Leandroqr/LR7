@@ -65,7 +65,7 @@ Cada afirmación lleva su nivel de certeza:
 - **Cabeceras de seguridad:** no hay CSP, `X-Frame-Options`/`frame-ancestors`, `X-Content-Type-Options`, `Referrer-Policy` ni `Permissions-Policy`. Además, la cabecera `x-powered-by: Next.js` queda expuesta ✅.
 - **Protección contra abuso:** no hay límite de peticiones ni anti-bots en `/api/payments/wompi/prepare` y `reconcile`, que **reservan inventario** 🔍.
 - **`proxy.ts` / middleware:** no existe. La sesión de Supabase no se refresca en un proxy; hoy solo afecta al admin 🔍.
-- **CI:** no hay `.github/workflows`, así que lint, tests y build solo se ejecutan a mano 🔍.
+- **CI:** ✅ resuelto en M11 (LR7-055). ~~No hay `.github/workflows`, así que lint, tests y build solo se ejecutan a mano~~ 🔍.
 - **Tests de extremo a extremo** del embudo de compra.
 - **Funciones de tienda que faltan:** mini-carrito o confirmación al agregar, barra de compra fija en la ficha móvil, franja de beneficios, prueba social y reseñas, cuenta de cliente con historial, aviso de reposición, filtros por color y equipo, sugerencias de búsqueda, imagen de Open Graph por defecto, JSON-LD `FAQPage`.
 
