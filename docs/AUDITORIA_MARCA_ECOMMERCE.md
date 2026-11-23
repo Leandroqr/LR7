@@ -65,7 +65,9 @@ La recomendación de marca es posicionarse en **diseños propios inspirados** (c
 
 ---
 
-## Propuesta de `PRODUCT.md` y `DESIGN.md` (pendiente de tu validación)
+## Propuesta de `PRODUCT.md` y `DESIGN.md`
+
+> **Sustituida (2026-11-23)** por los archivos validados `PRODUCT.md` y `DESIGN.md` en la raíz del repositorio. Lo que sigue es el borrador original.
 
 No existen. Esto es un borrador y **no lo uso como base hasta que lo valides o lo corrijas.** Las partes entre corchetes [ ] las tienes que decidir tú.
 

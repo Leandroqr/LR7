@@ -22,11 +22,11 @@ Este roadmap sale de `docs/DIAGNOSTICO_LR7.md` (2026-11-23). **No hay nada imple
 | D2 | Razón social, NIT, dirección, correo y teléfono legal | C5 |
 | D3 | Número de WhatsApp | C6 |
 | D4 | Fotos reales de los productos | C3 |
-| D5 | Decisión sobre licencias: productos oficiales o diseños inspirados | C4 |
+| D5 | ✅ Resuelto (2026-11-23): diseños inspirados, sin escudos ni logos de terceros | C4 |
 | D6 | Acceso a un Supabase de staging y a las claves sandbox de Wompi | C7, A15 |
 | D7 | ID de GA4 o GTM | A5 |
 | D8 | Tarifa de envío y umbral de envío gratis | A10 |
-| D9 | Validación de `PRODUCT.md` y `DESIGN.md` | A7, M6 |
+| D9 | ✅ Resuelto (2026-11-23): `PRODUCT.md` y `DESIGN.md` validados ("El Dorsal", todo en español, azul para acciones y naranja para señales) | A7, M6 |
 
 ## Orden y dependencias
 

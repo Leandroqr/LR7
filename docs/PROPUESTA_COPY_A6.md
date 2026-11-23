@@ -1,4 +1,6 @@
-# Propuesta de copy editorial (A6, pendiente de aprobación)
+# Propuesta de copy editorial (A6)
+
+> **Decisión (2026-11-23): opción A, todo en español**, streetwear incluido. La tabla queda aprobada como base y se aplicará en el rediseño de cada pantalla, ajustada a la voz de `PRODUCT.md`.
 
 A6 ya corrigió lo funcional: tildes, códigos internos, insignias, navegación, `alt`, placeholders y metadatos.
 
