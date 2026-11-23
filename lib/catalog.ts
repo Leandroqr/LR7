@@ -1,7 +1,10 @@
 import "server-only";
 
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { unstable_cache } from "next/cache";
+import { CACHE_TAGS, PUBLIC_DATA_REVALIDATE_SECONDS } from "@/lib/cache-tags";
 import { PRODUCTS } from "@/lib/products";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabasePublicClient } from "@/lib/supabase/public";
 import type { Database } from "@/types/database";
 import type {
   Product,
@@ -62,8 +65,27 @@ function rowsByProduct<Row extends { product_id: string }>(rows: Row[]) {
 export async function getPublicProducts(): Promise<Product[]> {
   if (process.env.CATALOG_SOURCE !== "supabase") return PRODUCTS;
 
-  const supabase = await createSupabaseServerClient();
-  if (!supabase) return PRODUCTS;
+  try {
+    const products = await getCachedSupabaseProducts();
+    return products.length ? products : PRODUCTS;
+  } catch {
+    // Supabase no respondió: se sirve el catálogo de respaldo sin guardarlo en caché.
+    return PRODUCTS;
+  }
+}
+
+class CatalogUnavailableError extends Error {}
+
+// Lanza en vez de devolver el respaldo: unstable_cache no guarda resultados que lanzan,
+// así un fallo transitorio no queda cacheado.
+const getCachedSupabaseProducts = unstable_cache(fetchSupabaseProducts, ["lr7-public-products"], {
+  tags: [CACHE_TAGS.catalog],
+  revalidate: PUBLIC_DATA_REVALIDATE_SECONDS,
+});
+
+async function fetchSupabaseProducts(): Promise<Product[]> {
+  const supabase = createSupabasePublicClient();
+  if (!supabase) throw new CatalogUnavailableError("Supabase no está configurado.");
 
   const productResult = await supabase
     .from("products")
@@ -71,7 +93,8 @@ export async function getPublicProducts(): Promise<Product[]> {
     .eq("active", true)
     .order("created_at", { ascending: false });
 
-  if (productResult.error || !productResult.data?.length) return PRODUCTS;
+  if (productResult.error) throw new CatalogUnavailableError(productResult.error.message);
+  if (!productResult.data?.length) return [];
 
   const productIds = productResult.data.map((product) => product.id);
   const [imageResult, variantResult, relationResult, categoryResult] = await Promise.all([
@@ -81,9 +104,8 @@ export async function getPublicProducts(): Promise<Product[]> {
     supabase.from("categories").select("*").eq("active", true),
   ]);
 
-  if (imageResult.error || variantResult.error || relationResult.error || categoryResult.error) {
-    return PRODUCTS;
-  }
+  const relatedError = imageResult.error ?? variantResult.error ?? relationResult.error ?? categoryResult.error;
+  if (relatedError) throw new CatalogUnavailableError(relatedError.message);
 
   const imagesByProduct = rowsByProduct<ProductImageRow>(imageResult.data ?? []);
   const variantsByProduct = rowsByProduct<VariantRow>(variantResult.data ?? []);
@@ -106,7 +128,7 @@ export async function getPublicProducts(): Promise<Product[]> {
     return mapped ? [mapped] : [];
   });
 
-  return products.length ? products : PRODUCTS;
+  return products;
 }
 
 export async function getPublicProductBySlug(slug: string) {
@@ -115,7 +137,7 @@ export async function getPublicProductBySlug(slug: string) {
 }
 
 function mapProduct(
-  supabase: NonNullable<Awaited<ReturnType<typeof createSupabaseServerClient>>>,
+  supabase: SupabaseClient<Database>,
   product: ProductRow,
   imageRows: ProductImageRow[],
   variantRows: VariantRow[],

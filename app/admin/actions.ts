@@ -1,6 +1,7 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
+import { CACHE_TAGS } from "@/lib/cache-tags";
 import { unstable_rethrow } from "next/navigation";
 import { AdminActionError, toAdminActionError, type AdminActionResult } from "@/lib/admin/action-result";
 import { isRemoteProductImagePath } from "@/lib/admin/product-images";
@@ -85,8 +86,14 @@ function jsonValue(formData: FormData, key: string): Json {
   }
 }
 
-/** Public pages read catalog, CMS and navigation data; refresh every cached route at once. */
+/**
+ * Public pages read catalog, CMS and navigation data through tagged caches (lib/catalog.ts,
+ * lib/content.ts). Expire those tags so the next visit reads fresh data, then refresh every
+ * cached route at once.
+ */
 function revalidatePublicSite() {
+  updateTag(CACHE_TAGS.catalog);
+  updateTag(CACHE_TAGS.content);
   revalidatePath("/", "layout");
 }
 

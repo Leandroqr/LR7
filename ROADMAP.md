@@ -175,7 +175,7 @@ D9 ─> A7, A8, A9, A11, M6
 - **Comprobación:** un script de carga en Preview recibe 429; una compra normal en sandbox sigue funcionando.
 - **Dependencias:** C7. Toca el flujo de pagos: necesita tu aprobación.
 
-### A3. Cachear las páginas públicas
+### A3. Cachear las páginas públicas ✅ Hecho (pendiente de deploy y de validar el refresco desde el admin en staging, LR7-049)
 - **Problema:** `getPublicNavigation()` lee cookies en el layout, así que todo el sitio queda `no-store` y consulta Supabase en cada visita.
 - **Archivos:**
   - `lib/content.ts` y `lib/catalog.ts`: un cliente sin cookies para lecturas públicas y caché con revalidación.
