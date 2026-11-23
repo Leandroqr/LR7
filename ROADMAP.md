@@ -46,7 +46,7 @@ D9 ─> A7, A8, A9, A11, M6
 
 ## CRÍTICA
 
-### C1. Actualizar Next.js y fijar versiones
+### C1. Actualizar Next.js y fijar versiones ✅ Hecho (commit `678b900`)
 - **Problema:** `next@16.4.0` tiene 10 vulnerabilidades (2 críticas, LR7-046). `next`, `react`, `react-dom` y `eslint-config-next` están en `latest`.
 - **Archivos:** `package.json`, `pnpm-lock.yaml`.
 - **Resultado:**
@@ -59,7 +59,7 @@ D9 ─> A7, A8, A9, A11, M6
   - Recorrido por las 23 rutas con código 200.
 - **Dependencias:** ninguna. Se hace en un git worktree aparte.
 
-### C2. Dominio correcto en URLs canónicas, sitemap y robots 🔒 D1
+### C2. Dominio correcto en URLs canónicas, sitemap y robots ✅ Hecho (commit `a8af229`, pendiente de deploy)
 - **Problema:** producción publica `https://sportco.co` en canonical, `og:url`, `robots.txt` y en las 36 URLs del sitemap.
 - **Archivos:**
   - `lib/site.ts`: quitar el dominio por defecto; usar `VERCEL_PROJECT_PRODUCTION_URL` o fallar en el build de producción.
@@ -287,9 +287,9 @@ D9 ─> A7, A8, A9, A11, M6
 - **Comprobación:** capturas y verificación de enlaces (todos responden 200).
 - **Dependencias:** C5.
 
-### A12. `robots.txt` completo
+### A12. `robots.txt` completo ✅ Hecho (commit pendiente de deploy, LR7-048)
 - **Problema:** no excluye `/admin`, `/api`, `/auth` ni `/checkout`.
-- **Archivos:** `app/robots.ts`, más `noindex` en `/carrito` y `/favoritos`.
+- **Archivos:** `app/robots.ts`, nuevo `lib/robots-rules.ts`. El `noindex` de `/carrito`, `/favoritos`, `/buscar`, `/checkout/estado` y `/admin` ya existía.
 - **Resultado:** solo las páginas públicas son indexables.
 - **Comprobación:** `curl /robots.txt` y la herramienta de robots de Search Console.
 - **Dependencias:** C2.
@@ -320,7 +320,7 @@ D9 ─> A7, A8, A9, A11, M6
 | M4 | Precio anterior y descuento | `compare_at_price` no se muestra | `product-card.tsx`, `product-page.tsx`, JSON-LD `Offer` | Precio tachado y % solo si es mayor que el precio. Test de cálculo | C3 |
 | M5 | Stock real y urgencia honesta | "DISPONIBLE" no refleja el stock (LR7-015) | `lib/catalog.ts`, tarjeta, ficha | "Últimas N" según `low_stock_threshold`. Verificación en staging | C3 |
 | M6 | Un solo acento de acción | Naranja en el carrito y la personalización frente al azul de la tienda | `app/globals.css` (tokens), carrito, `personalization-studio.tsx` | Coherente con `DESIGN.md`. Capturas | D9 |
-| M7 | SEO complementario | Faltan metadata, imagen de Open Graph, `FAQPage` y `Organization` completo | 4 `page.tsx`, `app/opengraph-image.tsx`, `lib/seo.ts`, preguntas frecuentes | Rich Results Test sin errores; las vistas previas al compartir muestran imagen | C2 |
+| M7 | SEO complementario | Faltan imagen de Open Graph, `FAQPage` y `Organization` completo | `app/opengraph-image.tsx`, `lib/seo.ts`, preguntas frecuentes | Rich Results Test sin errores; las vistas previas al compartir muestran imagen | C2 |
 | M8 | Accesibilidad | Contraste y tamaño de fuente (Lighthouse), zoom solo con hover, tarjetas densas | `app/globals.css`, `product-card.tsx`, galería | Lighthouse Accesibilidad de 100 en las 3 páginas; navegación con teclado completa | — |
 | M9 | Estilos en línea a clases y tokens | Más de 170 `style={{}}` | `navbar.tsx`, `home-personalizer.tsx`, `nosotros`, `catalog-page`, `buscar`, `contacto`, `footer` | Mismo aspecto (comparación de capturas antes y después) y menos CSS en línea | — |
 | M10 | Venta cruzada "completa el look" | Relacionados limitados a la misma categoría | `product-page.tsx` | Mezcla fútbol y training. Prueba en navegador | — |

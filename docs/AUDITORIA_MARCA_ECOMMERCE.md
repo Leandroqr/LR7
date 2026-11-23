@@ -188,7 +188,7 @@ Impacto en ventas: A = alto · M = medio · B = bajo. Esfuerzo: S = pequeño · 
 ### SEO
 | Punto | Estado | Evidencia | Prioridad | Impacto / esfuerzo |
 |---|---|---|---|---|
-| Metadata por página | Mejorable | 21 páginas con metadata; faltan `/contacto`, `/favoritos`, `/carrito` y `/preguntas-frecuentes` | P2 | M / S |
+| Metadata por página | OK | Corrección (A12): `/contacto`, `/favoritos`, `/carrito` y `/preguntas-frecuentes` la tienen en su `layout.tsx`; las privadas llevan `noindex` | — | — |
 | Imagen de Open Graph | Mejorable | No hay `opengraph-image` por defecto: las páginas sin producto se comparten sin imagen | P2 | M / S |
 | Datos estructurados | Mejorable | Hay `Product`, `BreadcrumbList`, `Organization` y `WebSite`. Falta `FAQPage`, y `Organization` no tiene `sameAs` ni contacto | P2 | M / S |
 | Sitemap y robots | OK | `app/sitemap.ts` y `app/robots.ts` | — | — |
@@ -234,7 +234,7 @@ Impacto en ventas: A = alto · M = medio · B = bajo. Esfuerzo: S = pequeño · 
 | 6 | Confirmación al agregar al carrito: panel lateral o toast con "Ir al carrito" | Hoy no hay respuesta visible al agregar | M | No |
 | 7 | Hero y propuesta de valor: un mensaje de marca claro más accesos a Fútbol, Training y Streetwear | Se entiende qué es LR7 en 5 segundos | S | Validar el copy |
 | 8 | Analítica: GA4 o GTM con eventos `view_item`, `add_to_cart`, `begin_checkout` y `purchase`, y banner de consentimiento | Sin medir no se sabe qué funciona | M | ID de GA4 o GTM |
-| 9 | Corregir el dominio por defecto `sportco.co`, añadir `priority` a la imagen principal, una imagen de Open Graph por defecto y metadata en las 4 páginas que no tienen | SEO y rendimiento, rápido | S | Dominio definitivo |
+| 9 | Corregir el dominio por defecto `sportco.co`, añadir `priority` a la imagen principal, una imagen de Open Graph por defecto | SEO y rendimiento, rápido | S | Dominio definitivo |
 | 10 | Newsletter real: conectar el componente a la tabla de suscriptores con consentimiento y ponerlo en la home y el footer | Construye una base de clientes propia | M | Confirmar la tabla, quizá cambio de esquema |
 
 **Fuera del top 10 pero crítico:** la fotografía real de producto (P0). No la puedo resolver con código; necesito tus fotos. Mientras tanto, puedo preparar el componente de galería (frontal, espalda, puesta) y un aviso de foto ilustrativa si lo apruebas.

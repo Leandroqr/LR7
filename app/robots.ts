@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { ROBOTS_DISALLOW } from "@/lib/robots-rules";
 import { SITE_CONFIG } from "@/lib/site";
 
 export default function robots(): MetadataRoute.Robots {
@@ -6,7 +7,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/carrito", "/favoritos", "/buscar"],
+      disallow: [...ROBOTS_DISALLOW],
     },
     sitemap: `${SITE_CONFIG.baseUrl}/sitemap.xml`,
   };

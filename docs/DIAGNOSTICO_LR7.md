@@ -80,7 +80,7 @@ Cada afirmación lleva su nivel de certeza:
 | E5 | **Textos sin tildes** en catálogo, navegación, footer y CMS (Seleccion, Clasico, CATALOGO, Envios, Guia, satisfaccion, dias…), y copy en inglés en tienda y streetwear | ✅ | Alta |
 | E6 | **Render dinámico en todo el sitio:** `app/layout.tsx:66` llama a `getPublicNavigation()`, que lee `cookies()`. Todas las páginas salen `no-store` y consultan Supabase en cada visita (TTFB en frío de 2,7 s en la home) | ✅ `cache-control: private, no-store` | Alta |
 | E7 | **LCP lento en móvil:** home 3,4 s, ficha 3,7 s, tienda 5,5 s. En la tienda, el elemento LCP es el fondo de `header.shop-hero`, que no se prioriza | ✅ Lighthouse | Alta |
-| E8 | **`robots.txt` incompleto:** no excluye `/admin`, `/api`, `/auth` ni `/checkout` | ✅ | Media |
+| E8 | ✅ Resuelto en A12. **`robots.txt` incompleto:** no excluye `/admin`, `/api`, `/auth` ni `/checkout` | ✅ | Media |
 | E9 | **Footer con errores:** "Preguntas frecuentes" sale dos veces y "Cómo comprar" lleva a `/contacto` | ✅ | Media |
 | E10 | **Talla S marcada por defecto** en la ficha | ✅ | Media |
 | E11 | **Pestañas de categoría vacías visibles:** "ACCESORIOS" y "FÚTBOL 5/7/8" aparecen tachadas | ✅ | Baja |
@@ -136,7 +136,7 @@ Cada afirmación lleva su nivel de certeza:
 
 1. **Dominio:** configurar `NEXT_PUBLIC_SITE_URL` y quitar el dominio por defecto `sportco.co` (E1).
 2. **Robots:** excluir `/admin`, `/api`, `/auth` y `/checkout` en `robots.txt`.
-3. **Metadata:** añadirla en `/contacto`, `/favoritos`, `/carrito` y `/preguntas-frecuentes`. A `/carrito` y `/favoritos`, además, `noindex`.
+3. **Metadata:** ~~añadirla en `/contacto`, `/favoritos`, `/carrito` y `/preguntas-frecuentes`~~. Corrección (A12): estas 4 páginas ya la tienen en su `layout.tsx`, y `/carrito`, `/favoritos`, `/buscar`, `/checkout/estado` y `/admin` ya llevan `noindex`.
 4. **Imagen para compartir:** crear una imagen de Open Graph por defecto (`app/opengraph-image`).
 5. **Datos estructurados:**
    - JSON-LD `FAQPage` en la página de preguntas frecuentes.
