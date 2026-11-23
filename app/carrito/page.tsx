@@ -78,7 +78,7 @@ export default function CartPage() {
         <div className="cart-container">
           <CartProgress />
           <section className="cart-empty" aria-labelledby="empty-cart-title">
-            <div className="cart-empty-mark" aria-hidden="true">07</div>
+            <div className="cart-empty-mark" aria-hidden="true" data-mark="07" />
             <p className="cart-eyebrow">TU SELECCIÓN</p>
             <h1 id="empty-cart-title" className="font-display">TU CARRITO ESTÁ VACÍO.</h1>
             <p>Explora camisetas de fútbol y training seleccionadas por LR7.</p>

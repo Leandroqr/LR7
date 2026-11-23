@@ -61,7 +61,7 @@ const pillars = [
 export default function AboutPage() {
   return (
     <div style={{ background: "var(--color-white)", paddingTop: "80px" }}>
-      <section style={{ position: "relative", minHeight: "80vh", display: "flex", alignItems: "center", overflow: "hidden" }}>
+      <section style={{ position: "relative", minHeight: "80vh", display: "flex", alignItems: "center", overflow: "hidden", color: "var(--color-text-on-dark)" }}>
         <Image
           src="https://images.unsplash.com/photo-1490108474814-221f6198acc5?w=1600&h=1000&fit=crop&auto=format"
           alt="Jugadores en cancha"
@@ -72,7 +72,7 @@ export default function AboutPage() {
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(10,10,10,0.95) 50%, rgba(10,10,10,0.3))" }} />
 
         <div style={{ position: "relative", zIndex: 2, maxWidth: "1440px", margin: "0 auto", padding: "4rem 2rem", width: "100%" }}>
-          <p className="font-display" style={{ fontSize: "0.8rem", letterSpacing: "0.25em", color: "var(--color-accent)", textTransform: "uppercase", marginBottom: "1rem" }}>
+          <p className="font-display" style={{ fontSize: "0.8rem", letterSpacing: "0.25em", color: "var(--color-accent-on-dark)", textTransform: "uppercase", marginBottom: "1rem" }}>
             - NUESTRA HISTORIA
           </p>
           <h1 className="font-display" style={{ fontSize: "clamp(3rem, 9vw, 7.5rem)", fontWeight: 900, textTransform: "uppercase", lineHeight: 0.88, marginBottom: "1.5rem" }}>
@@ -82,7 +82,7 @@ export default function AboutPage() {
             <br />
             <span style={{ color: "var(--color-accent)" }}>CAMISETAS.</span>
           </h1>
-          <p style={{ fontSize: "1.1rem", color: "var(--color-text-muted)", maxWidth: "480px", lineHeight: 1.7, fontWeight: 300 }}>
+          <p style={{ fontSize: "1.1rem", color: "var(--color-text-muted-on-dark)", maxWidth: "480px", lineHeight: 1.7, fontWeight: 300 }}>
             Vendemos una forma de llevar tu pasión contigo.
           </p>
         </div>
@@ -103,10 +103,10 @@ export default function AboutPage() {
         </section>
       ))}
 
-      <section style={{ background: "#0f0f0f", padding: "6rem 0", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+      <section style={{ background: "#0f0f0f", color: "var(--color-text-on-dark)", padding: "6rem 0", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
         <div style={{ maxWidth: "1440px", margin: "0 auto", padding: "0 2rem" }}>
           <div style={{ textAlign: "center", marginBottom: "4rem" }}>
-            <p className="font-display" style={{ fontSize: "0.8rem", letterSpacing: "0.25em", color: "var(--color-accent)", textTransform: "uppercase", marginBottom: "0.75rem" }}>
+            <p className="font-display" style={{ fontSize: "0.8rem", letterSpacing: "0.25em", color: "var(--color-accent-on-dark)", textTransform: "uppercase", marginBottom: "0.75rem" }}>
               - NUESTRA ESENCIA
             </p>
             <h2 className="font-display" style={{ fontSize: "clamp(2.5rem, 6vw, 5rem)", fontWeight: 900, textTransform: "uppercase", lineHeight: 0.9 }}>
@@ -119,9 +119,9 @@ export default function AboutPage() {
           <div className="pillars-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1px", background: "rgba(255,255,255,0.06)" }}>
             {pillars.map((p) => (
               <div key={p.title} style={{ background: "#0f0f0f", padding: "3.5rem 2.5rem", borderTop: "3px solid transparent", textAlign: "center" }}>
-                <div style={{ fontSize: "1.5rem", color: "var(--color-accent)", marginBottom: "1.25rem" }}>{p.icon}</div>
+                <div aria-hidden="true" style={{ fontSize: "1.5rem", color: "var(--color-accent-on-dark)", marginBottom: "1.25rem" }}>{p.icon}</div>
                 <h3 className="font-display" style={{ fontSize: "2rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "1rem" }}>{p.title}</h3>
-                <p style={{ fontSize: "0.9rem", color: "var(--color-text-muted)", lineHeight: 1.75, fontWeight: 300 }}>{p.desc}</p>
+                <p style={{ fontSize: "0.9rem", color: "var(--color-text-muted-on-dark)", lineHeight: 1.75, fontWeight: 300 }}>{p.desc}</p>
               </div>
             ))}
           </div>

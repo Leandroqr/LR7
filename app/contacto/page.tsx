@@ -27,16 +27,16 @@ export default function ContactPage() {
             style={{ display: "flex", flexDirection: "column", gap: "1.25rem", background: "#0f0f0f", padding: "2.5rem" }}
           >
             <label style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-              <span style={{ fontSize: "0.65rem", letterSpacing: "0.18em", color: "rgba(255,255,255,0.4)", fontFamily: "'Barlow Condensed'", fontWeight: 700, textTransform: "uppercase" }}>NOMBRE</span>
-              <input value={name} onChange={(event) => setName(event.target.value)} required style={{ width: "100%", padding: "0.85rem 1rem", background: "var(--color-ice)", border: "1px solid var(--color-border)", color: "var(--color-dark)", fontFamily: "var(--font-body)", fontWeight: 400, fontSize: "0.9rem", outline: "none" }} />
+              <span style={{ fontSize: "0.65rem", letterSpacing: "0.18em", color: "var(--color-text-muted-on-dark)", fontFamily: "'Barlow Condensed'", fontWeight: 700, textTransform: "uppercase" }}>NOMBRE</span>
+              <input value={name} onChange={(event) => setName(event.target.value)} required style={{ width: "100%", padding: "0.85rem 1rem", background: "var(--color-ice)", border: "1px solid var(--color-border)", color: "var(--color-dark)", fontFamily: "var(--font-body)", fontWeight: 400, fontSize: "0.9rem" }} />
             </label>
             <label style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-              <span style={{ fontSize: "0.65rem", letterSpacing: "0.18em", color: "rgba(255,255,255,0.4)", fontFamily: "'Barlow Condensed'", fontWeight: 700, textTransform: "uppercase" }}>EMAIL</span>
-              <input value={email} onChange={(event) => setEmail(event.target.value)} type="email" required style={{ width: "100%", padding: "0.85rem 1rem", background: "var(--color-ice)", border: "1px solid var(--color-border)", color: "var(--color-dark)", fontFamily: "var(--font-body)", fontWeight: 400, fontSize: "0.9rem", outline: "none" }} />
+              <span style={{ fontSize: "0.65rem", letterSpacing: "0.18em", color: "var(--color-text-muted-on-dark)", fontFamily: "'Barlow Condensed'", fontWeight: 700, textTransform: "uppercase" }}>EMAIL</span>
+              <input value={email} onChange={(event) => setEmail(event.target.value)} type="email" required style={{ width: "100%", padding: "0.85rem 1rem", background: "var(--color-ice)", border: "1px solid var(--color-border)", color: "var(--color-dark)", fontFamily: "var(--font-body)", fontWeight: 400, fontSize: "0.9rem" }} />
             </label>
             <label style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-              <span style={{ fontSize: "0.65rem", letterSpacing: "0.18em", color: "rgba(255,255,255,0.4)", fontFamily: "'Barlow Condensed'", fontWeight: 700, textTransform: "uppercase" }}>MENSAJE</span>
-              <textarea value={message} onChange={(event) => setMessage(event.target.value)} rows={5} required style={{ width: "100%", padding: "0.85rem 1rem", background: "var(--color-ice)", border: "1px solid var(--color-border)", color: "var(--color-dark)", fontFamily: "var(--font-body)", fontWeight: 400, fontSize: "0.9rem", outline: "none", resize: "vertical" }} />
+              <span style={{ fontSize: "0.65rem", letterSpacing: "0.18em", color: "var(--color-text-muted-on-dark)", fontFamily: "'Barlow Condensed'", fontWeight: 700, textTransform: "uppercase" }}>MENSAJE</span>
+              <textarea value={message} onChange={(event) => setMessage(event.target.value)} rows={5} required style={{ width: "100%", padding: "0.85rem 1rem", background: "var(--color-ice)", border: "1px solid var(--color-border)", color: "var(--color-dark)", fontFamily: "var(--font-body)", fontWeight: 400, fontSize: "0.9rem", resize: "vertical" }} />
             </label>
             <button type="submit" className="btn-primary" disabled={!getWhatsAppUrl()} style={{ justifyContent: "center" }}>
               ENVIAR MENSAJE

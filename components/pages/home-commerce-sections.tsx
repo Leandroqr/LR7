@@ -20,10 +20,11 @@ const BENEFIT_ITEMS = [
 export function BenefitsStrip() {
   return (
     <section className="benefits-strip" aria-label="Beneficios LR7">
-      <div className="benefits-strip-inner">
+      {/* En móvil la franja se desplaza: el contenedor es enfocable para poder recorrerla con teclado. */}
+      <div className="benefits-strip-inner" tabIndex={0}>
         <div className="benefits-strip-track">
           {[...BENEFIT_ITEMS, ...BENEFIT_ITEMS].map((item, index) => (
-            <span key={`${item.id}-${index}`}>
+            <span key={`${item.id}-${index}`} aria-hidden={index >= BENEFIT_ITEMS.length ? true : undefined}>
               <b aria-hidden="true">+</b> {item.text}
             </span>
           ))}

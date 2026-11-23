@@ -24,10 +24,16 @@ export function Navbar({ navigation }: Readonly<{ navigation: NavigationItem[] }
   const [searchQuery, setSearchQuery] = useState("");
   const mobileMenuRef = useRef<HTMLElement>(null);
   const mobileMenuButtonRef = useRef<HTMLButtonElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const { cartCount, favoriteCount } = useStore();
   const pathname = usePathname();
   const router = useRouter();
   const whatsappMessage = getGeneralWhatsAppMessage(pathname);
+
+  // Al abrir el buscador, el foco va al campo (el panel deja de ser inert en este mismo render).
+  useEffect(() => {
+    if (searchOpen) searchInputRef.current?.focus();
+  }, [searchOpen]);
   const navigationLinks = navigation.length ? navigation : NAV_LINKS;
 
   useEffect(() => {
@@ -149,6 +155,8 @@ export function Navbar({ navigation }: Readonly<{ navigation: NavigationItem[] }
               <button
               type="button"
               onClick={() => setSearchOpen((value) => !value)}
+              aria-expanded={searchOpen}
+              aria-controls="site-search"
               style={{ background: "none", border: "none", cursor: "pointer", color: iconColor, padding: "6px", transition: "color 0.2s" }}
               onMouseEnter={(event) => {
                 event.currentTarget.style.color = "var(--color-accent)";
@@ -156,7 +164,7 @@ export function Navbar({ navigation }: Readonly<{ navigation: NavigationItem[] }
               onMouseLeave={(event) => {
                 event.currentTarget.style.color = iconColor;
               }}
-              aria-label="Abrir buscador"
+              aria-label={searchOpen ? "Cerrar buscador" : "Abrir buscador"}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <circle cx="11" cy="11" r="8" />
@@ -219,7 +227,11 @@ export function Navbar({ navigation }: Readonly<{ navigation: NavigationItem[] }
           </div>
         </div>
 
+        {/* Cerrado, el buscador sale del orden de tabulación y del árbol accesible (antes se enfocaba invisible). */}
         <div
+          id="site-search"
+          inert={!searchOpen}
+          aria-hidden={!searchOpen}
           style={{
             maxHeight: searchOpen ? "80px" : "0",
             overflow: "hidden",
@@ -233,10 +245,11 @@ export function Navbar({ navigation }: Readonly<{ navigation: NavigationItem[] }
             style={{ maxWidth: "1440px", margin: "0 auto", padding: "0.85rem 2rem", display: "flex", gap: "1rem", alignItems: "center" }}
           >
             <input
+              ref={searchInputRef}
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
               placeholder="Buscar camiseta, equipo, selección..."
-              style={{ flex: 1, background: "transparent", border: "none", borderBottom: "1px solid rgba(7,20,38,0.2)", color: "var(--color-dark)", fontFamily: "'Barlow Condensed'", fontWeight: 700, fontSize: "1.1rem", letterSpacing: "0.06em", outline: "none", padding: "0.4rem 0", textTransform: "uppercase" }}
+              style={{ flex: 1, background: "transparent", border: "none", borderBottom: "1px solid rgba(7,20,38,0.2)", color: "var(--color-dark)", fontFamily: "'Barlow Condensed'", fontWeight: 700, fontSize: "1.1rem", letterSpacing: "0.06em", padding: "0.4rem 0", textTransform: "uppercase" }}
               aria-label="Buscar producto"
             />
             <button type="submit" className="btn-primary" style={{ padding: "0.5rem 1.2rem", fontSize: "0.85rem" }}>

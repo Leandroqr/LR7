@@ -26,6 +26,10 @@
   --color-border-hover: rgba(17, 82, 232, 0.65);
   --color-text-muted: rgba(5, 6, 8, 0.64);
   --color-danger: #b42318;
+  /* Texto sobre fondos oscuros (navy/negro): contraste ≥ 4.5:1 para texto pequeño (WCAG AA). */
+  --color-text-on-dark: #FFFFFF;
+  --color-text-muted-on-dark: rgba(255, 255, 255, 0.72);
+  --color-accent-on-dark: #5B8CFF;
 
   /* Highlights Carousel Responsive */
   --highlights-cards-visible: 3;
@@ -85,6 +89,7 @@
   line-height: 0.82;
 }
 
+.personalizer-controls-heading > p { color: var(--color-accent-orange-text); }
 .personalizer-header h1 span { color: var(--color-accent-orange); }
 .personalizer-header > div { padding-left: 1.5rem; border-left: 2px solid var(--color-accent-orange); }
 .personalizer-header > div span { font-family: var(--font-display), sans-serif; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.12em; }
@@ -480,7 +485,7 @@
 .street-chapters a:hover { background: var(--street-ink); color: var(--color-white); }
 .street-chapters span { grid-row: 1 / 3; color: var(--color-accent); font-family: var(--font-display), sans-serif; font-size: 0.62rem; font-weight: 900; }
 .street-chapters strong { font-family: var(--font-display), sans-serif; font-size: 1rem; font-weight: 900; letter-spacing: 0.04em; }
-.street-chapters small { color: rgba(8, 10, 13, 0.5); font-size: 0.65rem; }
+.street-chapters small { color: var(--color-text-muted); font-size: 0.65rem; }
 .street-chapters a:hover small { color: rgba(255, 255, 255, 0.6); }
 
 .street-manifesto-tape {
@@ -742,6 +747,7 @@
 }
 
 .street-culture-copy h2 { margin: 1.2rem 0 2.5rem; font-size: clamp(3.7rem, 7vw, 7rem); font-style: italic; font-weight: 900; line-height: 0.82; }
+.street-culture-copy > p:first-child { color: var(--color-accent-on-dark); }
 .street-culture-copy h2 span { color: var(--color-accent); }
 .street-culture-copy blockquote { margin: 0; padding: 0 0 0 1.5rem; border-left: 2px solid var(--color-accent-orange); color: rgba(255, 255, 255, 0.9); font-family: var(--font-display), sans-serif; font-size: clamp(1.25rem, 2vw, 1.8rem); font-style: italic; line-height: 1.3; }
 .street-culture-code {
@@ -1348,7 +1354,7 @@ body {
 }
 
 .shop-sort > span {
-  color: rgba(7, 20, 38, 0.52);
+  color: var(--color-text-muted);
   font-family: var(--font-display), sans-serif;
   font-size: 0.62rem;
   font-weight: 800;
@@ -1396,7 +1402,7 @@ body {
 .shop-filter-group > legend,
 .shop-filter-group > span {
   padding: 0;
-  color: rgba(7, 20, 38, 0.54);
+  color: var(--color-text-muted);
   font-family: var(--font-display), sans-serif;
   font-size: 0.62rem;
   font-weight: 800;
@@ -1459,7 +1465,7 @@ body {
 }
 .shop-results-header p {
   margin: 0;
-  color: rgba(7, 20, 38, 0.52);
+  color: var(--color-text-muted);
   font-family: var(--font-display), sans-serif;
   font-size: 0.62rem;
   font-weight: 800;
@@ -1554,7 +1560,7 @@ body {
 .shop-quick-sizes legend {
   margin-bottom: 0.45rem;
   padding: 0;
-  color: rgba(7, 20, 38, 0.52);
+  color: var(--color-text-muted);
   font-family: var(--font-display), sans-serif;
   font-size: 0.55rem;
   font-weight: 800;
@@ -3687,6 +3693,19 @@ body {
   transform: translateY(-1px);
 }
 
+/* Zonas con scroll horizontal enfocables con teclado (franja de beneficios, looks de streetwear). */
+.benefits-strip-inner:focus-visible,
+.street-look-grid:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: -3px;
+}
+
+/* El buscador de la tienda quitaba el contorno: se recupera al navegar con teclado. */
+.shop-search input:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
 :where(a, button, input, textarea, select):focus-visible {
   outline: 3px solid var(--color-accent);
   outline-offset: 3px;
@@ -4697,7 +4716,7 @@ input:disabled {
 
 .checkout-header-label {
   justify-self: end;
-  color: rgba(7, 20, 38, 0.55);
+  color: var(--color-text-muted);
   font-family: var(--font-display), sans-serif;
   font-size: 0.68rem;
   font-weight: 800;
@@ -4729,7 +4748,7 @@ input:disabled {
 .cart-progress li {
   position: relative;
   padding-top: 1rem;
-  color: rgba(7, 20, 38, 0.38);
+  color: var(--color-text-muted);
   font-family: var(--font-display), sans-serif;
   font-size: 0.62rem;
   font-weight: 800;
@@ -5280,6 +5299,7 @@ input:disabled {
   color: var(--color-off-white);
 }
 
+.cart-empty .cart-eyebrow { color: var(--color-accent-orange); }
 .cart-empty > p:not(.cart-eyebrow) {
   position: relative;
   max-width: 460px;
@@ -5298,6 +5318,9 @@ input:disabled {
   justify-content: space-between;
   text-decoration: none;
 }
+
+/* El "07" es decorativo: va como contenido CSS para que no cuente como texto. */
+.cart-empty-mark::before { content: attr(data-mark); }
 
 .cart-empty-mark {
   position: absolute;
@@ -5923,7 +5946,7 @@ input:disabled {
 .content-empty { margin: 0; color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.7; }
 .content-empty { padding: 2rem 0; }
 .size-guide-table { width: 100%; border-collapse: collapse; }
-.size-guide-table th { padding: 1rem; border-bottom: 1px solid rgba(7, 20, 38, 0.15); color: rgba(7, 20, 38, 0.5); font-family: var(--font-display), sans-serif; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.12em; text-align: left; }
+.size-guide-table th { padding: 1rem; border-bottom: 1px solid rgba(7, 20, 38, 0.15); color: var(--color-text-muted); font-family: var(--font-display), sans-serif; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.12em; text-align: left; }
 .size-guide-table td { padding: 1.1rem 1rem; border-bottom: 1px solid rgba(7, 20, 38, 0.08); color: var(--color-primary-dark); font-size: 0.9rem; }
 .size-guide-table td:first-child { color: var(--color-accent); font-family: var(--font-display), sans-serif; font-size: 1.1rem; font-weight: 900; }
 .managed-home-section { padding: 5rem 2rem; background: var(--color-primary-dark); color: var(--color-white); }

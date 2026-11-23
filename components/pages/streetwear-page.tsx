@@ -194,7 +194,7 @@ export function StreetwearExperience({ products }: StreetwearPageProps) {
         <Link href="#street-drops"><span>04</span><strong>NEW ARRIVALS</strong><small>Lo más nuevo</small></Link>
       </nav>
 
-      <div className="street-manifesto-tape" aria-label="Fútbol inspirado en streetwear">
+      <div className="street-manifesto-tape" aria-hidden="true">
         <div aria-hidden="true">
           <span>FOOTBALL, BUT MAKE IT FASHION</span><i>✦</i><span>OVERSIZE FIT</span><i>✦</i><span>MADE FOR THE OUTFIT</span><i>✦</i><span>WEAR THE GAME</span><i>✦</i>
           <span>FOOTBALL, BUT MAKE IT FASHION</span><i>✦</i><span>OVERSIZE FIT</span><i>✦</i><span>MADE FOR THE OUTFIT</span><i>✦</i><span>WEAR THE GAME</span><i>✦</i>
@@ -241,7 +241,7 @@ export function StreetwearExperience({ products }: StreetwearPageProps) {
           <p>03 / HOW TO WEAR IT</p>
           <h2 id="street-looks-title" className="font-display">UNA CAMISETA.<br /><span>TODO EL OUTFIT.</span></h2>
         </header>
-        <div className="street-look-grid">
+        <div className="street-look-grid" role="region" aria-label="Looks de streetwear" tabIndex={0}>
           {LOOKS.map((look, index) => (
             <article key={look.number} className="street-look" data-street-reveal>
               <div><Image src={STREET_IMAGES.looks[index].src} alt={STREET_IMAGES.looks[index].alt} fill sizes="(max-width: 700px) 84vw, 33vw" /></div>

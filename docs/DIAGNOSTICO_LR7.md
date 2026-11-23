@@ -84,7 +84,7 @@ Cada afirmación lleva su nivel de certeza:
 | E9 | **Footer con errores:** "Preguntas frecuentes" sale dos veces y "Cómo comprar" lleva a `/contacto` | ✅ | Media |
 | E10 | ✅ Resuelto en A8 (LR7-052). **Talla S marcada por defecto** en la ficha | ✅ | Media |
 | E11 | **Pestañas de categoría vacías visibles:** "ACCESORIOS" y "FÚTBOL 5/7/8" aparecen tachadas | ✅ | Baja |
-| E12 | **Lighthouse marca contraste y tamaño de fuente:** texto gris pequeño en las tarjetas y en el footer | ✅ | Media |
+| E12 | ✅ Resuelto en M8 (LR7-054). **Lighthouse marca contraste y tamaño de fuente:** texto gris pequeño en las tarjetas y en el footer | ✅ | Media |
 
 ## 5. Riesgos técnicos
 
