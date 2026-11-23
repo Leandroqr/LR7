@@ -1,4 +1,8 @@
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://sportco.co";
+import { LOCAL_SITE_URL } from "./site-url";
+
+// LR7_SITE_URL se fija en el build desde next.config.ts (resolveSiteUrl) y se inyecta
+// igual en servidor y navegador, para que canonical, sitemap y enlaces coincidan.
+const siteUrl = process.env.LR7_SITE_URL || LOCAL_SITE_URL;
 const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER?.replace(/\D/g, "") ?? "";
 
 export const SITE_CONFIG = {

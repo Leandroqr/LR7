@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { resolveSiteUrl } from "./lib/site-url";
 
 const remotePatterns: NonNullable<NextConfig["images"]>["remotePatterns"] = [
   {
@@ -18,6 +19,9 @@ if (supabaseUrl) {
 }
 
 const nextConfig: NextConfig = {
+  env: {
+    LR7_SITE_URL: resolveSiteUrl(process.env),
+  },
   images: {
     remotePatterns,
   },
