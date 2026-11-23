@@ -28,11 +28,21 @@ export type CartItem = {
   quantity: number;
 };
 
+/** Última línea agregada con aviso; `id` cambia en cada aviso aunque se repita el mismo producto. */
+export type CartNotice = Readonly<{ id: number; item: CartItem }>;
+
+type AddToCartOptions = Readonly<{
+  /** Abre el mini-carrito. Solo para botones de "agregar"; "comprar ahora" y "deshacer" no avisan. */
+  notify?: boolean;
+}>;
+
 type StoreContextValue = {
   cart: CartItem[];
   favorites: ProductId[];
   hydrated: boolean;
-  addToCart: (item: CartItem) => void;
+  addToCart: (item: CartItem, options?: AddToCartOptions) => void;
+  cartNotice: CartNotice | null;
+  dismissCartNotice: () => void;
   removeFromCart: (index: number) => void;
   updateQty: (index: number, quantity: number) => void;
   clearCart: () => void;
@@ -47,6 +57,7 @@ export function StoreProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [favorites, setFavorites] = useState<ProductId[]>([]);
   const [hydrated, setHydrated] = useState(false);
+  const [cartNotice, setCartNotice] = useState<CartNotice | null>(null);
 
   useEffect(() => {
     try {
@@ -76,7 +87,8 @@ export function StoreProvider({ children }: Readonly<{ children: ReactNode }>) {
     localStorage.setItem("favs", JSON.stringify(favorites));
   }, [favorites, hydrated]);
 
-  const addToCart = (item: CartItem) => {
+  const addToCart = (item: CartItem, options?: AddToCartOptions) => {
+    if (options?.notify) setCartNotice((current) => ({ id: (current?.id ?? 0) + 1, item }));
     setCart((previous) => {
       const existingIndex = previous.findIndex(
         (entry) =>
@@ -136,6 +148,8 @@ export function StoreProvider({ children }: Readonly<{ children: ReactNode }>) {
     favorites,
     hydrated,
     addToCart,
+    cartNotice,
+    dismissCartNotice: () => setCartNotice(null),
     removeFromCart,
     updateQty,
     clearCart,

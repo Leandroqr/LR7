@@ -48,7 +48,7 @@ export function ProductCard({ product, imageLoading = "lazy" }: Readonly<{ produ
       customNumber: "",
       unitPrice: product.price.amount,
       quantity: 1,
-    });
+    }, { notify: true });
     setAdded(true);
   };
 

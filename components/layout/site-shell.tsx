@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
+import { MiniCart } from "@/components/commerce/mini-cart";
 import { CheckoutHeader } from "@/components/layout/checkout-header";
 import { Footer } from "@/components/layout/footer";
 import { Navbar } from "@/components/layout/navbar";
@@ -31,6 +32,7 @@ export function SiteShell({ children, navigation }: Readonly<{ children: ReactNo
       <main>{children}</main>
       <Footer navigation={navigation.filter((item) => item.location === "footer")} />
       <WhatsAppFloat />
+      <MiniCart />
     </>
   );
 }

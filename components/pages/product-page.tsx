@@ -146,7 +146,7 @@ export function ProductPage({ product, relatedProducts, purchaseInfo = [], sizeG
 
   const handleAddToCart = () => {
     if (!requireSize() || !selectedVariant) return;
-    addToCart(selectedCartItem);
+    addToCart(selectedCartItem, { notify: true });
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   };

@@ -128,7 +128,7 @@ export function PersonalizationStudio({ products, initialProductSlug, stockedVar
       },
       unitPrice: total,
       quantity: 1,
-    });
+    }, { notify: true });
     setAdded(true);
   };
 

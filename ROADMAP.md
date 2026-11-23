@@ -273,7 +273,7 @@ D9 ─> A7, A8, A9, A11, M6
   - Navegación con teclado.
 - **Dependencias:** D9.
 
-### A9. Confirmación al agregar al carrito
+### A9. Confirmación al agregar al carrito ✅ Hecho (LR7-053, pendiente de deploy)
 - **Problema:** al agregar no se ve ninguna respuesta.
 - **Archivos:**
   - `components/providers/store-provider.tsx`.

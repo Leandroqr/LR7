@@ -6,20 +6,11 @@ import { useEffect, useState } from "react";
 import { WhatsAppLink } from "@/components/commerce/whatsapp-link";
 import { CheckoutPanel } from "@/components/commerce/checkout-panel";
 import { type CartItem, useStore } from "@/components/providers/store-provider";
+import { getItemUnitPrice } from "@/lib/cart-pricing";
 import { CUSTOM_PRICE, formatCurrency, PRODUCTS } from "@/lib/products";
 import { isWhatsAppConfigured } from "@/lib/site";
 import { getCartWhatsAppMessage } from "@/lib/whatsapp";
 
-function getItemUnitPrice(item: CartItem) {
-  if (item.unitPrice !== undefined) return item.unitPrice;
-  let customizationPrice = 0;
-  if (item.customization?.enabled) {
-    customizationPrice = item.customization.price;
-  } else if (item.customName || item.customNumber) {
-    customizationPrice = CUSTOM_PRICE;
-  }
-  return item.product.price.amount + customizationPrice;
-}
 
 function hasCartVariant(item: CartItem) {
   return item.product.variants.some((variant) => {
@@ -38,7 +29,7 @@ export default function CartPage() {
   const itemCount = currentCart.reduce((sum, item) => sum + item.quantity, 0);
 
   const subtotal = currentCart.reduce(
-    (sum, item) => sum + getItemUnitPrice(item) * item.quantity,
+    (sum, item) => sum + getItemUnitPrice(item, CUSTOM_PRICE) * item.quantity,
     0,
   );
   const hasInvalidVariant = currentCart.some((item) => !hasCartVariant(item));
@@ -126,7 +117,7 @@ export default function CartPage() {
 
             <ul className="cart-product-list">
               {currentCart.map((item, index) => {
-                const itemPrice = getItemUnitPrice(item);
+                const itemPrice = getItemUnitPrice(item, CUSTOM_PRICE);
                 const variantExists = hasCartVariant(item);
 
                 return (

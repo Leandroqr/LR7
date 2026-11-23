@@ -79,7 +79,7 @@ function StreetProduct({ product, index }: Readonly<{ product: Product; index: n
       customNumber: "",
       unitPrice: product.price.amount,
       quantity: 1,
-    });
+    }, { notify: true });
     setAdded(true);
   };
 
