@@ -14,6 +14,6 @@ export default async function AdminNavigationPage() {
   </AdminPage>;
 }
 
-function NavigationForm({ action, item, submitLabel }: Readonly<{ action: (data: FormData) => void | Promise<void>; item?: NavigationItem; submitLabel: string }>) {
+function NavigationForm({ action, item, submitLabel }: Readonly<{ action: (data: FormData) => unknown; item?: NavigationItem; submitLabel: string }>) {
   return <AdminMutationForm action={action} successMessage="Enlace guardado." className="admin-form admin-form-grid"><label><span>UBICACIÓN</span><select name="location" defaultValue={item?.location ?? "header"}><option value="header">Header</option><option value="footer">Footer</option></select></label><label><span>ETIQUETA</span><input name="label" defaultValue={item?.label} required /></label><label className="admin-form-full"><span>DESTINO</span><input name="href" defaultValue={item?.href ?? "/"} required /></label><label><span>ORDEN</span><input name="sort_order" type="number" min="0" defaultValue={item?.sort_order ?? 0} required /></label><label className="admin-check-label"><input name="active" type="checkbox" defaultChecked={item?.active ?? true} /> Visible</label><button type="submit" className="admin-primary admin-form-full">{submitLabel}</button></AdminMutationForm>;
 }

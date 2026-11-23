@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+/** Internal path ("/tienda") or absolute HTTPS URL. Rejects protocol-relative "//host" and other schemes. */
+const SAFE_HREF = /^(\/(?![/\\])|https:\/\/)/;
+
 const nullableText = (maximum: number) =>
   z.preprocess(
     (value) => (typeof value === "string" && value.trim() === "" ? null : value),
@@ -47,6 +50,9 @@ export const productSchema = z.object({
   personalizable: z.boolean(),
   featured: z.boolean(),
   active: z.boolean(),
+}).refine((product) => product.compare_at_price === null || product.compare_at_price > product.price, {
+  path: ["compare_at_price"],
+  message: "must be greater than price",
 });
 
 export const categorySchema = z.object({
@@ -96,7 +102,7 @@ export const homeSlideSchema = z.object({
   accent_text: nullableText(180),
   subtitle: nullableText(500),
   cta_label: z.string().trim().min(1).max(80),
-  cta_href: z.string().trim().regex(/^(\/|https:\/\/)/).max(500),
+  cta_href: z.string().trim().regex(SAFE_HREF).max(500),
   sort_order: z.coerce.number().int().nonnegative(),
   active: z.boolean(),
 });
@@ -110,7 +116,7 @@ export const homeSectionSchema = z.object({
   cta_label: nullableText(80),
   cta_href: z.preprocess(
     (value) => (typeof value === "string" && value.trim() === "" ? null : value),
-    z.string().trim().regex(/^(\/|https:\/\/)/).max(500).nullable(),
+    z.string().trim().regex(SAFE_HREF).max(500).nullable(),
   ),
   sort_order: z.coerce.number().int().nonnegative(),
   active: z.boolean(),
@@ -119,7 +125,7 @@ export const homeSectionSchema = z.object({
 export const navigationSchema = z.object({
   location: z.enum(["header", "footer"]),
   label: z.string().trim().min(1).max(80),
-  href: z.string().trim().regex(/^(\/|https:\/\/)/).max(500),
+  href: z.string().trim().regex(SAFE_HREF).max(500),
   sort_order: z.coerce.number().int().nonnegative(),
   active: z.boolean(),
 });
@@ -129,7 +135,7 @@ export const subscriberStatusSchema = z.enum(["pending", "active", "unsubscribed
 
 const nullableUrl = z.preprocess(
   (value) => (typeof value === "string" && value.trim() === "" ? null : value),
-  z.string().trim().regex(/^(\/|https:\/\/)/).max(500).nullable(),
+  z.string().trim().regex(SAFE_HREF).max(500).nullable(),
 );
 
 export const contentItemSchema = z.object({
@@ -150,6 +156,16 @@ export const siteSettingSchema = z.object({
   setting_key: z.string().trim().toLowerCase().regex(/^[a-z0-9]+(?:_[a-z0-9]+)*$/).max(80),
   value: z.union([z.record(z.string(), z.unknown()), z.array(z.unknown()), z.string(), z.number(), z.boolean()]),
   active: z.boolean(),
+});
+
+export const recordIdSchema = z.uuid();
+
+export const homeContentTableSchema = z.enum(["home_slides", "home_sections"]);
+
+export const productImageSchema = z.object({
+  alt_text: z.string().trim().min(1).max(240),
+  sort_order: z.coerce.number().int().nonnegative(),
+  is_hover: z.boolean(),
 });
 
 export function checkbox(formData: FormData, key: string) {

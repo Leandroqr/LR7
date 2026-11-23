@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getAdminSession } from "@/lib/auth/admin";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { loginAdmin } from "@/app/admin/login/actions";
+import { LoginSubmitButton } from "@/components/admin/login-submit-button";
 
 export const metadata: Metadata = {
   title: "Admin",
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
 
 const ERROR_MESSAGES: Record<string, string> = {
   invalid: "Revisa el correo y la contraseña.",
-  credentials: "Credenciales inválidas.",
+  credentials: "Correo o contraseña incorrectos.",
   forbidden: "Esta cuenta no tiene acceso ADMIN.",
   callback: "No fue posible completar la sesión.",
   config: "Supabase todavía no está configurado en este entorno.",
@@ -48,7 +49,7 @@ export default async function AdminLoginPage({ searchParams }: LoginPageProps) {
             <span>CONTRASEÑA</span>
             <input name="password" type="password" autoComplete="current-password" minLength={8} required disabled={!configured} />
           </label>
-          <button type="submit" disabled={!configured}>INICIAR SESIÓN</button>
+          <LoginSubmitButton disabled={!configured} />
         </form>
       </section>
     </main>

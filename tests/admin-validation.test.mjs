@@ -5,12 +5,15 @@ import {
   checkbox,
   contentItemSchema,
   fulfillmentStatusSchema,
+  homeContentTableSchema,
   homeSectionSchema,
   homeSlideSchema,
   inventorySchema,
   navigationSchema,
   orderStatusSchema,
+  productImageSchema,
   productSchema,
+  recordIdSchema,
   siteSettingSchema,
   subscriberStatusSchema,
   userRoleSchema,
@@ -59,4 +62,28 @@ test("reads checkbox values from submitted FormData", () => {
   const unchecked = new FormData();
   assert.equal(checkbox(checked, "active"), true);
   assert.equal(checkbox(unchecked, "active"), false);
+});
+
+test("rejects protocol-relative and backslash destinations", () => {
+  assert.equal(navigationSchema.safeParse({ ...validForms[6][2], href: "//evil.example" }).success, false);
+  assert.equal(navigationSchema.safeParse({ ...validForms[6][2], href: "/\\evil.example" }).success, false);
+  assert.equal(homeSlideSchema.safeParse({ ...validForms[4][2], cta_href: "https://lr7.co/tienda" }).success, true);
+});
+
+test("requires compare-at price to be higher than the price", () => {
+  assert.equal(productSchema.safeParse({ ...validForms[0][2], compare_at_price: "120000" }).success, true);
+  assert.equal(productSchema.safeParse({ ...validForms[0][2], compare_at_price: "99000" }).success, false);
+});
+
+test("only allows home tables and UUID record ids from bound arguments", () => {
+  assert.equal(homeContentTableSchema.safeParse("home_slides").success, true);
+  assert.equal(homeContentTableSchema.safeParse("orders").success, false);
+  assert.equal(recordIdSchema.safeParse("6f1c2b8e-2d4a-4b8e-9c1d-3e5f7a9b0c12").success, true);
+  assert.equal(recordIdSchema.safeParse("../other-product").success, false);
+});
+
+test("validates product image metadata", () => {
+  assert.equal(productImageSchema.safeParse({ alt_text: "Camiseta frontal", sort_order: "1", is_hover: false }).success, true);
+  assert.equal(productImageSchema.safeParse({ alt_text: "  ", sort_order: "1", is_hover: false }).success, false);
+  assert.equal(productImageSchema.safeParse({ alt_text: "ok", sort_order: "-1", is_hover: false }).success, false);
 });
