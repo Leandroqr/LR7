@@ -258,7 +258,7 @@ D9 ─> A7, A8, A9, A11, M6
   - Tu aprobación del copy.
 - **Dependencias:** D9.
 
-### A8. Ficha de producto para móvil
+### A8. Ficha de producto para móvil ✅ Hecho (LR7-052, pendiente de deploy)
 - **Problema:** el botón de compra queda bajo la primera pantalla, la talla S viene marcada y no hay datos de envío ni de cambios.
 - **Archivos:**
   - `components/pages/product-page.tsx`.

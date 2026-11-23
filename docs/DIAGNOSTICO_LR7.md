@@ -82,7 +82,7 @@ Cada afirmación lleva su nivel de certeza:
 | E7 | **LCP lento en móvil:** home 3,4 s, ficha 3,7 s, tienda 5,5 s. En la tienda, el elemento LCP es el fondo de `header.shop-hero`, que no se prioriza | ✅ Lighthouse | Alta |
 | E8 | ✅ Resuelto en A12. **`robots.txt` incompleto:** no excluye `/admin`, `/api`, `/auth` ni `/checkout` | ✅ | Media |
 | E9 | **Footer con errores:** "Preguntas frecuentes" sale dos veces y "Cómo comprar" lleva a `/contacto` | ✅ | Media |
-| E10 | **Talla S marcada por defecto** en la ficha | ✅ | Media |
+| E10 | ✅ Resuelto en A8 (LR7-052). **Talla S marcada por defecto** en la ficha | ✅ | Media |
 | E11 | **Pestañas de categoría vacías visibles:** "ACCESORIOS" y "FÚTBOL 5/7/8" aparecen tachadas | ✅ | Baja |
 | E12 | **Lighthouse marca contraste y tamaño de fuente:** texto gris pequeño en las tarjetas y en el footer | ✅ | Media |
 

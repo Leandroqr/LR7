@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { Product } from "@/types/ecommerce";
+import type { PurchaseInfoItem, SizeGuideRow } from "@/lib/purchase-info";
 import { CUSTOM_PRICE, formatCurrency, getBadgeDisplayName, getCategoryDisplayName } from "@/lib/products";
 import { isWhatsAppConfigured, SITE_CONFIG } from "@/lib/site";
 import { getProductWhatsAppMessage } from "@/lib/whatsapp";
@@ -16,7 +17,19 @@ import { ProductCard } from "@/components/product/product-card";
 type ProductPageProps = Readonly<{
   product: Product;
   relatedProducts: Product[];
+  purchaseInfo?: readonly PurchaseInfoItem[];
+  sizeGuide?: readonly SizeGuideRow[];
 }>;
+
+/** Solo se preselecciona la talla cuando no hay nada que elegir. */
+function getInitialSize(product: Product) {
+  const sizes = Array.from(new Set(product.variants.map((variant) => variant.size)));
+  return sizes.length === 1 ? sizes[0] : "";
+}
+
+function getInitialColor(product: Product, size: string) {
+  return size ? product.variants.find((variant) => variant.size === size)?.color ?? "" : "";
+}
 
 function getPreviewPersonType(name: string, number: string): "both" | "number" | "none" {
   if (name) return "both";
@@ -24,11 +37,16 @@ function getPreviewPersonType(name: string, number: string): "both" | "number" |
   return "none";
 }
 
-export function ProductPage({ product, relatedProducts }: ProductPageProps) {
+export function ProductPage({ product, relatedProducts, purchaseInfo = [], sizeGuide = [] }: ProductPageProps) {
   const router = useRouter();
   const [mainImg, setMainImg] = useState(0);
-  const [size, setSize] = useState(product.variants[0]?.size ?? "");
-  const [color, setColor] = useState(product.variants[0]?.color ?? "");
+  const [size, setSize] = useState(() => getInitialSize(product));
+  const [color, setColor] = useState(() => getInitialColor(product, getInitialSize(product)));
+  const [sizeError, setSizeError] = useState(false);
+  const [showStickyBar, setShowStickyBar] = useState(false);
+  const sizeSelectorRef = useRef<HTMLFieldSetElement>(null);
+  const purchasePanelRef = useRef<HTMLElement>(null);
+  const sizeGuideRef = useRef<HTMLDialogElement>(null);
   const [wantCustom, setWantCustom] = useState(false);
   const [customName, setCustomName] = useState("");
   const [customNumber, setCustomNumber] = useState("");
@@ -42,10 +60,36 @@ export function ProductPage({ product, relatedProducts }: ProductPageProps) {
   }, []);
 
   useEffect(() => {
-    const firstVariant = product.variants[0];
-    setSize(firstVariant?.size ?? "");
-    setColor(firstVariant?.color ?? "");
-  }, [product.slug, product.variants]);
+    const initialSize = getInitialSize(product);
+    setSize(initialSize);
+    setColor(getInitialColor(product, initialSize));
+    setSizeError(false);
+  }, [product]);
+
+  // Barra de compra fija (solo visible en móvil por CSS): aparece cuando el bloque de compra
+  // ya quedó por encima de la pantalla y se oculta al llegar al footer para no taparlo.
+  useEffect(() => {
+    const panel = purchasePanelRef.current;
+    if (!panel || typeof IntersectionObserver === "undefined") return;
+    let panelPassed = false;
+    let footerVisible = false;
+    const update = () => setShowStickyBar(panelPassed && !footerVisible);
+    const panelObserver = new IntersectionObserver(([entry]) => {
+      panelPassed = !entry.isIntersecting && entry.boundingClientRect.top < 0;
+      update();
+    });
+    panelObserver.observe(panel);
+    const footer = document.querySelector("footer");
+    const footerObserver = new IntersectionObserver(([entry]) => {
+      footerVisible = entry.isIntersecting;
+      update();
+    });
+    if (footer) footerObserver.observe(footer);
+    return () => {
+      panelObserver.disconnect();
+      footerObserver.disconnect();
+    };
+  }, []);
 
   const isFavorite = favorites.includes(product.id);
   const customizationPrice = product.customization?.price ?? CUSTOM_PRICE;
@@ -84,18 +128,38 @@ export function ProductPage({ product, relatedProducts }: ProductPageProps) {
     quantity: 1,
   };
 
+  const selectSize = (optionSize: string) => {
+    setSize(optionSize);
+    setColor(product.variants.find((variant) => variant.size === optionSize)?.color ?? "");
+    setSizeError(false);
+  };
+
+  /** Sin talla no se agrega nada: se avisa y se lleva al selector. */
+  const requireSize = () => {
+    if (size) return true;
+    setSizeError(true);
+    const selector = sizeSelectorRef.current;
+    selector?.scrollIntoView({ behavior: "smooth", block: "center" });
+    selector?.querySelector<HTMLButtonElement>(".size-btn")?.focus({ preventScroll: true });
+    return false;
+  };
+
   const handleAddToCart = () => {
-    if (!selectedVariant) return;
+    if (!requireSize() || !selectedVariant) return;
     addToCart(selectedCartItem);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   };
 
   const handleBuyNow = () => {
-    if (!selectedVariant) return;
+    if (!requireSize() || !selectedVariant) return;
     addToCart(selectedCartItem);
     router.push("/carrito");
   };
+
+  const openSizeGuide = () => sizeGuideRef.current?.showModal();
+  const hasSizeGuide = sizeGuide.length > 0;
+  const purchaseBlocked = Boolean(size) && !selectedVariant;
 
   return (
     <main className="product-page">
@@ -157,20 +221,23 @@ export function ProductPage({ product, relatedProducts }: ProductPageProps) {
               <p className="product-price-note">Precio en COP · IVA incluido</p>
             </header>
 
-            <fieldset className="product-size-selector">
+            <fieldset ref={sizeSelectorRef} className={`product-size-selector${sizeError ? " has-error" : ""}`} aria-describedby={sizeError ? "product-size-error" : undefined}>
               <legend>
-                TALLA SELECCIONADA: <span style={{ color: "var(--color-accent)" }}>{size || "—"}</span>
+                {size ? <>TALLA SELECCIONADA: <span style={{ color: "var(--color-accent)" }}>{size}</span></> : "ELIGE TU TALLA"}
               </legend>
+              {hasSizeGuide ? (
+                <button type="button" className="product-size-guide-trigger" onClick={openSizeGuide}>GUÍA DE TALLAS</button>
+              ) : (
+                <Link href="/guia-de-tallas" className="product-size-guide-trigger">GUÍA DE TALLAS</Link>
+              )}
               <div className="product-size-options">
-                {sizeOptions.map((optionSize) => {
-                  const firstVariant = product.variants.find((variant) => variant.size === optionSize);
-                  return (
-                  <button type="button" key={optionSize} className={`size-btn ${size === optionSize ? "active" : ""}`} onClick={() => { setSize(optionSize); setColor(firstVariant?.color ?? ""); }} aria-pressed={size === optionSize}>
+                {sizeOptions.map((optionSize) => (
+                  <button type="button" key={optionSize} className={`size-btn ${size === optionSize ? "active" : ""}`} onClick={() => selectSize(optionSize)} aria-pressed={size === optionSize}>
                     {optionSize}
                   </button>
-                  );
-                })}
+                ))}
               </div>
+              {sizeError ? <p id="product-size-error" className="product-size-error" role="alert">Elige una talla para continuar.</p> : null}
             </fieldset>
 
             {colorOptions.length > 0 ? (
@@ -250,15 +317,15 @@ export function ProductPage({ product, relatedProducts }: ProductPageProps) {
               </section>
             ) : null}
 
-            <section className="product-purchase-panel" aria-label="Resumen de compra">
+            <section ref={purchasePanelRef} className="product-purchase-panel" aria-label="Resumen de compra">
               <div className="product-total">
                 <span className="font-display">TOTAL</span>
                 <strong className="font-display">${formatCurrency(customTotal)}</strong>
               </div>
-              <button type="button" onClick={handleBuyNow} className="btn-primary product-buy-button" disabled={!selectedVariant}>
+              <button type="button" onClick={handleBuyNow} className="btn-primary product-buy-button" disabled={purchaseBlocked}>
                 COMPRAR AHORA
               </button>
-              <button type="button" onClick={handleAddToCart} className="btn-outline product-cart-button" aria-live="polite" disabled={!selectedVariant}>
+              <button type="button" onClick={handleAddToCart} className="btn-outline product-cart-button" aria-live="polite" disabled={purchaseBlocked}>
                 {added ? "AGREGADO AL CARRITO" : "AGREGAR AL CARRITO"}
               </button>
               {added ? (
@@ -279,8 +346,15 @@ export function ProductPage({ product, relatedProducts }: ProductPageProps) {
                   </WhatsAppLink>
                 </div>
               ) : null}
+              {purchaseInfo.length > 0 ? (
+                <ul className="product-purchase-info" aria-label="Envío y cambios">
+                  {purchaseInfo.map((item) => (
+                    <li key={item.title}><strong>{item.title}</strong><span>{item.body}</span></li>
+                  ))}
+                </ul>
+              ) : null}
               <div className="product-help-links" aria-label="Información para tu compra">
-                <Link href="/guia-de-tallas">GUÍA DE TALLAS</Link>
+                {hasSizeGuide ? <button type="button" onClick={openSizeGuide}>GUÍA DE TALLAS</button> : <Link href="/guia-de-tallas">GUÍA DE TALLAS</Link>}
                 <Link href="/envios">ENVÍOS</Link>
                 <Link href="/cambios-y-devoluciones">CAMBIOS</Link>
               </div>
@@ -291,6 +365,33 @@ export function ProductPage({ product, relatedProducts }: ProductPageProps) {
             </p>
           </section>
         </div>
+
+        <div className="product-sticky-bar" data-visible={showStickyBar ? "true" : "false"} aria-hidden={!showStickyBar} inert={!showStickyBar}>
+          <div className="product-sticky-summary">
+            <strong className="font-display">${formatCurrency(customTotal)}</strong>
+            <span>{size ? `Talla ${size}` : "Sin talla elegida"}</span>
+          </div>
+          <button type="button" className="btn-primary" onClick={handleBuyNow} disabled={purchaseBlocked}>
+            {size ? "COMPRAR AHORA" : "ELIGE TALLA"}
+          </button>
+        </div>
+
+        {hasSizeGuide ? (
+          <dialog ref={sizeGuideRef} className="product-size-dialog" aria-labelledby="product-size-dialog-title" onClick={(event) => { if (event.target === event.currentTarget) event.currentTarget.close(); }}>
+            <div className="product-size-dialog-body">
+              <header>
+                <h2 id="product-size-dialog-title" className="font-display">GUÍA DE TALLAS</h2>
+                <button type="button" onClick={() => sizeGuideRef.current?.close()} aria-label="Cerrar guía de tallas">×</button>
+              </header>
+              <p>Medidas en centímetros. Mídete sin ropa para mayor precisión.</p>
+              <table className="size-guide-table">
+                <thead><tr><th scope="col">TALLA</th><th scope="col">PECHO</th><th scope="col">LARGO</th><th scope="col">HOMBRO</th></tr></thead>
+                <tbody>{sizeGuide.map((row) => <tr key={row.size}><td>{row.size}</td><td>{row.chest}</td><td>{row.length}</td><td>{row.shoulder}</td></tr>)}</tbody>
+              </table>
+              <Link href="/guia-de-tallas" className="product-size-dialog-link">VER GUÍA COMPLETA →</Link>
+            </div>
+          </dialog>
+        ) : null}
 
         {relatedProducts.length > 0 ? (
           <section style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "5rem 0" }}>

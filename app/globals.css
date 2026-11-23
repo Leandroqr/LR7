@@ -25,6 +25,7 @@
   --color-border: rgba(7, 20, 38, 0.14);
   --color-border-hover: rgba(17, 82, 232, 0.65);
   --color-text-muted: rgba(5, 6, 8, 0.64);
+  --color-danger: #b42318;
 
   /* Highlights Carousel Responsive */
   --highlights-cards-visible: 3;
@@ -192,7 +193,7 @@
 .personalizer-step input { width: 100%; min-height: 58px; padding: 0.8rem 1rem; border: 1px solid #bfc7cf; border-radius: 0; background: var(--color-off-white); color: var(--color-primary-dark); font-family: var(--font-display), sans-serif; font-size: 1.25rem; font-weight: 800; text-transform: uppercase; outline: none; transition: border-color 150ms ease, box-shadow 150ms ease; }
 .personalizer-step input::placeholder { color: #747e88; opacity: 1; }
 .personalizer-step input:focus { border-color: var(--color-accent-blue); box-shadow: 0 0 0 3px rgba(17, 82, 232, 0.16); }
-.personalizer-step input[aria-invalid="true"] { border-color: #b42318; box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.1); }
+.personalizer-step input[aria-invalid="true"] { border-color: var(--color-danger); box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.1); }
 .personalizer-number-field { position: relative; }
 .personalizer-number-field input { padding-right: 120px; font-size: 1.8rem; }
 .personalizer-number-field > span { position: absolute; right: 1rem; top: 50%; color: #606b76; font-size: 0.58rem; font-weight: 600; transform: translateY(-50%); }
@@ -3701,11 +3702,15 @@ input:disabled {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0.75rem 1.5rem;
+  align-items: center;
+  gap: 0 1.5rem;
   padding-top: 0.25rem;
 }
 
 .product-help-links a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
   color: var(--color-text-muted);
   font-family: var(--font-display), sans-serif;
   font-size: 0.7rem;
@@ -3873,9 +3878,143 @@ input:disabled {
   line-height: 1.7;
 }
 
-.product-size-selector { min-width: 0; margin: 0; padding: 0; border: 0; }
+.product-size-selector { position: relative; min-width: 0; margin: 0; padding: 0; border: 0; }
 
+/* La guía de tallas queda a mano junto al selector; el legend sigue siendo el primer hijo del fieldset. */
+.product-size-guide-trigger {
+  position: absolute;
+  top: -14px;
+  right: 0;
+  min-height: 44px;
+  padding: 0 0.25rem;
+  display: inline-flex;
+  align-items: center;
+  border: 0;
+  background: none;
+  color: var(--color-accent);
+  font-family: var(--font-display), sans-serif;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+.product-size-selector.has-error .size-btn { border-color: var(--color-danger); }
+.product-size-error {
+  margin: 0.65rem 0 0;
+  color: var(--color-danger);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.product-purchase-info {
+  margin: 0;
+  padding: 0.85rem 0 0;
+  list-style: none;
+  border-top: 1px solid var(--color-border);
+  display: grid;
+  gap: 0.6rem;
+}
+
+.product-purchase-info li { display: grid; gap: 0.15rem; }
+.product-purchase-info strong {
+  color: var(--color-primary-dark);
+  font-family: var(--font-display), sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.product-purchase-info span { color: var(--color-text-muted); font-size: 0.85rem; line-height: 1.5; }
+
+.product-help-links button {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-text-muted);
+  font-family: var(--font-display), sans-serif;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+.product-help-links button:hover { color: var(--color-accent); }
+
+.product-size-dialog {
+  width: min(560px, calc(100% - 2rem));
+  max-height: calc(100dvh - 2rem);
+  padding: 0;
+  border: 0;
+  background: var(--color-white);
+  color: var(--color-primary-dark);
+}
+.product-size-dialog::backdrop { background: rgba(7, 20, 38, 0.6); }
+.product-size-dialog-body { padding: 1.5rem; display: grid; gap: 1rem; }
+.product-size-dialog-body header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.product-size-dialog-body h2 { margin: 0; font-size: 1.6rem; font-weight: 900; font-style: italic; }
+.product-size-dialog-body header button {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--color-border);
+  background: var(--color-white);
+  color: var(--color-primary-dark);
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+.product-size-dialog-body p { margin: 0; color: var(--color-text-muted); font-size: 0.85rem; }
+.product-size-dialog-body .size-guide-table th,
+.product-size-dialog-body .size-guide-table td { padding: 0.75rem 0.6rem; }
+.product-size-dialog-link {
+  justify-self: start;
+  color: var(--color-accent);
+  font-family: var(--font-display), sans-serif;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+/* Barra de compra fija: solo en móvil y tableta, cuando el bloque de compra ya no se ve. */
+.product-sticky-bar { display: none; }
+
+@media (max-width: 900px) {
+  .product-sticky-bar {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 900;
+    padding: 0.75rem max(1rem, env(safe-area-inset-right)) max(0.75rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    border-top: 1px solid var(--color-border);
+    background: var(--color-white);
+    box-shadow: 0 -8px 24px rgba(7, 20, 38, 0.08);
+    transform: translateY(110%);
+    transition: transform 220ms ease;
+  }
+  .product-sticky-bar[data-visible="true"] { transform: translateY(0); }
+  .product-sticky-summary { min-width: 0; display: grid; gap: 0.1rem; }
+  .product-sticky-summary strong { color: var(--color-accent); font-size: 1.35rem; font-weight: 900; line-height: 1; }
+  .product-sticky-summary span { color: var(--color-text-muted); font-size: 0.78rem; }
+  .product-sticky-bar .btn-primary { flex: 0 0 auto; min-height: 48px; padding: 0.75rem 1.25rem; font-size: 0.88rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-sticky-bar { transition: none; }
+}
+
+/* Flotado, el legend entra en el flujo normal del fieldset y el enlace de la guía se alinea con él. */
 .product-size-selector legend {
+  float: left;
+  width: 100%;
+  padding-right: 8.5rem;
   margin-bottom: 0.85rem;
   color: var(--color-text-muted);
   font-family: var(--font-display), sans-serif;
@@ -3886,6 +4025,7 @@ input:disabled {
 }
 
 .product-size-options {
+  clear: both;
   display: grid;
   grid-template-columns: repeat(5, minmax(48px, 1fr));
   gap: 0.5rem;

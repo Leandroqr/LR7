@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProductPage } from "@/components/pages/product-page";
 import { getPublicProductBySlug, getPublicProducts } from "@/lib/catalog";
+import { getContentItems } from "@/lib/content";
+import { buildPurchaseInfo, buildSizeGuide } from "@/lib/purchase-info";
 import { serializeJsonLd } from "@/lib/seo";
 import { SITE_CONFIG } from "@/lib/site";
 
@@ -46,7 +48,12 @@ export async function generateMetadata({ params }: ProductRouteProps): Promise<M
 
 export default async function ProductRoutePage({ params }: Readonly<ProductRouteProps>) {
   const { slug } = await params;
-  const products = await getPublicProducts();
+  const [products, shipping, returns, sizeGuideRows] = await Promise.all([
+    getPublicProducts(),
+    getContentItems("shipping"),
+    getContentItems("returns"),
+    getContentItems("size-guide"),
+  ]);
   const product = products.find((entry) => entry.slug === slug);
 
   if (!product) {
@@ -104,7 +111,7 @@ export default async function ProductRoutePage({ params }: Readonly<ProductRoute
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(productJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }} />
-      <ProductPage product={product} relatedProducts={related} />
+      <ProductPage product={product} relatedProducts={related} purchaseInfo={buildPurchaseInfo(shipping, returns)} sizeGuide={buildSizeGuide(sizeGuideRows)} />
     </>
   );
 }
