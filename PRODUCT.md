@@ -67,7 +67,10 @@ Lo que LR7 comunica y otra tienda no puede copiar tal cual es la combinación de
   - Orgullo por el juego sin exagerar.
   - Español de Colombia con tildes y sin anglicismos de relleno.
   - Ejemplo del tono: "Tu nombre. Tu número. Tu camiseta."
-- **Color (restricción vinculante del dueño):** el azul de la marca es el color de todas las acciones, en tienda, carrito, checkout y personalizador. El naranja queda solo para señales: NUEVO, oferta, urgencia de stock.
+- **Color (restricción vinculante del dueño, 2026-11-23):** paleta de noche `#071426`, navy `#0D1F38`, acero `#174A7E`, azul `#1152E8`, negro, blanco y grises. El azul es el único color de interacción. **El naranja se elimina** de todo el sitio.
+- **Guía interna de marca (no visible en el sitio):** "FOOTBALL FIRST. PREMIUM STYLE." El cliente solo lee español.
+- **Personalidad:** deportiva, premium, juvenil, moderna, elegante, minimalista y comercial. Sin estilos genéricos ni exceso de degradados, sombras o efectos; sin copiar a Nike, Adidas o Puma.
+- **Imágenes provisionales (decisión del dueño, 2026-11-23):** mientras no haya fotos reales, el producto se muestra con las fotos de stock del catálogo. Riesgo aceptado: varias muestran logos y escudos de terceros y no corresponden al producto exacto. Cuando el dueño suba fotos propias desde el admin, sustituyen a las de stock sin cambiar código. El render plano solo se usa si un producto no tiene ninguna imagen, y en la vista previa de la personalización.
 
 ## Evidence on Hand
 
