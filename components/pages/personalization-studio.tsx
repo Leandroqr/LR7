@@ -39,16 +39,21 @@ function getCtaLabel(added: boolean, size: string, canAdd: boolean) {
 type PersonalizationStudioProps = {
   products: Product[];
   initialProductSlug?: string;
+  /** Nombre y número que llegan desde el hero de la home (?nombre=&numero=), ya saneados. */
+  initialName?: string;
+  initialNumber?: string;
   stockedVariantSkus: string[] | null;
 };
 
-export function PersonalizationStudio({ products, initialProductSlug, stockedVariantSkus }: Readonly<PersonalizationStudioProps>) {
+export function PersonalizationStudio({ products, initialProductSlug, initialName = "", initialNumber = "", stockedVariantSkus }: Readonly<PersonalizationStudioProps>) {
   const initialProduct = products.find((product) => product.slug === initialProductSlug) ?? products[0];
   const [selectedProductId, setSelectedProductId] = useState<ProductId>(initialProduct.id);
   const [size, setSize] = useState("");
   const [color, setColor] = useState("");
-  const [name, setName] = useState("");
-  const [number, setNumber] = useState("");
+  // Lo que llega por URL se recorta a los límites de la camiseta inicial.
+  const initialSettings = initialProduct.customization ?? DEFAULT_SETTINGS;
+  const [name, setName] = useState(initialName.slice(0, initialSettings.nameMaxLength));
+  const [number, setNumber] = useState(initialNumber.slice(0, String(initialSettings.numberMax).length));
   const [view, setView] = useState<"front" | "back">("back");
   const [touched, setTouched] = useState({ size: false, name: false, number: false });
   const [added, setAdded] = useState(false);
@@ -144,7 +149,7 @@ export function PersonalizationStudio({ products, initialProductSlug, stockedVar
   const ctaLabel = getCtaLabel(added, size, canAdd);
 
   return (
-    <main className="personalizer-page">
+    <div className="personalizer-page">
       <header className="personalizer-header">
         <p>LR7 CUSTOM STUDIO</p>
         <h1 className="font-display">TU NOMBRE.<br /><span>TU NÚMERO.</span></h1>
@@ -272,7 +277,7 @@ export function PersonalizationStudio({ products, initialProductSlug, stockedVar
         <div><span>TOTAL</span><strong>${formatCurrency(total)}</strong></div>
         <button type="button" onClick={handleAdd} className={added ? "is-added" : ""} aria-disabled={!canAdd}>{added ? "AÑADIDA ✓" : ctaLabel}</button>
       </div>
-    </main>
+    </div>
   );
 }
 

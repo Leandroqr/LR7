@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { PersonalizationStudio } from "@/components/pages/personalization-studio";
 import { getPublicProducts } from "@/lib/catalog";
 import { getStockedPersonalizationSkus } from "@/lib/catalog/personalization-stock";
+import { sanitizeDorsalName, sanitizeDorsalNumber } from "@/lib/dorsal";
 import { PRODUCTS } from "@/lib/products";
 import { SITE_CONFIG } from "@/lib/site";
 
@@ -24,16 +25,24 @@ export const metadata: Metadata = {
 };
 
 type PersonalizaPageProps = {
-  searchParams: Promise<{ producto?: string }>;
+  searchParams: Promise<{ producto?: string; nombre?: string; numero?: string }>;
 };
 
 export default async function PersonalizaPage({ searchParams }: Readonly<PersonalizaPageProps>) {
-  const [{ producto }, catalog] = await Promise.all([searchParams, getPublicProducts()]);
+  const [{ producto, nombre, numero }, catalog] = await Promise.all([searchParams, getPublicProducts()]);
   const catalogProducts = catalog.filter((product) => product.personalizable);
   const products = catalogProducts.length
     ? catalogProducts
     : PRODUCTS.filter((product) => product.personalizable);
   const stockedVariantSkus = await getStockedPersonalizationSkus(products.map((product) => product.slug));
 
-  return <PersonalizationStudio products={products} initialProductSlug={producto} stockedVariantSkus={stockedVariantSkus} />;
+  return (
+    <PersonalizationStudio
+      products={products}
+      initialProductSlug={producto}
+      initialName={sanitizeDorsalName(typeof nombre === "string" ? nombre : "").trim()}
+      initialNumber={sanitizeDorsalNumber(typeof numero === "string" ? numero : "")}
+      stockedVariantSkus={stockedVariantSkus}
+    />
+  );
 }

@@ -36,8 +36,8 @@ export function PersonalizedJerseySchematic({ name, number, view }: Personalized
         <path d="M139 56 92 72 35 111 58 203 110 187 110 443Q210 468 310 443L310 187 362 203 385 111 328 72 281 56Q262 97 210 99 158 97 139 56Z" fill={`url(#${gradientId})`} />
         <path d="M139 56 92 72 35 111 58 203 110 187 110 443Q210 468 310 443L310 187 362 203 385 111 328 72 281 56Q262 97 210 99 158 97 139 56Z" fill={`url(#${patternId})`} />
         <path d="M139 56Q158 97 210 99 262 97 281 56" fill="none" stroke="#10243a" strokeWidth="7" />
-        <path d="M150 61Q166 87 210 89 254 87 270 61" fill="none" stroke="#ff6a00" strokeWidth="2.5" />
-        <path d="M49 117 69 190M371 117 351 190" fill="none" stroke="#ff6a00" strokeOpacity="0.8" strokeWidth="3" />
+        <path d="M150 61Q166 87 210 89 254 87 270 61" fill="none" stroke="#1152E8" strokeWidth="2.5" />
+        <path d="M49 117 69 190M371 117 351 190" fill="none" stroke="#1152E8" strokeOpacity="0.8" strokeWidth="3" />
         <path d="M119 204v228M301 204v228" fill="none" stroke="#10243a" strokeOpacity="0.11" strokeWidth="1" />
         <path d="M127 433q83 18 166 0" fill="none" stroke="#10243a" strokeOpacity="0.2" strokeWidth="2" />
         {isBack ? (
