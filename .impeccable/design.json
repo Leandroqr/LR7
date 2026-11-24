@@ -1,117 +1,311 @@
 {
-  "schemaVersion": 2,
-  "generatedAt": "2026-11-23T20:30:00-05:00",
-  "title": "Design System: LR7",
-  "extensions": {
-    "colorMeta": {
-      "dorsal-blue": { "role": "primary", "displayName": "Azul Dorsal", "canonical": "#1152E8", "tonalRamp": ["#071F5C", "#0A2E85", "#0D3DAE", "#1152E8", "#4A7BEF", "#7FA2F4", "#B4C9F9", "#E6EDFD"] },
-      "dorsal-blue-on-dark": { "role": "primary", "displayName": "Azul Dorsal sobre noche", "canonical": "#5B8CFF" },
-      "signal-orange": { "role": "secondary", "displayName": "Naranja Señal", "canonical": "#FF6A00", "tonalRamp": ["#5C2600", "#853700", "#A83F00", "#D95700", "#FF6A00", "#FF9545", "#FFBF8C", "#FFEBDB"] },
-      "night-navy": { "role": "neutral", "displayName": "Azul Noche", "canonical": "#071426" },
-      "deep-navy": { "role": "neutral", "displayName": "Navy Profundo", "canonical": "#0D1F38" },
-      "ink": { "role": "neutral", "displayName": "Tinta", "canonical": "#050608" },
-      "ice": { "role": "neutral", "displayName": "Hielo", "canonical": "#DCEAF5" },
-      "chalk": { "role": "neutral", "displayName": "Tiza", "canonical": "#F5F7F8" },
-      "white": { "role": "neutral", "displayName": "Blanco", "canonical": "#FFFFFF" },
-      "danger": { "role": "neutral", "displayName": "Rojo Error", "canonical": "#B42318" }
-    },
-    "typographyMeta": {
-      "display": { "displayName": "Display", "purpose": "Heros y campañas: Barlow Condensed 900 cursiva en mayúsculas, una palabra en azul." },
-      "headline": { "displayName": "Headline", "purpose": "Títulos de sección y nombre del producto." },
-      "label": { "displayName": "Label", "purpose": "Botones, etiquetas, insignias y migas de pan, en mayúsculas." },
-      "body": { "displayName": "Body", "purpose": "Descripciones, políticas y FAQ." }
-    },
-    "shadows": [
-      { "name": "panel-lateral", "value": "-16px 0 40px rgba(7, 20, 38, 0.18)", "purpose": "Mini-carrito flotando sobre la página." },
-      { "name": "barra-fija", "value": "0 -8px 24px rgba(7, 20, 38, 0.08)", "purpose": "Barra de compra fija en móvil." }
-    ],
-    "motion": [
-      { "name": "panel-in", "value": "220ms ease-out", "purpose": "Entrada del mini-carrito y de la barra fija; desactivado con prefers-reduced-motion." }
-    ],
-    "breakpoints": [
-      { "name": "mobile", "value": "600px" },
-      { "name": "tablet", "value": "900px" },
-      { "name": "container", "value": "1440px" }
+ "schemaVersion": 2,
+ "generatedAt": "2026-11-23T22:00:00-05:00",
+ "title": "Design System: LR7",
+ "extensions": {
+  "colorMeta": {
+   "night": {
+    "role": "neutral",
+    "displayName": "Noche",
+    "canonical": "#071426"
+   },
+   "navy": {
+    "role": "neutral",
+    "displayName": "Navy",
+    "canonical": "#0D1F38"
+   },
+   "steel": {
+    "role": "secondary",
+    "displayName": "Acero",
+    "canonical": "#174A7E",
+    "tonalRamp": [
+     "#0A2238",
+     "#0F3152",
+     "#133F69",
+     "#174A7E",
+     "#4A6F98",
+     "#7D95B3",
+     "#B1C1D2",
+     "#E4EAF0"
     ]
+   },
+   "action": {
+    "role": "primary",
+    "displayName": "Acción",
+    "canonical": "#1152E8",
+    "tonalRamp": [
+     "#071F5C",
+     "#0A2E85",
+     "#0D3DAE",
+     "#1152E8",
+     "#4A7BEF",
+     "#7FA2F4",
+     "#B4C9F9",
+     "#E6EDFD"
+    ]
+   },
+   "action-hover": {
+    "role": "primary",
+    "displayName": "Acción hover",
+    "canonical": "#0D3DAE"
+   },
+   "action-on-dark": {
+    "role": "primary",
+    "displayName": "Acción sobre oscuro",
+    "canonical": "#5B8CFF"
+   },
+   "black": {
+    "role": "neutral",
+    "displayName": "Negro",
+    "canonical": "#050608"
+   },
+   "white": {
+    "role": "neutral",
+    "displayName": "Blanco",
+    "canonical": "#FFFFFF"
+   },
+   "gray-50": {
+    "role": "neutral",
+    "displayName": "Gris 50",
+    "canonical": "#F5F7F8"
+   },
+   "gray-100": {
+    "role": "neutral",
+    "displayName": "Gris 100",
+    "canonical": "#ECEFF2"
+   },
+   "gray-200": {
+    "role": "neutral",
+    "displayName": "Gris 200",
+    "canonical": "#DCE1E6"
+   },
+   "gray-400": {
+    "role": "neutral",
+    "displayName": "Gris 400",
+    "canonical": "#8A949E"
+   },
+   "gray-600": {
+    "role": "neutral",
+    "displayName": "Gris 600",
+    "canonical": "#5C6670"
+   },
+   "danger": {
+    "role": "neutral",
+    "displayName": "Error",
+    "canonical": "#B42318"
+   },
+   "success": {
+    "role": "neutral",
+    "displayName": "Éxito",
+    "canonical": "#17652D"
+   }
   },
-  "components": [
-    {
-      "name": "Botón primario",
-      "kind": "button",
-      "refersTo": "button-primary",
-      "description": "Toda acción que avanza: comprar, agregar, ir al carrito.",
-      "html": "<button class=\"ds-btn-primary\">COMPRAR AHORA</button>",
-      "css": ".ds-btn-primary { background: #1152E8; color: #fff; border: 1px solid #1152E8; border-radius: 6px; min-height: 52px; padding: 0.85rem 2rem; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 1rem; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; } .ds-btn-primary:hover { background: #0D3DAE; } .ds-btn-primary:focus-visible { outline: 3px solid #1152E8; outline-offset: 3px; }"
-    },
-    {
-      "name": "Botón outline",
-      "kind": "button",
-      "refersTo": "button-outline",
-      "description": "Acción secundaria: agregar al carrito, seguir comprando.",
-      "html": "<button class=\"ds-btn-outline\">AGREGAR AL CARRITO</button>",
-      "css": ".ds-btn-outline { background: transparent; color: #071426; border: 1.5px solid #071426; border-radius: 6px; min-height: 52px; padding: 0.85rem 2rem; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 1rem; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; } .ds-btn-outline:hover { background: #071426; color: #fff; } .ds-btn-outline:focus-visible { outline: 3px solid #1152E8; outline-offset: 3px; }"
-    },
-    {
-      "name": "Selector de talla",
-      "kind": "chip",
-      "refersTo": "size-button",
-      "description": "Botones de talla rectos; la seleccionada en azul dorsal.",
-      "html": "<div class=\"ds-sizes\"><button class=\"ds-size\">S</button><button class=\"ds-size is-selected\" aria-pressed=\"true\">M</button><button class=\"ds-size\">L</button></div>",
-      "css": ".ds-sizes { display: flex; gap: 0.5rem; } .ds-size { min-width: 56px; height: 48px; background: #fff; color: #071426; border: 1px solid rgba(7,20,38,0.14); border-radius: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; cursor: pointer; } .ds-size:hover { border-color: rgba(17,82,232,0.65); } .ds-size.is-selected { background: #1152E8; border-color: #1152E8; color: #fff; } .ds-size:focus-visible { outline: 3px solid #1152E8; outline-offset: 3px; }"
-    },
-    {
-      "name": "Insignia de señal",
-      "kind": "chip",
-      "refersTo": "badge-signal",
-      "description": "Solo señales: NUEVO, oferta, urgencia.",
-      "html": "<span class=\"ds-badge\">NUEVO</span>",
-      "css": ".ds-badge { display: inline-block; background: #FF6A00; color: #050608; padding: 0.3rem 0.6rem; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; }"
-    },
-    {
-      "name": "Campo de texto",
-      "kind": "input",
-      "description": "Campo recto con borde fino y foco azul visible.",
-      "html": "<input class=\"ds-input\" placeholder=\"Nombre en la camiseta\" />",
-      "css": ".ds-input { width: 100%; min-height: 48px; padding: 0.8rem 1rem; border: 1px solid rgba(7,20,38,0.14); border-radius: 0; background: #fff; color: #071426; font-family: 'Barlow', sans-serif; font-size: 1rem; } .ds-input:focus-visible { outline: 3px solid #1152E8; outline-offset: 3px; }"
-    },
-    {
-      "name": "Titular dorsal",
-      "kind": "custom",
-      "description": "Titular condensado 900 en cursiva con una palabra en azul.",
-      "html": "<h2 class=\"ds-dorsal\">TU NOMBRE.<br><span>TU NÚMERO.</span></h2>",
-      "css": ".ds-dorsal { margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-style: italic; font-size: 3.5rem; line-height: 0.88; text-transform: uppercase; color: #071426; } .ds-dorsal span { color: #1152E8; }"
-    }
+  "typographyMeta": {
+   "display": {
+    "displayName": "Display",
+    "purpose": "Solo el hero de cada página."
+   },
+   "headline": {
+    "displayName": "Headline",
+    "purpose": "Título de sección y nombre del producto en la ficha."
+   },
+   "title": {
+    "displayName": "Title",
+    "purpose": "Títulos de bloque y nombres en carrito y mini-carrito."
+   },
+   "body": {
+    "displayName": "Body",
+    "purpose": "Descripciones, políticas y FAQ."
+   },
+   "body-sm": {
+    "displayName": "Body small",
+    "purpose": "Metadatos, ayudas de campo y notas."
+   },
+   "label": {
+    "displayName": "Label",
+    "purpose": "Botones, pestañas, navegación y tallas; mayúsculas solo aquí."
+   },
+   "caption": {
+    "displayName": "Caption",
+    "purpose": "Insignias y contadores; tamaño mínimo del sistema (12 px)."
+   }
+  },
+  "shadows": [
+   {
+    "name": "cajon-lateral",
+    "value": "-16px 0 40px rgba(7, 20, 38, 0.18)",
+    "purpose": "Mini-carrito y filtros."
+   },
+   {
+    "name": "barra-fija",
+    "value": "0 -8px 24px rgba(7, 20, 38, 0.08)",
+    "purpose": "Barra de compra en móvil."
+   }
   ],
-  "narrative": {
-    "northStar": "El Dorsal",
-    "overview": "Todo el sistema parte de la espalda de una camiseta: un nombre y un número grandes, condensados y en mayúsculas, que se leen desde la tribuna. La superficie es clara y limpia, con bloques en azul noche para los momentos de marca; las formas son firmes y deportivas, sin sombras decorativas.",
-    "keyCharacteristics": [
-      "Titulares en Barlow Condensed 900, cursiva y mayúsculas; el cuerpo en Barlow.",
-      "Un solo color de acción (azul dorsal); el naranja solo como señal.",
-      "Superficies planas con borde fino; el azul noche como bloque de marca.",
-      "Números como recurso gráfico (dorsales, pasos, contadores).",
-      "Pensado primero para 390 px y una mano."
-    ],
-    "rules": [
-      { "name": "The Azul Acción Rule", "body": "Si se puede pulsar para avanzar, es azul. Si avisa de algo, es naranja. Nunca al revés, y nunca un botón naranja.", "section": "colors" },
-      { "name": "The Contraste Mínimo Rule", "body": "El texto pequeño cumple 4,5:1 contra su fondo real. Sobre oscuro se usan los tokens *-on-dark.", "section": "colors" },
-      { "name": "The Dorsal Rule", "body": "Barlow Condensed en mayúsculas es para titulares, botones y etiquetas. Los párrafos nunca van en condensada ni en mayúsculas.", "section": "typography" },
-      { "name": "The Una Palabra Azul Rule", "body": "En un titular, como mucho una palabra o un verso en azul.", "section": "typography" },
-      { "name": "The Plano por Defecto Rule", "body": "Las tarjetas y secciones no llevan sombra. Una sombra significa que algo flota sobre el contenido.", "section": "elevation" }
-    ],
-    "dos": [
-      "Do usar el azul dorsal para toda acción, también en carrito, checkout y personalizador.",
-      "Do escribir titulares en Barlow Condensed 900 en mayúsculas con como mucho una palabra en azul.",
-      "Do mostrar la personalización (nombre y número) en la home y en la ficha.",
-      "Do usar los tokens *-on-dark para texto pequeño sobre azul noche o negro.",
-      "Do mantener áreas táctiles de 44 px o más y el foco visible en todo elemento interactivo."
-    ],
-    "donts": [
-      "Don't usar naranja en botones de acción. El naranja es solo señal.",
-      "Don't usar escudos ni logos de terceros en fotos, gráficos o nombres de producto.",
-      "Don't poner sombras en tarjetas o secciones planas.",
-      "Don't escribir párrafos en condensada o en mayúsculas.",
-      "Don't usar texto gris claro sobre fondos claros por debajo de 4,5:1."
-    ]
+  "motion": [
+   {
+    "name": "ease-out",
+    "value": "cubic-bezier(0.23, 1, 0.32, 1)",
+    "purpose": "Entradas y respuestas."
+   },
+   {
+    "name": "ease-drawer",
+    "value": "cubic-bezier(0.32, 0.72, 0, 1)",
+    "purpose": "Cajones."
+   },
+   {
+    "name": "duration-press",
+    "value": "120ms",
+    "purpose": "Pulsación y color."
+   },
+   {
+    "name": "duration-state",
+    "value": "200ms",
+    "purpose": "Hover, cambios de estado y salidas."
+   },
+   {
+    "name": "duration-drawer",
+    "value": "320ms",
+    "purpose": "Cajones y entradas."
+   },
+   {
+    "name": "duration-hero",
+    "value": "900ms",
+    "purpose": "Solo la entrada del hero."
+   }
+  ],
+  "breakpoints": [
+   {
+    "name": "sm",
+    "value": "600px"
+   },
+   {
+    "name": "md",
+    "value": "900px"
+   },
+   {
+    "name": "lg",
+    "value": "1200px"
+   },
+   {
+    "name": "container",
+    "value": "1440px"
+   }
+  ]
+ },
+ "components": [
+  {
+   "name": "Botón primario",
+   "kind": "button",
+   "refersTo": "button-primary",
+   "description": "Toda acción que avanza; uno por vista.",
+   "html": "<button class=\"ds-btn-primary\">AGREGAR AL CARRITO</button>",
+   "css": ".ds-btn-primary { background: #1152E8; color: #fff; border: 0; border-radius: 6px; height: 52px; padding: 0 1.5rem; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.875rem; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: transform 120ms cubic-bezier(0.23,1,0.32,1), background-color 120ms ease; } .ds-btn-primary:active { transform: scale(0.97); } .ds-btn-primary:focus-visible { outline: 3px solid #1152E8; outline-offset: 3px; } @media (hover: hover) and (pointer: fine) { .ds-btn-primary:hover { background: #0D3DAE; } }"
+  },
+  {
+   "name": "Botón secundario",
+   "kind": "button",
+   "refersTo": "button-secondary",
+   "description": "Acción alternativa (seguir comprando, ver guía).",
+   "html": "<button class=\"ds-btn-secondary\">SEGUIR COMPRANDO</button>",
+   "css": ".ds-btn-secondary { background: transparent; color: #071426; border: 1.5px solid #071426; border-radius: 6px; height: 52px; padding: 0 1.5rem; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.875rem; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: transform 120ms cubic-bezier(0.23,1,0.32,1), background-color 120ms ease, color 120ms ease; } .ds-btn-secondary:active { transform: scale(0.97); } .ds-btn-secondary:focus-visible { outline: 3px solid #1152E8; outline-offset: 3px; } @media (hover: hover) and (pointer: fine) { .ds-btn-secondary:hover { background: #071426; color: #fff; } }"
+  },
+  {
+   "name": "Talla",
+   "kind": "chip",
+   "refersTo": "size-option",
+   "description": "Selección de talla; la elegida en noche.",
+   "html": "<div class=\"ds-sizes\"><button class=\"ds-size\">S</button><button class=\"ds-size is-selected\" aria-pressed=\"true\">M</button><button class=\"ds-size\" disabled aria-label=\"L, agotada\">L</button></div>",
+   "css": ".ds-sizes { display: flex; gap: 0.5rem; } .ds-size { min-width: 56px; height: 48px; background: #fff; color: #071426; border: 1px solid #8A949E; border-radius: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.875rem; cursor: pointer; transition: background-color 120ms ease, color 120ms ease; } .ds-size.is-selected { background: #071426; border-color: #071426; color: #fff; } .ds-size:disabled { opacity: 0.5; text-decoration: line-through; cursor: not-allowed; } .ds-size:focus-visible { outline: 3px solid #1152E8; outline-offset: 3px; }"
+  },
+  {
+   "name": "Tarjeta de producto",
+   "kind": "card",
+   "refersTo": "product-card",
+   "description": "Única tarjeta del sitio: imagen 4:5, nombre, metadatos y precio.",
+   "html": "<a class=\"ds-card\" href=\"#\"><span class=\"ds-card-media\"><span class=\"ds-badge\">NUEVO</span></span><span class=\"ds-card-name\">Tricolor 90</span><span class=\"ds-card-meta\">Personalizable</span><span class=\"ds-card-price\">$89.000</span></a>",
+   "css": ".ds-card { display: grid; gap: 0.25rem; width: 220px; color: #071426; text-decoration: none; } .ds-card-media { position: relative; aspect-ratio: 4 / 5; background: #F5F7F8; margin-bottom: 0.5rem; } .ds-badge { position: absolute; top: 0.5rem; left: 0.5rem; background: #071426; color: #fff; padding: 0.25rem 0.5rem; font-family: 'Barlow', sans-serif; font-weight: 500; font-size: 0.75rem; } .ds-card-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 1.375rem; line-height: 1.1; } .ds-card-meta { font-family: 'Barlow', sans-serif; font-size: 0.875rem; color: #5C6670; } .ds-card-price { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.875rem; letter-spacing: 0.06em; } .ds-card:focus-visible { outline: 3px solid #1152E8; outline-offset: 3px; }"
+  },
+  {
+   "name": "Campo",
+   "kind": "input",
+   "refersTo": "field",
+   "description": "Campo con etiqueta visible, borde gris 400 y foco azul.",
+   "html": "<label class=\"ds-field\"><span>Nombre en la camiseta</span><input placeholder=\"TU NOMBRE\" /></label>",
+   "css": ".ds-field { display: grid; gap: 0.25rem; font-family: 'Barlow', sans-serif; font-size: 0.875rem; font-weight: 500; color: #071426; } .ds-field input { height: 48px; padding: 0 1rem; border: 1px solid #8A949E; border-radius: 0; background: #fff; color: #071426; font-size: 1rem; } .ds-field input:focus-visible { outline: 3px solid #1152E8; outline-offset: 3px; }"
+  },
+  {
+   "name": "Titular",
+   "kind": "custom",
+   "description": "Headline condensado 900, sin etiqueta encima ni palabra resaltada.",
+   "html": "<h2 class=\"ds-headline\">TU NOMBRE. TU NÚMERO.</h2>",
+   "css": ".ds-headline { margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 3rem; line-height: 0.92; text-transform: uppercase; color: #071426; }"
   }
+ ],
+ "narrative": {
+  "northStar": "El Dorsal, en silencio",
+  "overview": "La identidad de LR7 es la espalda de una camiseta: un nombre y un número grandes, condensados, que se leen desde lejos. Premium, aquí, significa quitar: una sola foto grande por pantalla, titulares que hablan solos, un único color para lo que se pulsa y mucho aire.",
+  "keyCharacteristics": [
+   "Barlow Condensed 900 para display y titulares; Barlow para todo lo que se lee.",
+   "Un solo color de acción (azul action). No hay naranja.",
+   "Superficies planas, sin sombras ni degradados decorativos.",
+   "Una imagen protagonista por pantalla; sin carruseles automáticos.",
+   "Números solo cuando hay una secuencia real: tallas, dorsal y pasos del checkout.",
+   "Diseñado primero para 390 px y para una mano."
+  ],
+  "rules": [
+   {
+    "name": "The Un Azul Rule",
+    "body": "El azul action es solo para lo que se pulsa. Si no es interactivo, no es azul.",
+    "section": "colors"
+   },
+   {
+    "name": "The Sin Naranja Rule",
+    "body": "No hay naranja en el sistema. Las señales (Nuevo, Últimas unidades) van en blanco sobre noche.",
+    "section": "colors"
+   },
+   {
+    "name": "The Contraste Mínimo Rule",
+    "body": "El texto cumple 4,5:1 contra su fondo real; los bordes de controles, 3:1.",
+    "section": "colors"
+   },
+   {
+    "name": "The Titular Solo Rule",
+    "body": "Un titular no lleva etiqueta encima por defecto ni una palabra en otro color.",
+    "section": "typography"
+   },
+   {
+    "name": "The Mayúsculas Con Motivo Rule",
+    "body": "Mayúsculas en display, headline y label. Metadatos, ayudas y párrafos van en minúsculas con mayúscula inicial.",
+    "section": "typography"
+   },
+   {
+    "name": "The Escala Cerrada Rule",
+    "body": "Solo los 7 tamaños de esta jerarquía. Un tamaño nuevo es un error, no una excepción.",
+    "section": "typography"
+   },
+   {
+    "name": "The Plano por Defecto Rule",
+    "body": "Tarjetas, secciones y botones no llevan sombra ni degradado.",
+    "section": "elevation"
+   }
+  ],
+  "dos": [
+   "Do usar el azul action solo en lo pulsable y un único botón primario por vista.",
+   "Do dejar que una foto o un render del producto sea la protagonista de cada pantalla.",
+   "Do mostrar la personalización con vista previa en vivo en la home y en la ficha.",
+   "Do usar la tarjeta de producto única (foto, nombre, metadatos, precio) en todo el sitio.",
+   "Do mantener todo texto en 12 px o más, el foco visible y áreas táctiles de 44 px o más.",
+   "Do escribir en español de Colombia, con verbos claros en los botones (\"Agregar al carrito\", \"Pagar\")."
+  ],
+  "donts": [
+   "Don't usar naranja ni ningún otro color de acento fuera de la paleta.",
+   "Don't usar escudos, logos ni nombres de clubes, selecciones o marcas de terceros en fotos, renders o nombres de producto.",
+   "Don't poner etiquetas numeradas (\"01 / …\") que no correspondan a una secuencia real, ni una etiqueta sobre cada titular.",
+   "Don't resaltar una palabra del titular en otro color por costumbre, ni añadir \"→\" al texto de los botones.",
+   "Don't usar franjas de texto en movimiento, carruseles automáticos, rejillas decorativas ni números gigantes de fondo.",
+   "Don't poner sombras o degradados en tarjetas y secciones.",
+   "Don't mostrar la insignia \"Más vendida\" si no se basa en ventas reales, ni reseñas o cifras inventadas."
+  ]
+ }
 }

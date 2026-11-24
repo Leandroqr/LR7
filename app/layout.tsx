@@ -4,19 +4,23 @@ import { AppProviders } from "@/components/providers/app-providers";
 import { SiteShell } from "@/components/layout/site-shell";
 import { getPublicNavigation } from "@/lib/content";
 import { SITE_CONFIG } from "@/lib/site";
-import "@/app/globals.css";
+import "@/app/styles.css";
 
+// UX9: solo los pesos que se pintan de verdad (medido en las 20 rutas públicas a 390 y 1280 px). Barlow
+// Condensed 600 y Barlow 300 no se usaban; quitarlos baja de 14 a 11 archivos de fuente.
 const displayFont = Barlow_Condensed({
   subsets: ["latin"],
-  weight: ["400", "600", "700", "800", "900"],
+  weight: ["400", "700", "800", "900"],
   style: ["normal", "italic"],
   variable: "--font-display",
 });
 
+// La fuente de texto no se precarga: así no compite con la de los titulares, que es la del LCP.
 const bodyFont = Barlow({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
+  weight: ["400", "500", "600"],
   variable: "--font-body",
+  preload: false,
 });
 
 export const metadata: Metadata = {

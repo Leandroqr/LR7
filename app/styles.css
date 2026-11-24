@@ -1,0 +1,105 @@
+/*
+ * Entrada de estilos (T0, adopción gradual de Tailwind CSS 4).
+ *
+ * Orden de capas: el tema de Tailwind, después el CSS existente (globals.css, en la capa "legacy")
+ * y al final las utilidades, que así ganan a las reglas antiguas en los componentes migrados.
+ * No se carga el reset de Tailwind (preflight): cambiaría márgenes y bordes de todo el sitio.
+ * Por eso, en los componentes migrados, `border` va siempre con `border-solid`.
+ */
+@layer theme, legacy, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "./globals.css" layer(legacy);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+/*
+ * Tokens de DESIGN.md para las utilidades (bg-night, text-action, font-heading, ease-out…).
+ * Los valores son los mismos que el :root de globals.css; tests/design-system.test.mjs comprueba
+ * que no se desincronicen. Se eliminan los valores por defecto de Tailwind para que solo exista
+ * el sistema de LR7 (sin naranjas, sin animate-bounce, sin otra escala tipográfica).
+ */
+@theme static {
+  --color-*: initial;
+  --color-night: #071426;
+  --color-navy: #0D1F38;
+  --color-steel: #174A7E;
+  --color-action: #1152E8;
+  --color-action-hover: #0D3DAE;
+  --color-action-on-dark: #5B8CFF;
+  --color-black: #050608;
+  --color-white: #FFFFFF;
+  --color-gray-50: #F5F7F8;
+  --color-gray-100: #ECEFF2;
+  --color-gray-200: #DCE1E6;
+  --color-gray-400: #8A949E;
+  --color-gray-600: #5C6670;
+  --color-danger: #B42318;
+  --color-success: #17652D;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  --font-*: initial;
+  --font-heading: var(--font-display), sans-serif;
+  --font-sans: var(--font-body), sans-serif;
+
+  --text-*: initial;
+  --text-caption: 0.75rem;
+  --text-body-sm: 0.875rem;
+  --text-body: 1rem;
+  --text-label: 0.875rem;
+  --text-title: 1.375rem;
+  --text-headline: clamp(2.25rem, 5vw, 3.75rem);
+  --text-display: clamp(3.25rem, 9vw, 7.5rem);
+
+  /* Espaciado: la escala de Tailwind (múltiplos de 0,25 rem) coincide con la base de 4 px:
+     space-4 = p-4, space-5 = p-6, space-6 = p-8, space-7 = p-12, space-8 = p-16, space-9 = p-24. */
+
+  /* Puntos de corte que ya usa el sitio: 600, 768, 901 y 1180 px. */
+  --breakpoint-*: initial;
+  --breakpoint-sm: 37.5rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 56.3125rem;
+  --breakpoint-xl: 73.75rem;
+
+  --radius-*: initial;
+  --radius-button: 6px;
+  --radius-full: 9999px;
+
+  --shadow-*: initial;
+  --shadow-drawer: -16px 0 40px rgba(7, 20, 38, 0.18);
+  --shadow-sticky: 0 -8px 24px rgba(7, 20, 38, 0.08);
+
+  /* Movimiento: curvas y duraciones del sistema; las animaciones genéricas de Tailwind no existen. */
+  --ease-*: initial;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --animate-*: initial;
+  --default-transition-duration: 200ms;
+  --default-transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+
+  /* Hero (un solo momento por página): las líneas del titular suben desde su máscara, el resto
+     aparece después y la foto se asienta despacio. Se usan con motion-safe:. */
+  --animate-hero-line: hero-line 640ms cubic-bezier(0.23, 1, 0.32, 1) both;
+  --animate-hero-fade: hero-fade 520ms cubic-bezier(0.23, 1, 0.32, 1) both;
+  --animate-hero-image: hero-image 1800ms cubic-bezier(0.23, 1, 0.32, 1) both;
+  /* Tiempo de cada diapositiva del carrusel: su final hace avanzar el hero (home-hero.tsx). */
+  --animate-hero-progress: lr7-hero-progress 7000ms linear forwards;
+
+  @keyframes hero-line {
+    from { transform: translateY(105%); }
+    to { transform: none; }
+  }
+  @keyframes hero-fade {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: none; }
+  }
+  /* Anima la propiedad scale (la que usan las utilidades scale-x-*), no transform: así no se multiplican. */
+  @keyframes lr7-hero-progress {
+    from { scale: 0 1; }
+    to { scale: 1 1; }
+  }
+  @keyframes hero-image {
+    from { opacity: 0; transform: scale(1.08); }
+    to { opacity: 1; transform: none; }
+  }
+}

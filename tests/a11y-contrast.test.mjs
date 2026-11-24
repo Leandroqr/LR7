@@ -4,10 +4,13 @@ import test from "node:test";
 
 const css = readFileSync("app/globals.css", "utf8");
 const root = css.slice(css.indexOf(":root"), css.indexOf("}", css.indexOf(":root")));
-const token = (name) => {
+// Resuelve alias del tipo var(--otro-token) hasta llegar a un valor literal.
+const token = (name, depth = 0) => {
   const match = root.match(new RegExp(`--${name}:\\s*([^;]+);`));
   assert.ok(match, `falta el token --${name}`);
-  return match[1].trim();
+  const value = match[1].trim();
+  const alias = value.match(/^var\(--([\w-]+)\)$/);
+  return alias && depth < 5 ? token(alias[1], depth + 1) : value;
 };
 const parse = (value) => {
   const hex = value.match(/^#([0-9a-f]{6})$/i);
@@ -37,9 +40,16 @@ test("muted text tokens meet WCAG AA on the light and dark surfaces they are use
     assert.ok(contrast(token("color-accent-on-dark"), surface) >= AA, `--color-accent-on-dark sobre ${surface}`);
     assert.ok(contrast(token("color-text-on-dark"), surface) >= AA);
   }
-  assert.ok(contrast(token("color-accent-orange-text"), token("color-white")) >= AA);
-  assert.ok(contrast(token("color-accent-orange"), token("color-mid")) >= AA);
-  assert.ok(contrast(token("color-danger"), token("color-white")) >= AA);
+  // Paleta "El Dorsal, en silencio": acción, acero y grises de texto sobre sus superficies reales.
+  for (const surface of [token("color-white"), token("color-gray-50")]) {
+    assert.ok(contrast(token("color-action"), surface) >= AA, `--color-action sobre ${surface}`);
+    assert.ok(contrast(token("color-gray-600"), surface) >= AA, `--color-gray-600 sobre ${surface}`);
+    assert.ok(contrast(token("color-danger"), surface) >= AA, `--color-danger sobre ${surface}`);
+  }
+  assert.ok(contrast(token("color-white"), token("color-action")) >= AA, "texto blanco sobre el botón primario");
+  assert.ok(contrast(token("color-white"), token("color-steel")) >= AA, "texto blanco sobre acero");
+  // Bordes de controles (WCAG 1.4.11): gris 400 ≥ 3:1 sobre blanco.
+  assert.ok(contrast(token("color-gray-400"), token("color-white")) >= 3, "borde de campo sobre blanco");
 });
 
 test("dark sections of the about page use the on-dark text tokens", () => {
