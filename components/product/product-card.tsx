@@ -1,145 +1,47 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { useStore } from "@/components/providers/store-provider";
-import { formatCurrency, getBadgeDisplayName } from "@/lib/products";
+import { getBadgeDisplayName, getCategoryDisplayName } from "@/lib/products";
 import type { Product } from "@/types/ecommerce";
 import { FavoriteButton } from "@/components/product/favorite-button";
+import { ProductVisual } from "@/components/product/product-visual";
+import { Badge } from "@/components/ui/badge";
+import { Price } from "@/components/ui/price";
 
-function getUniqueVariants(product: Product) {
-  return product.variants.filter(
-    (variant, index, variants) =>
-      variants.findIndex((candidate) => candidate.size === variant.size) === index,
-  );
+const CARD_SIZES = "(max-width: 767px) 50vw, (max-width: 1179px) 33vw, 25vw";
+
+/** Una línea de contexto: lo que más ayuda a decidir (DESIGN.md → Tarjeta de producto). */
+function cardMeta(product: Product, available: boolean) {
+  if (!available) return "Agotado";
+  if (product.brand === "TRAINING") return getCategoryDisplayName(product.category);
+  if (product.personalizable) return "Personalizable";
+  return getCategoryDisplayName(product.category);
 }
 
-function getQuickAddLabel(added: boolean, hasSelection: boolean, available: boolean) {
-  if (added) return "AÑADIDO";
-  if (hasSelection) return "AÑADIR AL CARRITO";
-  return available ? "ELIGE TALLA" : "AGOTADO";
-}
-
+/**
+ * Tarjeta única del sitio (UX4): render o foto 4:5, nombre, una línea de contexto y precio.
+ * Toda la tarjeta lleva a la ficha, donde se elige talla y se añade al carrito.
+ */
 export function ProductCard({ product, imageLoading = "lazy" }: Readonly<{ product: Product; imageLoading?: "eager" | "lazy" }>) {
-  const [hovered, setHovered] = useState(false);
-  const [selectedSize, setSelectedSize] = useState("");
-  const [added, setAdded] = useState(false);
-  const { addToCart } = useStore();
-  const productHref = `/productos/${product.slug}`;
-  const availableVariants = getUniqueVariants(product);
-  const selectedVariant = availableVariants.find((variant) => variant.size === selectedSize);
-  const available = availableVariants.length > 0;
-  const quickAddLabel = getQuickAddLabel(added, Boolean(selectedVariant), available);
-
-  useEffect(() => {
-    if (!added) return;
-    const timeout = window.setTimeout(() => setAdded(false), 1800);
-    return () => window.clearTimeout(timeout);
-  }, [added]);
-
-  const handleAdd = () => {
-    if (!selectedVariant) return;
-    addToCart({
-      product,
-      variant: selectedVariant,
-      size: selectedVariant.size,
-      customName: "",
-      customNumber: "",
-      unitPrice: product.price.amount,
-      quantity: 1,
-    }, { notify: true });
-    setAdded(true);
-  };
+  const available = product.variants.length > 0;
+  const badge = available ? getBadgeDisplayName(product.badge) : null;
+  // Segunda foto real del producto (la de su ficha), nunca inventada; solo cambia con puntero.
+  const hover = product.hoverImage?.src && product.hoverImage.src !== product.images[0]?.src ? product.hoverImage : null;
 
   return (
-    <article
-      className="product-card shop-product-card"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      <div className="product-img-wrap shop-product-media">
-        <Link href={productHref} className="shop-product-image-link" aria-label={`Ver ${product.name}`}>
-          <Image
-            className="product-img"
-            src={product.images[0].src}
-            alt={product.images[0].alt}
-            fill
-            loading={imageLoading}
-            sizes="(max-width: 600px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            style={{ objectFit: "cover", opacity: hovered ? 0 : 1 }}
-          />
-          <Image
-            className="product-img shop-product-hover-image"
-            src={product.hoverImage.src}
-            alt={product.hoverImage.alt}
-            fill
-            loading="lazy"
-            sizes="(max-width: 600px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            style={{ objectFit: "cover", opacity: hovered ? 1 : 0 }}
-          />
-        </Link>
-
-        {product.badge ? (
-          <span className={`shop-product-badge shop-product-badge-${product.badge.toLowerCase().replaceAll(" ", "-")}`}>
-            {getBadgeDisplayName(product.badge)}
-          </span>
-        ) : null}
-        <FavoriteButton productId={product.id} />
-        {product.personalizable ? <span className="shop-product-customizable">PERSONALIZABLE</span> : null}
-      </div>
-
-      <div className="shop-product-info">
-        <div className="shop-product-context">
-          <span>{product.brand === "FUTBOL" ? product.team : "LR7 TRAINING"}</span>
-          <span>{available ? "DISPONIBLE" : "AGOTADO"}</span>
-        </div>
-        <h2><Link href={productHref}>{product.name}</Link></h2>
-        <p className="shop-product-price" aria-label={`Precio ${formatCurrency(product.price.amount)} pesos colombianos`}>
-          ${formatCurrency(product.price.amount)}
-        </p>
-
-        <div className="shop-product-actions">
-          {available ? (
-            <fieldset className="shop-quick-sizes">
-              <legend>SELECCIONA TALLA</legend>
-              <div>
-                {availableVariants.map((variant) => (
-                  <button
-                    type="button"
-                    key={variant.size}
-                    className={selectedSize === variant.size ? "is-selected" : ""}
-                    onClick={() => { setSelectedSize(variant.size); setAdded(false); }}
-                    aria-pressed={selectedSize === variant.size}
-                    aria-label={`Talla ${variant.size}`}
-                  >
-                    {variant.size}
-                  </button>
-                ))}
-              </div>
-            </fieldset>
-          ) : null}
-
-          <button
-            type="button"
-            className="shop-quick-add"
-            onClick={handleAdd}
-            disabled={!selectedVariant || !available}
-          >
-            <span>{quickAddLabel}</span>
-            <span aria-hidden="true">{added ? "✓" : "→"}</span>
-          </button>
-
-          {product.personalizable ? (
-            <Link className="shop-personalize-link" href={`/personaliza?producto=${encodeURIComponent(product.slug)}`}>
-              PERSONALIZAR <span aria-hidden="true">→</span>
-            </Link>
-          ) : null}
-        </div>
-        <p className="shop-card-status" aria-live="polite">
-          {added ? `${product.name}, talla ${selectedSize}, añadido al carrito.` : ""}
-        </p>
-      </div>
+    <article className={`pcard${available ? "" : " is-sold-out"}`}>
+      <Link href={`/productos/${product.slug}`} className="pcard-link">
+        <span className="pcard-media">
+          <ProductVisual product={product} sizes={CARD_SIZES} loading={imageLoading} className="pcard-visual" />
+          {hover ? <Image className="pcard-visual pcard-hover-image" src={hover.src} alt="" fill loading="lazy" sizes={CARD_SIZES} style={{ objectFit: "cover" }} /> : null}
+        </span>
+        <span className="pcard-body">
+          <h3 className="pcard-name">{product.name}</h3>
+          <span className="pcard-meta">{cardMeta(product, available)}</span>
+          <Price amount={product.price.amount} className="pcard-price" />
+        </span>
+      </Link>
+      {badge ? <Badge className="pcard-badge">{badge}</Badge> : null}
+      <FavoriteButton productId={product.id} className="pcard-favorite" />
     </article>
   );
 }

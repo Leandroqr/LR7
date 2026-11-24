@@ -1,12 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ProductCard } from "@/components/product/product-card";
 import type { Product } from "@/types/ecommerce";
-
-const SHOP_HERO_IMAGE = "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1800&auto=format&fit=crop";
 
 type ShopSection = "all" | "football" | "new" | "retro" | "accessories" | "training" | "f678";
 type PriceFilter = "all" | "under-90" | "90-110" | "over-110";
@@ -20,16 +17,19 @@ type ShopPageProps = {
 };
 
 const SIZES = ["S", "M", "L", "XL", "XXL"];
+
+const SEARCH_ICON = <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>;
+const CLOSE_ICON = <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18 6 6 18M6 6l12 12" /></svg>;
 const PAGE_SIZE = 8;
 
 const SECTIONS: Array<{ id: ShopSection; label: string }> = [
-  { id: "all", label: "TODOS" },
-  { id: "football", label: "FÚTBOL" },
-  { id: "new", label: "NUEVA TEMPORADA" },
-  { id: "retro", label: "RETRO" },
-  { id: "accessories", label: "ACCESORIOS" },
-  { id: "training", label: "TRAINING" },
-  { id: "f678", label: "FÚTBOL 6 / 7 / 8" },
+  { id: "all", label: "Todo" },
+  { id: "football", label: "Fútbol" },
+  { id: "new", label: "Nueva temporada" },
+  { id: "retro", label: "Retro" },
+  { id: "accessories", label: "Accesorios" },
+  { id: "training", label: "Training" },
+  { id: "f678", label: "Fútbol 6 / 7 / 8" },
 ];
 
 function normalizeText(value: string) {
@@ -115,12 +115,28 @@ export function ShopPage({ products, initialCategory, initialBrand }: Readonly<S
   const activeFilterCount = sizes.length + Number(price !== "all") + Number(availability !== "all") + Number(personalizableOnly);
   const hasFilters = section !== "all" || query.trim() || activeFilterCount > 0;
 
+  // M5: el cajón de filtros sale hacia abajo en 200 ms antes de desmontarse (al instante con movimiento reducido).
+  // Solo cambia cuándo se cierra; los filtros aplicados no dependen de esto.
+  const [filtersClosing, setFiltersClosing] = useState(false);
+  const closeFilters = useCallback(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) setFiltersOpen(false);
+    else setFiltersClosing(true);
+  }, []);
+  useEffect(() => {
+    if (!filtersClosing) return;
+    const timeout = window.setTimeout(() => {
+      setFiltersOpen(false);
+      setFiltersClosing(false);
+    }, 200);
+    return () => window.clearTimeout(timeout);
+  }, [filtersClosing]);
+
   useEffect(() => {
     if (!filtersOpen) return;
     const dialog = filterDialogRef.current;
     dialog?.showModal();
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setFiltersOpen(false);
+      if (event.key === "Escape") closeFilters();
     };
     document.body.style.overflow = "hidden";
     window.addEventListener("keydown", onKeyDown);
@@ -129,7 +145,7 @@ export function ShopPage({ products, initialCategory, initialBrand }: Readonly<S
       document.body.style.overflow = "";
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [filtersOpen]);
+  }, [filtersOpen, closeFilters]);
 
   const resetVisible = () => setVisible(PAGE_SIZE);
   const selectSection = (nextSection: ShopSection) => {
@@ -153,7 +169,7 @@ export function ShopPage({ products, initialCategory, initialBrand }: Readonly<S
   const filters = (
     <div className="shop-filter-groups">
       <fieldset className="shop-filter-group">
-        <legend>TALLA</legend>
+        <legend>Talla</legend>
         <div className="shop-filter-sizes">
           {SIZES.map((size) => (
             <button type="button" key={size} className={sizes.includes(size) ? "is-selected" : ""} onClick={() => toggleSize(size)} aria-pressed={sizes.includes(size)}>
@@ -164,7 +180,7 @@ export function ShopPage({ products, initialCategory, initialBrand }: Readonly<S
       </fieldset>
 
       <label className="shop-filter-group">
-        <span>PRECIO</span>
+        <span>Precio</span>
         <select value={price} onChange={(event) => { setPrice(event.target.value as PriceFilter); resetVisible(); }}>
           <option value="all">Todos los precios</option>
           <option value="under-90">Menos de $90.000</option>
@@ -174,7 +190,7 @@ export function ShopPage({ products, initialCategory, initialBrand }: Readonly<S
       </label>
 
       <label className="shop-filter-group">
-        <span>DISPONIBILIDAD</span>
+        <span>Disponibilidad</span>
         <select value={availability} onChange={(event) => { setAvailability(event.target.value as AvailabilityFilter); resetVisible(); }}>
           <option value="all">Todos</option>
           <option value="available">Disponibles</option>
@@ -184,59 +200,38 @@ export function ShopPage({ products, initialCategory, initialBrand }: Readonly<S
 
       <label className="shop-filter-check">
         <input type="checkbox" checked={personalizableOnly} onChange={(event) => { setPersonalizableOnly(event.target.checked); resetVisible(); }} />
-        <span>SOLO PERSONALIZABLES</span>
+        <span>Solo personalizables</span>
       </label>
 
-      {hasFilters ? <button type="button" className="shop-clear-filters" onClick={clearFilters}>LIMPIAR FILTROS</button> : null}
+      {hasFilters ? <button type="button" className="shop-clear-filters" onClick={clearFilters}>Limpiar filtros</button> : null}
     </div>
   );
 
   return (
-    <main className="shop-page">
+    <div className="shop-page">
+      {/* Cabecera sin foto de stock: el catálogo es lo que se mira (UX4). */}
       <header className="shop-hero">
-        <div className="shop-hero-media" aria-hidden="true">
-          <Image
-            src={SHOP_HERO_IMAGE}
-            alt=""
-            fill
-            sizes="100vw"
-            loading="eager"
-            fetchPriority="high"
-            style={{ objectFit: "cover", objectPosition: "center 44%" }}
-          />
-        </div>
         <nav aria-label="Migas de pan" className="shop-breadcrumbs">
-          <Link href="/">INICIO</Link><span aria-hidden="true">/</span><span>TIENDA</span>
+          <Link href="/">Inicio</Link><span aria-hidden="true">/</span><span aria-current="page">Tienda</span>
         </nav>
-        <div className="shop-hero-copy">
-          <p>LR7 / SHOP</p>
-          <h1 className="font-display">FOOTBALL<br /><span>BUILT FOR THE GAME.</span></h1>
-          <div>
-            <span>CAMISETAS</span><span>RETRO</span><span>TRAINING</span>
-          </div>
-        </div>
-        <p className="shop-hero-note">Fútbol primero. Piezas para jugar, entrenar y llevar la historia del juego.</p>
+        <h1 className="font-display">Tienda</h1>
+        <p>Camisetas de fútbol de diseño propio, retro y ropa de training, con envío a toda Colombia.</p>
       </header>
 
       <nav className="shop-category-nav" aria-label="Categorías de tienda">
         <div>
-          {SECTIONS.map((item) => {
-            const disabled = sectionCounts[item.id] === 0;
-            return (
-              <button
-                type="button"
-                key={item.id}
-                className={section === item.id ? "is-active" : ""}
-                onClick={() => selectSection(item.id)}
-                aria-pressed={section === item.id}
-                disabled={disabled}
-                title={disabled ? "Próximamente" : undefined}
-              >
-                <span>{item.label}</span>
-                {section === item.id ? <span aria-hidden="true">●</span> : null}
-              </button>
-            );
-          })}
+          {/* Las líneas sin productos no se anuncian (antes salían tachadas como "Próximamente"). */}
+          {SECTIONS.filter((item) => item.id === "all" || item.id === section || sectionCounts[item.id] > 0).map((item) => (
+            <button
+              type="button"
+              key={item.id}
+              className={section === item.id ? "is-active" : ""}
+              onClick={() => selectSection(item.id)}
+              aria-pressed={section === item.id}
+            >
+              {item.label}
+            </button>
+          ))}
         </div>
       </nav>
 
@@ -248,33 +243,33 @@ export function ShopPage({ products, initialCategory, initialBrand }: Readonly<S
               type="search"
               value={query}
               onChange={(event) => { setQuery(event.target.value); resetVisible(); }}
-              placeholder="BUSCAR EQUIPO, CAMISETA O COLECCIÓN"
+              placeholder="Busca equipo, camiseta o colección"
             />
-            <span aria-hidden="true">⌕</span>
+            <span className="shop-search-icon">{SEARCH_ICON}</span>
           </label>
 
           <div className="shop-mobile-tools">
             <button type="button" onClick={() => setFiltersOpen(true)} aria-expanded={filtersOpen} aria-controls="shop-filter-dialog">
-              FILTRAR {activeFilterCount ? `(${activeFilterCount})` : ""}
+              Filtrar{activeFilterCount ? ` (${activeFilterCount})` : ""}
             </button>
             <label>
               <span className="shop-visually-hidden">Ordenar productos</span>
               <select value={sort} onChange={(event) => setSort(event.target.value as SortOption)}>
-                <option value="featured">DESTACADOS</option>
-                <option value="newest">MÁS RECIENTES</option>
-                <option value="price-asc">PRECIO: MENOR A MAYOR</option>
-                <option value="price-desc">PRECIO: MAYOR A MENOR</option>
+                <option value="featured">Destacados</option>
+                <option value="newest">Más recientes</option>
+                <option value="price-asc">Precio: menor a mayor</option>
+                <option value="price-desc">Precio: mayor a menor</option>
               </select>
             </label>
           </div>
 
           <label className="shop-sort">
-            <span>ORDENAR</span>
+            <span>Ordenar</span>
             <select value={sort} onChange={(event) => setSort(event.target.value as SortOption)}>
-              <option value="featured">DESTACADOS</option>
-              <option value="newest">MÁS RECIENTES</option>
-              <option value="price-asc">PRECIO: MENOR A MAYOR</option>
-              <option value="price-desc">PRECIO: MAYOR A MENOR</option>
+              <option value="featured">Destacados</option>
+              <option value="newest">Más recientes</option>
+              <option value="price-asc">Precio: menor a mayor</option>
+              <option value="price-desc">Precio: mayor a menor</option>
             </select>
           </label>
         </div>
@@ -284,32 +279,28 @@ export function ShopPage({ products, initialCategory, initialBrand }: Readonly<S
 
           <div className="shop-results">
             <header className="shop-results-header">
-              <div>
-                <p>{section === "all" ? "COLECCIÓN LR7" : SECTIONS.find((item) => item.id === section)?.label}</p>
-                <h2 id="shop-results-title" className="font-display">{filteredProducts.length} {filteredProducts.length === 1 ? "PRODUCTO" : "PRODUCTOS"}</h2>
-              </div>
-              <p aria-live="polite">{query ? `RESULTADOS PARA “${query}”` : "FOOTBALL FIRST / TRAINING SECOND"}</p>
+              <h2 id="shop-results-title" className="font-display">{filteredProducts.length} {filteredProducts.length === 1 ? "producto" : "productos"}</h2>
+              <p aria-live="polite">{query ? `Resultados para “${query}”` : ""}</p>
             </header>
 
             {filteredProducts.length ? (
               <>
-                <div className="shop-product-grid">
+                <div className="product-grid">
                   {filteredProducts.slice(0, visible).map((product, index) => <ProductCard key={product.id} product={product} imageLoading={index === 0 ? "eager" : "lazy"} />)}
                 </div>
                 {visible < filteredProducts.length ? (
                   <div className="shop-load-more">
-                    <button type="button" onClick={() => setVisible((count) => count + PAGE_SIZE)}>
-                      VER MÁS <span>({filteredProducts.length - visible})</span>
+                    <button type="button" className="btn-outline" onClick={() => setVisible((count) => count + PAGE_SIZE)}>
+                      Ver más productos ({filteredProducts.length - visible})
                     </button>
                   </div>
                 ) : null}
               </>
             ) : (
               <div className="shop-empty-state">
-                <p>0 / {products.length}</p>
-                <h2 className="font-display">NO ENCONTRAMOS<br />LO QUE BUSCAS.</h2>
-                <span>Prueba otra categoría o elimina los filtros activos.</span>
-                <button type="button" onClick={() => { clearFilters(); setSection("football"); }}>VER TODO EL FÚTBOL</button>
+                <h2 className="font-display">No encontramos lo que buscas</h2>
+                <p>Prueba otra categoría o quita los filtros activos.</p>
+                <button type="button" className="btn-primary" onClick={() => { clearFilters(); setSection("football"); }}>VER TODO EL FÚTBOL</button>
               </div>
             )}
           </div>
@@ -322,15 +313,15 @@ export function ShopPage({ products, initialCategory, initialBrand }: Readonly<S
             ref={filterDialogRef}
             id="shop-filter-dialog"
             aria-labelledby="shop-filter-title"
-            className="shop-filter-drawer"
-            onCancel={(event) => { event.preventDefault(); setFiltersOpen(false); }}
+            className={`shop-filter-drawer${filtersClosing ? " is-closing" : ""}`}
+            onCancel={(event) => { event.preventDefault(); closeFilters(); }}
           >
-            <header><h2 id="shop-filter-title">FILTRAR PRODUCTOS</h2><button type="button" autoFocus onClick={() => setFiltersOpen(false)} aria-label="Cerrar filtros">×</button></header>
+            <header><h2 id="shop-filter-title" className="font-display">Filtrar productos</h2><button type="button" autoFocus onClick={closeFilters} aria-label="Cerrar filtros">{CLOSE_ICON}</button></header>
             {filters}
-            <button type="button" className="shop-apply-filters" onClick={() => setFiltersOpen(false)}>VER {filteredProducts.length} PRODUCTOS</button>
+            <button type="button" className="btn-primary shop-apply-filters" onClick={closeFilters}>VER {filteredProducts.length} {filteredProducts.length === 1 ? "PRODUCTO" : "PRODUCTOS"}</button>
           </dialog>
         </div>
       ) : null}
-    </main>
+    </div>
   );
 }

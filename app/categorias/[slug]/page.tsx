@@ -96,13 +96,13 @@ export default async function CategoryPage({ params }: Readonly<CategoryPageProp
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(itemListJsonLd) }} />
-      <PageHero label="— CATEGORÍA" title={categoryName} sub={category.description} />
-      <section style={{ padding: "4rem 0 6rem", background: "var(--color-white)" }}>
-        <div style={{ maxWidth: "1440px", margin: "0 auto", padding: "0 2rem" }}>
-          <p style={{ maxWidth: "860px", margin: "0 0 2rem", color: "var(--color-text-muted)", lineHeight: 1.7, fontWeight: 300 }}>
+      <PageHero title={categoryName} sub={category.description} />
+      <section className="shop-catalog">
+        <div>
+          <p className="listing-count">
             Explora {categoryName.toLowerCase()} con diseños exclusivos, diferentes tallas y opciones para compra en Colombia.
           </p>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(260px, 100%), 1fr))", gap: "2px" }}>
+          <div className="product-grid">
             {products.map((product, index) => (
               <ProductCard key={product.id} product={product} imageLoading={index === 0 ? "eager" : "lazy"} />
             ))}

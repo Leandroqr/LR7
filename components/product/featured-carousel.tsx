@@ -5,9 +5,14 @@ import { useEffect, useState } from "react";
 import type { Product } from "@/types/ecommerce";
 import { ProductCard } from "@/components/product/product-card";
 
+// Sin autoavance: el visitante decide cuándo pasar (UX4; WCAG 2.2.2 y "un momento por página").
+const ARROW_LEFT = <svg className="carousel-arrow-glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 5 8 12l7 7" /></svg>;
+const ARROW_RIGHT = <svg className="carousel-arrow-glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9 5 7 7-7 7" /></svg>;
+
 type FeaturedCarouselProps = {
   products: Product[];
-  label: string;
+  /** Etiqueta opcional sobre el título; por defecto no se muestra (DESIGN.md → The Titular Solo Rule). */
+  label?: string;
   title: string;
   href: string;
   cta: string;
@@ -15,14 +20,14 @@ type FeaturedCarouselProps = {
 
 export function FeaturedCarousel({ products, label, title, href, cta }: Readonly<FeaturedCarouselProps>) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const [visibleSlides, setVisibleSlides] = useState(3);
+  const [visibleSlides, setVisibleSlides] = useState(4);
 
   useEffect(() => {
     const updateVisibleSlides = () => {
-      let preferredSlides = 3.2;
-      if (window.innerWidth <= 600) preferredSlides = 1.12;
-      else if (window.innerWidth <= 1000) preferredSlides = 2.15;
+      // Se asoma la tarjeta siguiente para indicar que hay más (misma escala que la rejilla de la tienda).
+      let preferredSlides = 4;
+      if (window.innerWidth <= 600) preferredSlides = 1.6;
+      else if (window.innerWidth <= 1000) preferredSlides = 2.6;
 
       const nextVisibleSlides = Math.min(preferredSlides, products.length);
       setVisibleSlides(nextVisibleSlides);
@@ -36,16 +41,6 @@ export function FeaturedCarousel({ products, label, title, href, cta }: Readonly
 
   const slideCount = Math.max(1, Math.floor(products.length - visibleSlides) + 1);
 
-  useEffect(() => {
-    if (isPaused || products.length < 2) return;
-
-    const interval = window.setInterval(() => {
-      setActiveIndex((index) => (index + 1) % slideCount);
-    }, 5000);
-
-    return () => window.clearInterval(interval);
-  }, [isPaused, products.length, slideCount]);
-
   const move = (direction: number) => {
     setActiveIndex((index) => (index + direction + slideCount) % slideCount);
   };
@@ -57,7 +52,7 @@ export function FeaturedCarousel({ products, label, title, href, cta }: Readonly
       <div className="featured-carousel-inner">
         <div className="featured-carousel-heading">
           <div>
-            <p className="font-display featured-carousel-label">{label}</p>
+            {label ? <p className="font-display featured-carousel-label">{label}</p> : null}
             <h2 className="font-display featured-carousel-title">{title}</h2>
           </div>
           <div className="featured-carousel-controls">
@@ -65,25 +60,18 @@ export function FeaturedCarousel({ products, label, title, href, cta }: Readonly
               <strong>{String(activeIndex + 1).padStart(2, "0")}</strong> / {String(slideCount).padStart(2, "0")}
             </span>
             <button type="button" className="carousel-arrow" onClick={() => move(-1)} aria-label="Producto anterior">
-              <span aria-hidden="true">←</span>
+              {ARROW_LEFT}
             </button>
             <button type="button" className="carousel-arrow" onClick={() => move(1)} aria-label="Siguiente producto">
-              <span aria-hidden="true">→</span>
+              {ARROW_RIGHT}
             </button>
           </div>
         </div>
 
-        <div
-          className="featured-carousel-viewport"
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
-          onFocus={() => setIsPaused(true)}
-          onBlur={() => setIsPaused(false)}
-        >
+        <div className="featured-carousel-viewport">
           <ol className="featured-carousel-track" style={{ transform: `translateX(-${activeIndex * (100 / visibleSlides)}%)` }}>
             {products.map((product, index) => (
               <li className="featured-carousel-slide" key={product.id} style={{ flex: `0 0 ${100 / visibleSlides}%` }} aria-label={`${index + 1} de ${products.length}`}>
-                <div className="featured-carousel-slide-number">0{index + 1}</div>
                 <ProductCard product={product} />
               </li>
             ))}
@@ -104,7 +92,7 @@ export function FeaturedCarousel({ products, label, title, href, cta }: Readonly
               />
             ))}
           </div>
-          <Link href={href} className="btn-outline">{cta} <span aria-hidden="true">→</span></Link>
+          <Link href={href} className="btn-outline">{cta}</Link>
         </div>
       </div>
     </section>
