@@ -1,56 +1,95 @@
-import Image from "next/image";
 import Link from "next/link";
 import type { Product } from "@/types/ecommerce";
 import type { Database } from "@/types/database";
-import { HeroCarousel } from "@/components/pages/hero-carousel";
-import { BenefitsStrip, FootballCollectionSection, NewDropSection } from "@/components/pages/home-commerce-sections";
+import { HERO_PHOTO_ID, HomeHero } from "@/components/pages/home-hero";
+import { HomeTeams } from "@/components/pages/home-teams";
 import { FeaturedCarousel } from "@/components/product/featured-carousel";
-
-function TrainingSection({ product }: Readonly<{ product: Product }>) {
-  return (
-    <section aria-labelledby="training-title" style={{ padding: "8rem 0 6rem", background: "var(--color-white)" }}>
-      <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "0 2rem" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4rem", alignItems: "center", minHeight: "500px" }} className="editorial-grid">
-          <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", paddingLeft: "2rem" }}>
-            <p className="font-display" style={{ fontSize: "0.75rem", letterSpacing: "0.3em", color: "var(--color-accent)", marginBottom: "1rem", textTransform: "uppercase", fontWeight: 700 }}>
-              TRAINING / PRODUCTOS
-            </p>
-            <h2 id="training-title" className="font-display" style={{ fontSize: "clamp(2.2rem, 6vw, 4rem)", fontWeight: 900, lineHeight: 1, letterSpacing: "-0.01em", textTransform: "uppercase", marginBottom: "1.5rem", color: "var(--color-dark)" }}>
-              ROPA PARA<br />ENTRENAR
-            </h2>
-            <p style={{ fontSize: "1rem", color: "var(--color-text-muted)", lineHeight: 1.8, marginBottom: "2rem", fontWeight: 300, maxWidth: "500px" }}>
-              Camisetas, camisillas, pantalonetas, buzos y conjuntos disponibles para tus sesiones de entrenamiento.
-            </p>
-            <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
-              <Link href="/training" className="btn-primary">EXPLORAR TRAINING</Link>
-              <Link href="/tienda?brand=TRAINING" className="btn-outline">VER PRODUCTOS</Link>
-            </div>
-          </div>
-
-          <div className="img-zoom" style={{ position: "relative", aspectRatio: "4/5", background: "var(--color-surface)", overflow: "hidden" }}>
-            <Image
-              src={product.images[0].src}
-              alt={product.images[0].alt}
-              fill
-              sizes="(max-width: 1000px) 100vw, 50vw"
-              style={{ objectFit: "cover", filter: "brightness(0.9)" }}
-            />
-          </div>
-        </div>
-      </div>
-      <style>{`.editorial-grid { grid-template-columns: 1fr 1fr !important; } @media(max-width:1000px) { .editorial-grid { grid-template-columns: 1fr !important; gap: 2rem !important; } } @media(max-width:600px) { .editorial-grid > div:first-child { padding-left: 0 !important; } }`}</style>
-    </section>
-  );
-}
+import { ProductVisual } from "@/components/product/product-visual";
+import { CUSTOM_PRICE, formatCurrency } from "@/lib/products";
 
 type HomeSlide = Database["public"]["Tables"]["home_slides"]["Row"];
 type HomeSection = Database["public"]["Tables"]["home_sections"]["Row"];
 
-function ManagedHomeSections({ sections }: Readonly<{ sections: HomeSection[] }>) {
-  return <>{sections.map((section) => <section key={section.id} className="managed-home-section"><div><p className="font-display home-section-label">{section.eyebrow ?? section.section_type}</p><h2 className="font-display home-section-title">{section.title}</h2>{section.subtitle ? <p>{section.subtitle}</p> : null}{section.cta_label && section.cta_href ? <Link href={section.cta_href} className="btn-primary">{section.cta_label}</Link> : null}</div></section>)}</>;
+// Líneas de la tienda. La imagen es la foto de un producto real de esa línea (no se inventan fotos).
+const LINES: ReadonlyArray<{ label: string; href: string; matches: (product: Product) => boolean }> = [
+  { label: "Clubes", href: "/categorias/futbol-clubes", matches: (product) => product.category === "FUTBOL_CLUBES" },
+  { label: "Selecciones", href: "/categorias/futbol-selecciones", matches: (product) => product.category === "FUTBOL_SELECCIONES" },
+  { label: "Retro", href: "/categorias/futbol-retro", matches: (product) => product.category === "FUTBOL_RETRO" },
+  { label: "Training", href: "/training", matches: (product) => product.brand === "TRAINING" },
+];
+
+function LinesSection({ products }: Readonly<{ products: Product[] }>) {
+  // Se prefiere un producto cuya foto no sea la del hero, para no repetirla dos pantallas seguidas.
+  const lines = LINES.map((line) => {
+    const candidates = products.filter(line.matches);
+    return { ...line, product: candidates.find((product) => !product.images[0]?.src.includes(HERO_PHOTO_ID)) ?? candidates[0] };
+  });
+  return (
+    <section className="home-lines" aria-labelledby="home-lines-title">
+      <div className="home-section-head">
+        <h2 id="home-lines-title" className="home-headline font-display">Elige tu línea</h2>
+        <Link href="/tienda" className="btn-text">Ver toda la tienda</Link>
+      </div>
+      <ul className="home-lines-grid">
+        {lines.map((line) => (
+          <li key={line.href}>
+            <Link href={line.href} className="home-line-card">
+              <span className="home-line-media">
+                {line.product ? (
+                  <ProductVisual product={line.product} sizes="(max-width: 900px) 50vw, 25vw" className="home-line-photo" />
+                ) : null}
+              </span>
+              <span className="home-line-name font-display">{line.label}</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
 }
 
-export function HomePage({ products, homeSlides, homeSections }: Readonly<{ products: Product[]; homeSlides?: HomeSlide[]; homeSections?: HomeSection[] }>) {
+// Datos verificados en PRODUCT.md y en el CMS; no se anuncia nada que la tienda no cumpla hoy.
+function TrustRow() {
+  const items = [
+    { title: "Tu nombre y tu número", detail: `Personalización en la espalda por $${formatCurrency(CUSTOM_PRICE)}` },
+    { title: "Envíos a toda Colombia", detail: "Entregas promedio de 2 a 5 días hábiles" },
+    { title: "Cambios en 5 días hábiles", detail: "Las personalizadas solo por defecto de fábrica" },
+    { title: "Tallas S a XXL", detail: "Con guía de medidas en centímetros" },
+  ];
+  return (
+    <section className="home-trust" aria-label="Por qué comprar en LR7">
+      <ul className="home-trust-list">
+        {items.map((item) => (
+          <li key={item.title}>
+            <strong>{item.title}</strong>
+            <span>{item.detail}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function TrainingSection({ product }: Readonly<{ product: Product }>) {
+  return (
+    <section className="home-training" aria-labelledby="training-title">
+      <div className="home-training-inner">
+        <div className="home-training-copy">
+          <h2 id="training-title" className="home-headline font-display">Ropa para entrenar</h2>
+          <p>Camisetas, camisillas, pantalonetas, buzos y conjuntos para tus sesiones de entrenamiento.</p>
+          <div className="home-training-actions">
+            <Link href="/training" className="btn-primary">VER TRAINING</Link>
+          </div>
+        </div>
+        <div className="home-training-media">
+          <ProductVisual product={product} sizes="(max-width: 900px) 100vw, 50vw" className="home-training-visual" />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function HomePage({ products, homeSlides }: Readonly<{ products: Product[]; homeSlides?: HomeSlide[]; homeSections?: HomeSection[] }>) {
   const footballProducts = products.filter((product) => product.brand === "FUTBOL");
   const trainingProducts = products.filter((product) => product.brand === "TRAINING");
   const newDropProducts = footballProducts.filter((product) => product.badge === "NUEVO");
@@ -61,19 +100,13 @@ export function HomePage({ products, homeSlides, homeSections }: Readonly<{ prod
 
   return (
     <>
-      <HeroCarousel products={products} homeSlides={homeSlides} />
-      <FootballCollectionSection products={footballProducts} />
-      <FeaturedCarousel
-        products={featuredProducts}
-        label="PRODUCTOS / DESTACADOS"
-        title="ELIGE TU CAMISETA."
-        href="/futbol"
-        cta="VER TODO FÚTBOL"
-      />
-      {newDropProducts.length > 0 ? <NewDropSection products={newDropProducts} /> : null}
-      <BenefitsStrip />
+      {/* Hero en carrusel: todas las diapositivas activas del CMS o, si no hay, generadas con productos reales. */}
+      <HomeHero products={products} slides={homeSlides} customPrice={CUSTOM_PRICE} />
+      <HomeTeams products={products} />
+      <LinesSection products={products} />
+      <FeaturedCarousel products={featuredProducts} title="Elige tu camiseta" href="/futbol" cta="VER TODO FÚTBOL" />
+      <TrustRow />
       {trainingProduct ? <TrainingSection product={trainingProduct} /> : null}
-      {/* {homeSections?.length ? <ManagedHomeSections sections={homeSections} /> : null} */}
     </>
   );
 }
