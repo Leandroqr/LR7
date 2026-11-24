@@ -6,6 +6,7 @@ import { WompiCheckout } from "@/components/commerce/wompi-checkout";
 import { useStore } from "@/components/providers/store-provider";
 import { CHECKOUT_ATTEMPT_STORAGE_KEY, serializeCheckoutCart } from "@/lib/checkout/cart";
 import { formatCurrency } from "@/lib/products";
+import { getOrderStatusLabel, getPaymentStatusLabel } from "@/lib/order-labels";
 
 type OrderItem = {
   id: string;
@@ -161,16 +162,16 @@ async function requestRetryPayment(orderId: string) {
 }
 
 function OrderItemList({ items }: Readonly<{ items: OrderItem[] }>) {
-  return <section className="order-status-section"><h2>ARTÍCULOS</h2><ul>{items.map((item) => <li key={item.id}>
-    <span>{item.quantity} × {item.product_name} · {item.size ?? ""}{item.color ? ` / ${item.color}` : ""}</span>
+  return <section className="order-status-section"><h2>Artículos</h2><ul>{items.map((item) => <li key={item.id}>
+    <span>{item.quantity} × {item.product_name}{item.size ? `, talla ${item.size}` : ""}{item.color ? `, ${item.color}` : ""}</span>
     <strong>${formatCurrency(item.line_total)}</strong>
-    {item.personalization.name || item.personalization.number ? <small>{item.personalization.name} {item.personalization.number ? `#${item.personalization.number}` : ""}</small> : null}
+    {item.personalization.name || item.personalization.number ? <small>{[item.personalization.name ? `Nombre ${item.personalization.name}` : "", item.personalization.number ? `número ${item.personalization.number}` : ""].filter(Boolean).join(", ")}</small> : null}
   </li>)}</ul></section>;
 }
 
 function PaymentList({ payments }: Readonly<{ payments: OrderStatusData["payments"] }>) {
-  return <section className="order-status-section"><h2>PAGO</h2>{payments.map((payment) => <dl key={payment.id}>
-    <div><dt>Estado</dt><dd>{payment.status.toUpperCase()}</dd></div>
+  return <section className="order-status-section"><h2>Pago</h2>{payments.map((payment) => <dl key={payment.id}>
+    <div><dt>Estado</dt><dd>{getPaymentStatusLabel(payment.status)}</dd></div>
     <div><dt>Referencia</dt><dd>{payment.reference ?? "—"}</dd></div>
     <div><dt>Transacción Wompi</dt><dd>{payment.transaction_id ?? "Pendiente"}</dd></div>
     <div><dt>Importe</dt><dd>${formatCurrency(payment.amount)} {payment.currency}</dd></div>
@@ -179,8 +180,9 @@ function PaymentList({ payments }: Readonly<{ payments: OrderStatusData["payment
 
 function OrderTotals({ data }: Readonly<{ data: OrderStatusData }>) {
   return <section className="order-status-section">
-    <h2>ENTREGA Y TOTAL</h2>
-    <p>{data.order.customer.fullName} · {data.order.customer.email}</p>
+    <h2>Entrega y total</h2>
+    <p>{data.order.customer.fullName}</p>
+    <p>{data.order.customer.email}</p>
     <p>{data.order.shippingInformation.address_line_1}, {data.order.shippingInformation.city}, {data.order.shippingInformation.department}</p>
     <dl>
       <div><dt>Subtotal</dt><dd>${formatCurrency(data.order.subtotal)}</dd></div>
@@ -203,14 +205,14 @@ function OrderStatusDetails({ data, retrying, retryCheckout, canRetry, onRetry, 
 }>) {
   return <>
     <section className="order-status-message" aria-live="polite">
-      <h2>{data.order.status.replaceAll("_", " ").toUpperCase()}</h2>
+      <h2>{getOrderStatusLabel(data.order.status)}</h2>
       <p>{getOrderMessage(data.order.status, data.order.fulfillmentHold)}</p>
     </section>
     {data.order.fulfillmentHoldReason ? <p role="alert">{data.order.fulfillmentHoldReason}</p> : null}
     <OrderItemList items={data.items} />
     <PaymentList payments={data.payments} />
     <OrderTotals data={data} />
-    {retryCheckout ? <section className="order-status-retry"><h2>REINTENTAR PAGO</h2><WompiCheckout {...retryCheckout.checkout} onTransaction={onRetryTransaction} /></section> : null}
+    {retryCheckout ? <section className="order-status-retry"><h2>Reintentar el pago</h2><WompiCheckout {...retryCheckout.checkout} onTransaction={onRetryTransaction} /></section> : null}
     {canRetry && !retryCheckout ? <button type="button" className="cart-checkout-button" onClick={onRetry} disabled={retrying}>{retrying ? "PREPARANDO..." : "REINTENTAR PAGO"}</button> : null}
     <button type="button" className="order-status-refresh" onClick={onRefresh} disabled={loading}>ACTUALIZAR ESTADO</button>
   </>;
@@ -228,15 +230,14 @@ function OrderStatusView({ data, error, retryError, loading, retrying, retryChec
   onRetryTransaction: (transaction: { id?: string }) => void;
   onRefresh: () => void;
 }>) {
-  return <main className="order-status-page"><div className="order-status-container">
-    <p className="order-status-eyebrow">LR7 · ESTADO DE PEDIDO</p>
-    <h1>{data ? `PEDIDO ${data.order.number}` : "CONSULTANDO PEDIDO"}</h1>
+  return <div className="order-status-page"><div className="order-status-container">
+    <h1>{data ? `Pedido ${data.order.number}` : "Consultando tu pedido"}</h1>
     {loading && !data ? <p aria-busy="true">Consultando el estado confirmado…</p> : null}
     {error ? <p className="checkout-feedback is-error" role="alert">{error}</p> : null}
     {retryError ? <p className="checkout-feedback is-error" role="alert">{retryError}</p> : null}
     {data ? <OrderStatusDetails data={data} retrying={retrying} retryCheckout={retryCheckout} canRetry={canRetry} onRetry={onRetry} onRetryTransaction={onRetryTransaction} onRefresh={onRefresh} loading={loading} /> : null}
     <Link href="/tienda" className="order-status-store-link">VOLVER A LA TIENDA</Link>
-  </div></main>;
+  </div></div>;
 }
 
 export function OrderStatusClient({ orderId, transactionId }: Readonly<{ orderId: string; transactionId: string | null }>) {

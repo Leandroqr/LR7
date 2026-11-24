@@ -130,17 +130,17 @@ export function CheckoutPanel({ cart }: Readonly<{ cart: CartItem[] }>) {
 
   return <>
     <form id="lr7-checkout-form" className="checkout-panel checkout-form" onSubmit={submit} aria-busy={isPending} hidden={Boolean(prepared)}>
-      <h2>DATOS PARA TU PEDIDO</h2>
+      <h2 className="font-display">Datos para tu pedido</h2>
       <div className="checkout-form-grid">
-        <label><span>NOMBRE COMPLETO</span><input name="full_name" autoComplete="name" minLength={2} maxLength={160} required disabled={isPending} /></label>
-        <label><span>CORREO</span><input name="email" type="email" autoComplete="email" maxLength={254} required disabled={isPending} /></label>
-        <label><span>CELULAR COLOMBIANO</span><input name="phone" type="tel" inputMode="tel" autoComplete="tel" minLength={10} maxLength={16} placeholder="3001234567 o +57 3001234567" required disabled={isPending} /></label>
-        <label className="checkout-form-wide"><span>DIRECCIÓN</span><input name="address_line_1" autoComplete="address-line1" minLength={5} maxLength={180} required disabled={isPending} /></label>
-        <label className="checkout-form-wide"><span>APARTAMENTO / REFERENCIA</span><input name="address_line_2" autoComplete="address-line2" maxLength={180} disabled={isPending} /></label>
-        <label><span>CIUDAD</span><input name="city" autoComplete="address-level2" minLength={2} maxLength={100} required disabled={isPending} /></label>
-        <label><span>DEPARTAMENTO</span><input name="region" autoComplete="address-level1" minLength={2} maxLength={100} required disabled={isPending} /></label>
-        <label><span>CÓDIGO POSTAL</span><input name="postal_code" autoComplete="postal-code" maxLength={20} disabled={isPending} /></label>
-        <label><span>CUPÓN</span><input name="coupon_code" autoComplete="off" maxLength={80} disabled={isPending} /></label>
+        <label><span>Nombre completo</span><input name="full_name" autoComplete="name" minLength={2} maxLength={160} required disabled={isPending} /></label>
+        <label><span>Correo</span><input name="email" type="email" autoComplete="email" maxLength={254} required disabled={isPending} /></label>
+        <label><span>Celular colombiano</span><input name="phone" type="tel" inputMode="tel" autoComplete="tel" minLength={10} maxLength={16} placeholder="3001234567 o +57 3001234567" required disabled={isPending} /></label>
+        <label className="checkout-form-wide"><span>Dirección</span><input name="address_line_1" autoComplete="address-line1" minLength={5} maxLength={180} required disabled={isPending} /></label>
+        <label className="checkout-form-wide"><span>Apartamento o referencia <small>(opcional)</small></span><input name="address_line_2" autoComplete="address-line2" maxLength={180} disabled={isPending} /></label>
+        <label><span>Ciudad</span><input name="city" autoComplete="address-level2" minLength={2} maxLength={100} required disabled={isPending} /></label>
+        <label><span>Departamento</span><input name="region" autoComplete="address-level1" minLength={2} maxLength={100} required disabled={isPending} /></label>
+        <label><span>Código postal <small>(opcional)</small></span><input name="postal_code" autoComplete="postal-code" maxLength={20} disabled={isPending} /></label>
+        <label><span>Cupón <small>(opcional)</small></span><input name="coupon_code" autoComplete="off" maxLength={80} disabled={isPending} /></label>
       </div>
       {error ? <p className="checkout-feedback is-error" role="alert">{error}</p> : null}
       <button type="submit" className="cart-checkout-button" disabled={isPending || cart.length === 0}>
@@ -150,7 +150,7 @@ export function CheckoutPanel({ cart }: Readonly<{ cart: CartItem[] }>) {
     </form>
     {prepared ? (
       <section className="checkout-panel" aria-labelledby="checkout-prepared-title">
-        <h2 id="checkout-prepared-title">PEDIDO {prepared.order.number}</h2>
+        <h2 id="checkout-prepared-title" className="font-display">Pedido {prepared.order.number}</h2>
         <div className="checkout-server-total">
           <span>Total confirmado por LR7</span>
           <strong>${formatCurrency(prepared.order.total)} COP</strong>
@@ -161,7 +161,7 @@ export function CheckoutPanel({ cart }: Readonly<{ cart: CartItem[] }>) {
           {prepared.order.discount ? <div><dt>Descuento</dt><dd>-${formatCurrency(prepared.order.discount)}</dd></div> : null}
         </dl>
         <WompiCheckout {...prepared.checkout} onTransaction={onTransaction} />
-        <button type="button" className="checkout-edit-details" onClick={() => setPrepared(null)}>EDITAR DATOS DE ENTREGA</button>
+        <button type="button" className="checkout-edit-details" onClick={() => setPrepared(null)}>Editar datos de entrega</button>
       </section>
     ) : null}
   </>;

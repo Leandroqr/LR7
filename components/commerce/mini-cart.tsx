@@ -1,12 +1,14 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { useStore } from "@/components/providers/store-provider";
 import { getCartSubtotal, getItemUnitPrice } from "@/lib/cart-pricing";
 import { CUSTOM_PRICE, formatCurrency } from "@/lib/products";
+import { ProductVisual } from "@/components/product/product-visual";
+
+const CLOSE_ICON = <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18 6 6 18M6 6l12 12" /></svg>;
 
 /**
  * Confirmación al agregar al carrito: panel lateral modal con la línea agregada, el subtotal y las
@@ -47,7 +49,8 @@ export function MiniCart() {
     ? [
         item.size ? `Talla ${item.size}` : "",
         item.variant?.color ?? "",
-        item.customName || item.customNumber ? `Personalizada: ${[item.customName, item.customNumber].filter(Boolean).join(" · ")}` : "",
+        item.customName ? `Nombre ${item.customName}` : "",
+        item.customNumber ? `Número ${item.customNumber}` : "",
       ].filter(Boolean)
     : [];
 
@@ -64,13 +67,13 @@ export function MiniCart() {
       {item ? (
         <div className="mini-cart-panel">
           <header className="mini-cart-header">
-            <h2 id="mini-cart-title" className="font-display">AGREGADO AL CARRITO</h2>
-            <button type="button" className="mini-cart-close" onClick={close} aria-label="Cerrar">×</button>
+            <h2 id="mini-cart-title" className="font-display">Agregado al carrito</h2>
+            <button type="button" className="mini-cart-close" onClick={close} aria-label="Cerrar">{CLOSE_ICON}</button>
           </header>
 
           <div className="mini-cart-line">
-            <div className="mini-cart-image">
-              <Image src={item.product.images[0].src} alt="" fill sizes="88px" style={{ objectFit: "cover" }} />
+            <div className="mini-cart-image" aria-hidden="true">
+              <ProductVisual product={item.product} sizes="88px" className="cart-line-visual" dorsal={{ name: item.customName, number: item.customNumber }} />
             </div>
             <div className="mini-cart-line-copy">
               <strong>{item.product.name}</strong>
