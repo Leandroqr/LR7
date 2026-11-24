@@ -1,8 +1,5 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect } from "react";
 import { ProductCard } from "@/components/product/product-card";
 import { formatCurrency } from "@/lib/products";
 import type { Product } from "@/types/ecommerce";
@@ -69,7 +66,7 @@ export function CollectionsExperience({ products }: Readonly<CollectionsPageProp
   const collections: EditorialCollection[] = [
     {
       id: "season",
-      eyebrow: "01 / JUST DROPPED",
+      eyebrow: "01 / RECIÉN LLEGADAS",
       title: "NUEVA TEMPORADA",
       description: "Lo último del fútbol, listo para salir a la cancha.",
       cta: "VER NUEVA TEMPORADA",
@@ -78,17 +75,17 @@ export function CollectionsExperience({ products }: Readonly<CollectionsPageProp
     },
     {
       id: "retro",
-      eyebrow: "02 / ARCHIVE",
+      eyebrow: "02 / ARCHIVO",
       title: "RETRO",
-      description: "The game never forgets. Camisetas que siguen haciendo historia.",
+      description: "El fútbol no olvida. Camisetas que siguen haciendo historia.",
       cta: "EXPLORAR RETRO",
       href: "/tienda?cat=FUTBOL_RETRO",
       product: retroProduct,
     },
     {
       id: "essentials",
-      eyebrow: "03 / FOOTBALL",
-      title: "FOOTBALL ESSENTIALS",
+      eyebrow: "03 / FÚTBOL",
+      title: "BÁSICOS DE FÚTBOL",
       description: "Clubes y selecciones. La identidad del juego en cada camiseta.",
       cta: "VER TODO FÚTBOL",
       href: "/futbol",
@@ -96,7 +93,7 @@ export function CollectionsExperience({ products }: Readonly<CollectionsPageProp
     },
     {
       id: "training",
-      eyebrow: "04 / PERFORMANCE",
+      eyebrow: "04 / RENDIMIENTO",
       title: "TRAINING",
       description: "La extensión técnica de LR7 para entrenar con intención.",
       cta: "EXPLORAR TRAINING",
@@ -105,31 +102,10 @@ export function CollectionsExperience({ products }: Readonly<CollectionsPageProp
     },
   ];
 
-  useEffect(() => {
-    const page = document.querySelector<HTMLElement>(".collections-page");
-    const elements = Array.from(document.querySelectorAll<HTMLElement>("[data-collections-reveal]"));
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      elements.forEach((element) => element.classList.add("is-visible"));
-      return;
-    }
-
-    page?.classList.add("collections-motion-ready");
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          entry.target.classList.add("is-visible");
-          observer.unobserve(entry.target);
-        });
-      },
-      { rootMargin: "0px 0px -8%", threshold: 0.12 },
-    );
-    elements.forEach((element) => observer.observe(element));
-    return () => observer.disconnect();
-  }, []);
+  // UX8: sin aparición por secciones (DESIGN.md, sección Motion: prohibida); el contenido está visible desde el principio.
 
   return (
-    <main className="collections-page">
+    <div className="collections-page">
       <header className="collections-hero">
         <div className="collections-hero-media" aria-hidden="true">
           <Image
@@ -143,18 +119,18 @@ export function CollectionsExperience({ products }: Readonly<CollectionsPageProp
         </div>
         <div className="collections-hero-overlay" />
         <nav className="collections-breadcrumbs" aria-label="Migas de pan">
-          <Link href="/">HOME</Link><span aria-hidden="true">/</span><span>NOVEDADES</span>
+          <Link href="/">INICIO</Link><span aria-hidden="true">/</span><span>NOVEDADES</span>
         </nav>
         <div className="collections-hero-copy">
-          <p>LR7 / NEW ARRIVALS</p>
-          <h1 className="font-display">NEW SEASON<br /><span>HAS ARRIVED.</span></h1>
+          <p>LR7 / NOVEDADES</p>
+          <h1 className="font-display">LLEGÓ LA<br /><span>NUEVA TEMPORADA.</span></h1>
           <div><span>CAMISETAS DE FÚTBOL</span><span>RETRO</span><span>TRAINING</span></div>
           <Link href="#new-arrivals" className="collections-primary-cta">
-            EXPLORAR NOVEDADES <span aria-hidden="true">↓</span>
+            EXPLORAR NOVEDADES
           </Link>
         </div>
         <div className="collections-hero-index" aria-hidden="true">
-          <span>DROP</span><strong>01</strong><span>/ LR7</span>
+          <span>LANZAMIENTO</span><strong>01</strong><span>/ LR7</span>
         </div>
       </header>
 
@@ -167,19 +143,19 @@ export function CollectionsExperience({ products }: Readonly<CollectionsPageProp
       </nav>
 
       <section id="new-arrivals" className="collections-arrivals" aria-labelledby="collections-arrivals-title">
-        <header className="collections-section-heading" data-collections-reveal>
+        <header className="collections-section-heading">
           <div>
-            <p>01 / CURATED NOW</p>
-            <h2 id="collections-arrivals-title" className="font-display">NEW<br /><span>ARRIVALS.</span></h2>
+            <p>01 / SELECCIÓN DE AHORA</p>
+            <h2 id="collections-arrivals-title" className="font-display">LO MÁS<br /><span>NUEVO.</span></h2>
           </div>
           <div>
             <p>Una selección de fútbol primero. Nuevas temporadas, ediciones con historia y una mirada técnica al entrenamiento.</p>
-            <Link href="/tienda?cat=NUEVO">VER TODAS LAS NOVEDADES <span aria-hidden="true">→</span></Link>
+            <Link href="/tienda?cat=NUEVO">VER TODAS LAS NOVEDADES</Link>
           </div>
         </header>
         <div className="collections-arrivals-grid">
-          {arrivals.map((product, index) => (
-            <div key={product.id} data-collections-reveal style={{ "--reveal-delay": `${Math.min(index, 3) * 70}ms` } as React.CSSProperties}>
+          {arrivals.map((product) => (
+            <div key={product.id}>
               <ProductCard product={product} />
             </div>
           ))}
@@ -188,18 +164,18 @@ export function CollectionsExperience({ products }: Readonly<CollectionsPageProp
 
       {newFootball.length ? (
         <section className="collections-drop" aria-labelledby="collections-drop-title">
-          <div className="collections-drop-feature" data-collections-reveal>
+          <div className="collections-drop-feature">
             <Image src={CAMPAIGN_IMAGES.drop.src} alt={CAMPAIGN_IMAGES.drop.alt} fill sizes="(max-width: 900px) 100vw, 66vw" />
             <div className="collections-drop-overlay" />
             <div className="collections-drop-copy">
-              <p>02 / THE NEW DROP</p>
-              <h2 id="collections-drop-title" className="font-display">BUILT FOR<br /><span>THE GAME.</span></h2>
-              <Link href={`/productos/${newFootball[0].slug}`}>COMPRAR AHORA <span aria-hidden="true">→</span></Link>
+              <p>02 / EL NUEVO LANZAMIENTO</p>
+              <h2 id="collections-drop-title" className="font-display">HECHA PARA<br /><span>EL JUEGO.</span></h2>
+              <Link href={`/productos/${newFootball[0].slug}`}>COMPRAR AHORA</Link>
             </div>
           </div>
           <div className="collections-drop-products">
             {newFootball.slice(0, 3).map((product, index) => (
-              <Link href={`/productos/${product.slug}`} key={product.id} className="collections-drop-product" data-collections-reveal>
+              <Link href={`/productos/${product.slug}`} key={product.id} className="collections-drop-product">
                 <div>
                   <Image src={product.images[0].src} alt={product.images[0].alt} fill sizes="(max-width: 900px) 50vw, 20vw" />
                   <span>NUEVO</span>
@@ -214,30 +190,30 @@ export function CollectionsExperience({ products }: Readonly<CollectionsPageProp
       ) : null}
 
       <section className="collections-explore" aria-labelledby="collections-explore-title">
-        <header className="collections-section-heading" data-collections-reveal>
-          <div><p>03 / COLLECTIONS</p><h2 id="collections-explore-title" className="font-display">EXPLORE<br /><span>THE DROP.</span></h2></div>
+        <header className="collections-section-heading">
+          <div><p>03 / COLECCIONES</p><h2 id="collections-explore-title" className="font-display">EXPLORA<br /><span>EL LANZAMIENTO.</span></h2></div>
           <div><p>Cuatro formas de entrar al universo LR7. El fútbol dirige; Training acompaña.</p></div>
         </header>
         <div className="collections-editorial-grid">
           {collections.map((collection) => (
-            <Link key={collection.id} href={collection.href} className={`collections-editorial-card collections-editorial-${collection.id}`} data-collections-reveal>
+            <Link key={collection.id} href={collection.href} className={`collections-editorial-card collections-editorial-${collection.id}`}>
               <Image src={collection.product.images[0].src} alt={collection.product.images[0].alt} fill sizes={collection.id === "season" ? "(max-width: 760px) 100vw, 66vw" : "(max-width: 760px) 100vw, 33vw"} />
               <div className="collections-editorial-overlay" />
               <div className="collections-editorial-content">
                 <p>{collection.eyebrow}</p>
                 <div><h3 className="font-display">{collection.title}</h3><span>{collection.description}</span></div>
-                <b>{collection.cta} <i aria-hidden="true">→</i></b>
+                <b>{collection.cta}</b>
               </div>
             </Link>
           ))}
         </div>
       </section>
 
-      <section className="collections-shop-close" data-collections-reveal>
-        <p>DISCOVER. FEEL THE DROP. SHOP THE GAME.</p>
-        <h2 className="font-display">READY FOR<br /><span>THE NEXT MATCH?</span></h2>
-        <Link href="/tienda">IR A LA TIENDA <span aria-hidden="true">→</span></Link>
+      <section className="collections-shop-close">
+        <p>DESCUBRE. SIENTE. JUEGA.</p>
+        <h2 className="font-display">¿LISTO PARA<br /><span>EL PRÓXIMO PARTIDO?</span></h2>
+        <Link href="/tienda">IR A LA TIENDA</Link>
       </section>
-    </main>
+    </div>
   );
 }

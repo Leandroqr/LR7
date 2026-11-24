@@ -2,20 +2,39 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useStore } from "@/components/providers/store-provider";
 import { WhatsAppLink } from "@/components/commerce/whatsapp-link";
 import { getGeneralWhatsAppMessage } from "@/lib/whatsapp";
 import type { NavigationItem } from "@/lib/content";
 
+// Navegación principal (DESIGN.md → Navigation). El logo lleva a Inicio; "Tienda" sustituye al
+// antiguo botón CATÁLOGO. Si el CMS define enlaces de cabecera, sustituyen a estos.
 const NAV_LINKS = [
-  { href: "/", label: "INICIO" },
-  { href: "/futbol", label: "FÚTBOL" },
-  { href: "/streetwear", label: "STREET" },
-  { href: "/training", label: "TRAINING" },
-  { href: "/colecciones", label: "NOVEDADES" },
-  { href: "/personaliza", label: "PERSONALIZA" },
+  { href: "/tienda", label: "Tienda" },
+  { href: "/futbol", label: "Fútbol" },
+  { href: "/training", label: "Training" },
+  { href: "/personaliza", label: "Personaliza" },
+  { href: "/streetwear", label: "Streetwear" },
 ];
+
+function isActive(pathname: string, href: string) {
+  return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
+}
+
+const ICONS = {
+  search: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>,
+  heart: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>,
+  bag: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" /><path d="M3 6h18" /><path d="M16 10a4 4 0 0 1-8 0" /></svg>,
+  menu: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><path d="M4 7h16M4 12h16M4 17h16" /></svg>,
+  close: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>,
+} satisfies Record<string, ReactNode>;
+
+/** Contador sobre un icono; la clave cambia con el número para repetir la animación de aviso. */
+function CountBadge({ count }: Readonly<{ count: number }>) {
+  if (count <= 0) return null;
+  return <span key={count} className="site-header-count" aria-hidden="true">{count > 99 ? "99+" : count}</span>;
+}
 
 export function Navbar({ navigation }: Readonly<{ navigation: NavigationItem[] }>) {
   const [scrolled, setScrolled] = useState(false);
@@ -29,18 +48,15 @@ export function Navbar({ navigation }: Readonly<{ navigation: NavigationItem[] }
   const pathname = usePathname();
   const router = useRouter();
   const whatsappMessage = getGeneralWhatsAppMessage(pathname);
+  const navigationLinks = navigation.length ? navigation : NAV_LINKS;
 
-  // Al abrir el buscador, el foco va al campo (el panel deja de ser inert en este mismo render).
+  // Al abrir el buscador, el foco va al campo (el panel deja de estar oculto en este mismo render).
   useEffect(() => {
     if (searchOpen) searchInputRef.current?.focus();
   }, [searchOpen]);
-  const navigationLinks = navigation.length ? navigation : NAV_LINKS;
 
   useEffect(() => {
-    const onScroll = () => {
-      setScrolled(window.scrollY > 60);
-    };
-
+    const onScroll = () => setScrolled(window.scrollY > 60);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -58,13 +74,11 @@ export function Navbar({ navigation }: Readonly<{ navigation: NavigationItem[] }
     };
   }, [menuOpen]);
 
+  // Menú móvil: foco al primer enlace, Tab encerrado dentro y Escape devuelve el foco al botón.
   useEffect(() => {
     if (!menuOpen) return;
-
     const menu = mobileMenuRef.current;
-    const getFocusableElements = () =>
-      Array.from(menu?.querySelectorAll<HTMLElement>('a[href], button:not([disabled])') ?? []);
-    const focusableElements = getFocusableElements();
+    const focusableElements = Array.from(menu?.querySelectorAll<HTMLElement>("a[href], button:not([disabled])") ?? []);
     focusableElements[0]?.focus();
 
     const onKeyDown = (event: KeyboardEvent) => {
@@ -74,7 +88,6 @@ export function Navbar({ navigation }: Readonly<{ navigation: NavigationItem[] }
         return;
       }
       if (event.key !== "Tab" || focusableElements.length === 0) return;
-
       const first = focusableElements[0];
       const last = focusableElements.at(-1);
       if (!first || !last) return;
@@ -91,11 +104,8 @@ export function Navbar({ navigation }: Readonly<{ navigation: NavigationItem[] }
     return () => menu?.removeEventListener("keydown", onKeyDown);
   }, [menuOpen]);
 
-  const isHome = pathname === "/";
-  const solid = scrolled || !isHome;
-  const textColor = isHome && !scrolled ? "rgba(255,255,255,0.95)" : "var(--color-dark)";
-  const iconColor = isHome && !scrolled ? "rgba(255,255,255,0.7)" : "rgba(5,6,8,0.62)";
-  const logoColor = isHome && !scrolled ? "var(--color-white)" : "var(--color-primary-dark)";
+  // Sobre el hero de la home la cabecera es transparente hasta hacer scroll (la foto manda).
+  const overHero = pathname === "/" && !scrolled && !menuOpen && !searchOpen;
 
   const handleSearch: React.FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
@@ -106,214 +116,122 @@ export function Navbar({ navigation }: Readonly<{ navigation: NavigationItem[] }
     setSearchQuery("");
   };
 
+  const searchToggle = (
+    <button
+      type="button"
+      className="site-header-icon"
+      onClick={() => setSearchOpen((value) => !value)}
+      aria-expanded={searchOpen}
+      aria-controls="site-search"
+      aria-label={searchOpen ? "Cerrar buscador" : "Abrir buscador"}
+    >
+      <span className="site-header-glyph" aria-hidden="true">{searchOpen ? ICONS.close : ICONS.search}</span>
+    </button>
+  );
+
   return (
     <>
-      <nav
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 100,
-          transition: "background 0.4s ease, padding 0.3s ease, border-color 0.4s ease",
-          background: solid ? "rgba(255,255,255,0.97)" : "transparent",
-          borderBottom: solid ? "1px solid rgba(7,20,38,0.1)" : "1px solid transparent",
-          backdropFilter: solid ? "blur(12px)" : "none",
-          padding: solid ? "0.9rem 0" : "1.4rem 0",
-        }}
-      >
-        <div
-          style={{
-            maxWidth: "1440px",
-            margin: "0 auto",
-            padding: "0 2rem",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Link href="/" style={{ textDecoration: "none" }}>
-            <div className="font-display" style={{ fontSize: "1.7rem", fontWeight: 900, letterSpacing: "0.08em", color: logoColor }}>
-              LR<span style={{ color: "var(--color-accent)" }}>7</span>
-            </div>
+      <header className={`site-header${overHero ? " is-over-hero" : ""}`}>
+        <div className="site-header-bar">
+          <Link href="/" className="site-header-logo font-display" aria-label="LR7, ir al inicio">
+            LR<span>7</span>
           </Link>
 
-          <div style={{ display: "flex", gap: "2.5rem", alignItems: "center" }} className="hidden-mobile">
-            {navigationLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="nav-link"
-                style={{ color: pathname === link.href ? "var(--color-accent)" : textColor }}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
+          <nav className="site-header-links" aria-label="Principal">
+            {navigationLinks.map((link) => {
+              const active = isActive(pathname, link.href);
+              return (
+                <Link key={link.href} href={link.href} className={`site-header-link${active ? " is-active" : ""}`} aria-current={active ? "page" : undefined}>
+                  {link.label}
+                </Link>
+              );
+            })}
+          </nav>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }} className="hidden-mobile">
-              <button
+          <div className="site-header-actions">
+            {searchToggle}
+            <Link href="/favoritos" className="site-header-icon site-header-desktop-only" aria-label={favoriteCount > 0 ? `Favoritos (${favoriteCount})` : "Favoritos"}>
+              <span className="site-header-glyph" aria-hidden="true">{ICONS.heart}</span>
+              <CountBadge count={favoriteCount} />
+            </Link>
+            <Link href="/carrito" className="site-header-icon" aria-label={cartCount > 0 ? `Carrito (${cartCount} productos)` : "Carrito"}>
+              <span className="site-header-glyph" aria-hidden="true">{ICONS.bag}</span>
+              <CountBadge count={cartCount} />
+            </Link>
+            <button
+              ref={mobileMenuButtonRef}
               type="button"
-              onClick={() => setSearchOpen((value) => !value)}
-              aria-expanded={searchOpen}
-              aria-controls="site-search"
-              style={{ background: "none", border: "none", cursor: "pointer", color: iconColor, padding: "6px", transition: "color 0.2s" }}
-              onMouseEnter={(event) => {
-                event.currentTarget.style.color = "var(--color-accent)";
-              }}
-              onMouseLeave={(event) => {
-                event.currentTarget.style.color = iconColor;
-              }}
-              aria-label={searchOpen ? "Cerrar buscador" : "Abrir buscador"}
+              className="site-header-icon site-header-mobile-only"
+              onClick={() => setMenuOpen((value) => !value)}
+              aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
+              aria-expanded={menuOpen}
+              aria-controls="mobile-navigation"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-            </button>
-            <Link href="/favoritos" aria-label="Ver favoritos" style={{ position: "relative", color: iconColor, transition: "color 0.2s", display: "flex" }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-              </svg>
-              {favoriteCount > 0 ? (
-                <span style={{ position: "absolute", top: "-6px", right: "-6px", background: "var(--color-accent)", color: "var(--color-dark)", fontSize: "0.6rem", fontWeight: 900, width: "16px", height: "16px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Barlow Condensed'" }}>
-                  {favoriteCount}
-                </span>
-              ) : null}
-            </Link>
-            <Link href="/carrito" aria-label="Ver carrito" style={{ position: "relative", color: iconColor, transition: "color 0.2s", display: "flex" }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-                <line x1="3" y1="6" x2="21" y2="6" />
-                <path d="M16 10a4 4 0 0 1-8 0" />
-              </svg>
-              {cartCount > 0 ? (
-                <span style={{ position: "absolute", top: "-6px", right: "-6px", background: "var(--color-accent)", color: "var(--color-dark)", fontSize: "0.6rem", fontWeight: 900, width: "16px", height: "16px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Barlow Condensed'" }}>
-                  {cartCount}
-                </span>
-              ) : null}
-            </Link>
-            <Link href="/tienda" className="btn-primary" style={{ padding: "0.5rem 1.2rem", fontSize: "0.85rem" }}>
-              CATÁLOGO
-            </Link>
-          </div>
-
-          <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }} className="show-mobile">
-            <Link href="/carrito" aria-label="Ver carrito" style={{ position: "relative", color: "rgba(5,6,8,0.72)", display: "flex" }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-                <line x1="3" y1="6" x2="21" y2="6" />
-              </svg>
-              {cartCount > 0 ? (
-                <span style={{ position: "absolute", top: "-5px", right: "-5px", background: "var(--color-accent)", color: "var(--color-dark)", fontSize: "0.55rem", fontWeight: 900, width: "14px", height: "14px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Barlow Condensed'" }}>
-                  {cartCount}
-                </span>
-              ) : null}
-            </Link>
-            <button ref={mobileMenuButtonRef} type="button" onClick={() => setMenuOpen((value) => !value)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-primary-dark)", padding: "4px" }} aria-label={menuOpen ? "Cerrar menu" : "Abrir menu"} aria-expanded={menuOpen} aria-controls="mobile-navigation">
-              {menuOpen ? (
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              ) : (
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <line x1="3" y1="7" x2="21" y2="7" />
-                  <line x1="3" y1="12" x2="21" y2="12" />
-                  <line x1="3" y1="17" x2="21" y2="17" />
-                </svg>
-              )}
+              <span className="site-header-glyph" aria-hidden="true">{menuOpen ? ICONS.close : ICONS.menu}</span>
             </button>
           </div>
         </div>
 
-        {/* Cerrado, el buscador sale del orden de tabulación y del árbol accesible (antes se enfocaba invisible). */}
-        <div
-          id="site-search"
-          inert={!searchOpen}
-          aria-hidden={!searchOpen}
-          style={{
-            maxHeight: searchOpen ? "80px" : "0",
-            overflow: "hidden",
-            transition: "max-height 0.3s ease",
-            background: "rgba(255,255,255,0.97)",
-            borderTop: searchOpen ? "1px solid rgba(255,255,255,0.07)" : "none",
-          }}
-        >
-          <form
-            onSubmit={handleSearch}
-            style={{ maxWidth: "1440px", margin: "0 auto", padding: "0.85rem 2rem", display: "flex", gap: "1rem", alignItems: "center" }}
-          >
+        {/* Cerrado, el buscador está oculto: fuera del orden de tabulación y del árbol accesible. */}
+        <div id="site-search" className="site-search" hidden={!searchOpen}>
+          <form onSubmit={handleSearch} className="site-search-form" role="search">
             <input
               ref={searchInputRef}
+              type="search"
+              className="site-search-input"
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Buscar camiseta, equipo, selección..."
-              style={{ flex: 1, background: "transparent", border: "none", borderBottom: "1px solid rgba(7,20,38,0.2)", color: "var(--color-dark)", fontFamily: "'Barlow Condensed'", fontWeight: 700, fontSize: "1.1rem", letterSpacing: "0.06em", padding: "0.4rem 0", textTransform: "uppercase" }}
+              placeholder="Busca camisetas y training"
               aria-label="Buscar producto"
+              enterKeyHint="search"
             />
-            <button type="submit" className="btn-primary" style={{ padding: "0.5rem 1.2rem", fontSize: "0.85rem" }}>
-              BUSCAR
-            </button>
+            <button type="submit" className="btn-primary site-search-submit">BUSCAR</button>
           </form>
         </div>
-      </nav>
+      </header>
 
+      {/* Hoja que sube desde abajo; tocar el fondo oscuro la cierra. */}
       <nav
         id="mobile-navigation"
         ref={mobileMenuRef}
+        className={`site-menu${menuOpen ? " is-open" : ""}`}
         aria-label="Menú móvil"
         aria-hidden={!menuOpen}
         inert={!menuOpen}
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          zIndex: 90,
-          background: "var(--color-white)",
-          transform: menuOpen ? "translateX(0)" : "translateX(100%)",
-          transition: "transform 0.35s cubic-bezier(0.76,0,0.24,1)",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "flex-start",
-          alignItems: "center",
-          gap: "clamp(1rem, 3vh, 1.5rem)",
-          boxSizing: "border-box",
-          padding: "calc(5.5rem + env(safe-area-inset-top)) 1rem 1.5rem",
-          overflowY: "auto",
+        onClick={(event) => {
+          if (event.target === event.currentTarget) setMenuOpen(false);
         }}
       >
-        {navigationLinks.map((link) => (
-          <Link key={link.href} href={link.href} className="font-display" style={{ fontSize: "2.5rem", fontWeight: 900, letterSpacing: "0.08em", color: "var(--color-primary-dark)", textDecoration: "none", textTransform: "uppercase" }}>
-            {link.label}
+        <div className="site-menu-panel">
+        <div className="site-menu-links">
+          {navigationLinks.map((link) => {
+            const active = isActive(pathname, link.href);
+            return (
+              <Link key={link.href} href={link.href} className={`site-menu-link font-display${active ? " is-active" : ""}`} aria-current={active ? "page" : undefined}>
+                {link.label}
+              </Link>
+            );
+          })}
+        </div>
+        <div className="site-menu-secondary">
+          <Link href="/favoritos" className="site-menu-secondary-link">
+            <span className="site-header-glyph" aria-hidden="true">{ICONS.heart}</span>
+            Favoritos{favoriteCount > 0 ? ` (${favoriteCount})` : ""}
           </Link>
-        ))}
-        <div style={{ display: "flex", gap: "1.5rem", marginTop: "0.5rem" }}>
-          <Link href="/favoritos" style={{ color: "rgba(5,6,8,0.72)", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.3rem", textDecoration: "none", fontSize: "0.65rem", fontFamily: "'Barlow Condensed'", letterSpacing: "0.1em" }}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-            </svg>
-            FAVORITOS
-          </Link>
-          <Link href="/carrito" style={{ color: "rgba(5,6,8,0.72)", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.3rem", textDecoration: "none", fontSize: "0.65rem", fontFamily: "'Barlow Condensed'", letterSpacing: "0.1em" }}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-              <line x1="3" y1="6" x2="21" y2="6" />
-            </svg>
-            CARRITO {cartCount > 0 ? `(${cartCount})` : ""}
+          <Link href="/carrito" className="site-menu-secondary-link">
+            <span className="site-header-glyph" aria-hidden="true">{ICONS.bag}</span>
+            Carrito{cartCount > 0 ? ` (${cartCount})` : ""}
           </Link>
         </div>
         <WhatsAppLink
           message={whatsappMessage}
-          className="btn-outline"
-          style={{ marginTop: "0.5rem" }}
+          className="btn-outline site-menu-whatsapp"
           eventData={{ placement: "mobile_menu", path: pathname }}
           aria-label="Contactar a LR7 por WhatsApp"
         >
           HABLA CON LR7
         </WhatsAppLink>
+        </div>
       </nav>
     </>
   );

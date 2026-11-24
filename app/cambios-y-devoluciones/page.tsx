@@ -1,6 +1,18 @@
 import type { Metadata } from "next";
 import { PageHero } from "@/components/layout/page-hero";
+import { InfoCards, InfoSection } from "@/components/pages/info-blocks";
 import { getContentItems } from "@/lib/content";
 
 export const metadata: Metadata = { title: "Cambios y devoluciones", description: "Políticas de cambio y devolución de LR7.", alternates: { canonical: "/cambios-y-devoluciones" } };
-export default async function ReturnsPage() { const items = await getContentItems("returns"); return <><PageHero label="— INFORMACIÓN" title="CAMBIOS Y DEVOLUCIONES" sub="Tu satisfacción es lo más importante para nosotros." /><section style={{ padding: "5rem 0 7rem", background: "var(--color-white)" }}><div className="content-card-grid">{items.map((item) => <article key={item.id}><h2>{item.title}</h2><p>{item.body}</p></article>)}{!items.length ? <p className="content-empty">No hay políticas publicadas.</p> : null}</div></section></>; }
+
+export default async function ReturnsPage() {
+  const items = await getContentItems("returns");
+  return (
+    <>
+      <PageHero title="CAMBIOS Y DEVOLUCIONES" sub="Plazos y condiciones para cambiar tu pedido." />
+      <InfoSection>
+        <InfoCards items={items} empty="Todavía no hay políticas de cambio publicadas." />
+      </InfoSection>
+    </>
+  );
+}

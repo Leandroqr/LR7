@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/colecciones" },
   openGraph: {
     title: "Novedades y colecciones de fútbol | LR7",
-    description: "New season has arrived. Descubre camisetas nuevas, fútbol retro y los últimos drops LR7.",
+    description: "Llegó la nueva temporada. Descubre camisetas nuevas, fútbol retro y los últimos lanzamientos LR7.",
     url: "/colecciones",
     type: "website",
     images: [{ url: socialImage, width: 1600, height: 900, alt: "Novedades de fútbol LR7" }],
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Novedades y colecciones de fútbol | LR7",
-    description: "Descubre los nuevos drops de fútbol LR7.",
+    description: "Descubre los nuevos lanzamientos de fútbol LR7.",
     images: [socialImage],
   },
 };

@@ -53,15 +53,19 @@ test("muted text tokens meet WCAG AA on the light and dark surfaces they are use
 });
 
 test("dark sections of the about page use the on-dark text tokens", () => {
+  // UX8: Nosotros se rehízo con Tailwind; su única sección oscura es noche con texto blanco y enlaces action-on-dark.
   const about = readFileSync("app/nosotros/page.tsx", "utf8");
-  assert.match(about, /minHeight: "80vh"[^}]*color: "var\(--color-text-on-dark\)"/);
-  assert.match(about, /background: "#0f0f0f", color: "var\(--color-text-on-dark\)"/);
+  assert.match(about, /className="bg-night py-16 text-white/);
+  assert.match(about, /text-action-on-dark/);
+  assert.doesNotMatch(about, /#0f0f0f|rgba\(255,255,255,0\.5\)/);
+  assert.ok(contrast(token("color-white"), token("color-night")) >= AA, "texto blanco sobre noche");
+  assert.ok(contrast(token("color-action-on-dark"), token("color-navy")) >= AA, "enlace sobre navy");
 });
 
 test("inputs keep a visible keyboard focus and the closed search is not focusable", () => {
   assert.doesNotMatch(readFileSync("app/contacto/page.tsx", "utf8"), /outline: "none"/);
   const navbar = readFileSync("components/layout/navbar.tsx", "utf8");
-  assert.match(navbar, /id="site-search"\s+inert=\{!searchOpen\}/);
+  assert.match(navbar, /id="site-search" className="site-search" hidden=\{!searchOpen\}/);
   assert.doesNotMatch(navbar.slice(navbar.indexOf("ref={searchInputRef}"), navbar.indexOf('aria-label="Buscar producto"')), /outline/);
   assert.match(css, /\.shop-search input:focus-visible \{/);
 });

@@ -1,8 +1,16 @@
 import { PageHero } from "@/components/layout/page-hero";
 import { FaqList } from "@/components/pages/faq-list";
+import { InfoSection } from "@/components/pages/info-blocks";
 import { getContentItems } from "@/lib/content";
 
 export default async function FAQPage() {
   const items = await getContentItems("faq");
-  return <><PageHero label="— AYUDA" title="PREGUNTAS FRECUENTES" sub="Encuentra respuestas rápidas a las dudas más comunes." /><section style={{ padding: "5rem 0 7rem", background: "var(--color-white)" }}><div style={{ maxWidth: "860px", margin: "0 auto", padding: "0 2rem" }}>{items.length ? <FaqList items={items} /> : <p className="content-empty">No hay preguntas frecuentes publicadas.</p>}</div></section></>;
+  return (
+    <>
+      <PageHero title="PREGUNTAS FRECUENTES" sub="Respuestas rápidas sobre tallas, personalización, envíos y pagos." />
+      <InfoSection narrow>
+        {items.length ? <FaqList items={items} /> : <p className="m-0 py-8 text-body text-gray-600">Todavía no hay preguntas frecuentes publicadas.</p>}
+      </InfoSection>
+    </>
+  );
 }

@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function ErrorPage({ reset }: Readonly<{ error: Error & { digest?: string }; reset: () => void }>) {
   return (
-    <main style={{ minHeight: "70vh", padding: "10rem 2rem 6rem", background: "var(--color-white)", color: "var(--color-dark)", textAlign: "center" }}>
+    <div style={{ minHeight: "70vh", padding: "10rem 2rem 6rem", background: "var(--color-white)", color: "var(--color-dark)", textAlign: "center" }}>
       <p className="font-display" style={{ color: "var(--color-accent)", fontWeight: 800, letterSpacing: "0.18em", marginBottom: "1rem" }}>
         LR7 / ERROR
       </p>
@@ -22,6 +22,6 @@ export default function ErrorPage({ reset }: Readonly<{ error: Error & { digest?
           IR AL CATÁLOGO
         </Link>
       </div>
-    </main>
+    </div>
   );
 }

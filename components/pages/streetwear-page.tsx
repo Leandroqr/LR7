@@ -38,18 +38,18 @@ const STREET_IMAGES = {
 } as const;
 
 const QUICK_CATEGORIES = [
-  { number: "01", label: "OVERSIZE FIT", href: "#street-products" },
-  { number: "02", label: "RETRO EDIT", href: "/tienda?cat=FUTBOL_RETRO" },
-  { number: "03", label: "NATIONAL ICONS", href: "/tienda?cat=FUTBOL_SELECCIONES" },
-  { number: "04", label: "CLUB CULTURE", href: "/tienda?cat=FUTBOL_CLUBES" },
-  { number: "05", label: "NEW IN", href: "/colecciones" },
-  { number: "06", label: "SHOP ALL", href: "/tienda" },
+  { number: "01", label: "FIT OVERSIZE", href: "#street-products" },
+  { number: "02", label: "RETRO", href: "/tienda?cat=FUTBOL_RETRO" },
+  { number: "03", label: "SELECCIONES", href: "/tienda?cat=FUTBOL_SELECCIONES" },
+  { number: "04", label: "CLUBES", href: "/tienda?cat=FUTBOL_CLUBES" },
+  { number: "05", label: "NOVEDADES", href: "/colecciones" },
+  { number: "06", label: "VER TODO", href: "/tienda" },
 ] as const;
 
 const LOOKS = [
-  { number: "LOOK 01 / DAY OFF", title: "OVERSIZE + BAGGY", detail: "Proporciones relajadas, denim ancho y sneakers limpios." },
-  { number: "LOOK 02 / AFTER DARK", title: "JERSEY + CARGO", detail: "Una camiseta protagonista para salir cuando cae la noche." },
-  { number: "LOOK 03 / EVERYDAY", title: "JERSEY + ACCESORIOS", detail: "Joyería, gafas y actitud para convertir la camiseta en el centro del look." },
+  { number: "LOOK 01 / DÍA LIBRE", title: "OVERSIZE + BAGGY", detail: "Proporciones relajadas, denim ancho y sneakers limpios." },
+  { number: "LOOK 02 / DE NOCHE", title: "JERSEY + CARGO", detail: "Una camiseta protagonista para salir cuando cae la noche." },
+  { number: "LOOK 03 / TODOS LOS DÍAS", title: "JERSEY + ACCESORIOS", detail: "Joyería, gafas y actitud para convertir la camiseta en el centro del look." },
 ] as const;
 
 function StreetProduct({ product, index }: Readonly<{ product: Product; index: number }>) {
@@ -61,7 +61,7 @@ function StreetProduct({ product, index }: Readonly<{ product: Product; index: n
       allVariants.findIndex((candidate) => candidate.size === variant.size) === variantIndex,
   );
   const selectedVariant = variants.find((variant) => variant.size === selectedSize);
-  const purchaseLabel = added ? "AÑADIDO" : selectedVariant ? "AÑADIR" : "ELIGE TALLA";
+  const purchaseLabel = added ? "AGREGADO" : selectedVariant ? "AGREGAR" : "ELIGE TALLA";
 
   useEffect(() => {
     if (!added) return;
@@ -84,7 +84,7 @@ function StreetProduct({ product, index }: Readonly<{ product: Product; index: n
   };
 
   return (
-    <article className={`street-product street-product-${index + 1}`} data-street-reveal>
+    <article className={`street-product street-product-${index + 1}`}>
       <div className="street-product-media">
         <Link href={`/productos/${product.slug}`} aria-label={`Ver ${product.name}`}>
           <Image
@@ -128,11 +128,11 @@ function StreetProduct({ product, index }: Readonly<{ product: Product; index: n
         </fieldset>
         <div className="street-product-purchase">
           <button type="button" onClick={handleAdd} disabled={!selectedVariant}>
-            {purchaseLabel}<span aria-hidden="true">{added ? "✓" : "+"}</span>
+            {purchaseLabel}
           </button>
-          <Link href={`/productos/${product.slug}`} className="street-product-link">VER PIEZA <span aria-hidden="true">↗</span></Link>
+          <Link href={`/productos/${product.slug}`} className="street-product-link">VER PIEZA</Link>
         </div>
-        <span className="street-product-status" aria-live="polite">{added ? `${product.name}, talla ${selectedSize}, añadido al carrito.` : ""}</span>
+        <span className="street-product-status" aria-live="polite">{added ? `${product.name}, talla ${selectedSize}, agregado al carrito.` : ""}</span>
       </div>
     </article>
   );
@@ -150,85 +150,67 @@ export function StreetwearExperience({ products }: StreetwearPageProps) {
     return () => document.body.classList.remove("streetwear-route");
   }, []);
 
-  useEffect(() => {
-    const elements = Array.from(document.querySelectorAll<HTMLElement>("[data-street-reveal]"));
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      elements.forEach((element) => element.classList.add("is-visible"));
-      return;
-    }
-
-    document.querySelector(".street-page")?.classList.add("street-motion-ready");
-    const observer = new IntersectionObserver(
-      (entries) => entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add("is-visible");
-        observer.unobserve(entry.target);
-      }),
-      { rootMargin: "0px 0px -7%", threshold: 0.1 },
-    );
-    elements.forEach((element) => observer.observe(element));
-    return () => observer.disconnect();
-  }, []);
+  // UX8: sin aparición por secciones ni cinta en movimiento (DESIGN.md, sección Motion: prohibidas). El contenido está
+  // visible desde el principio, así que tampoco quedan huecos en blanco al bajar rápido.
 
   return (
-    <main className="street-page">
+    <div className="street-page">
       <header className="street-hero">
         <Image src={STREET_IMAGES.hero.src} alt={STREET_IMAGES.hero.alt} fill priority sizes="100vw" />
         <div className="street-hero-shade" />
-        <div className="street-hero-stamp" aria-hidden="true"><span>LR7</span><strong>STYLE<br />ISSUE<br />01 / 26</strong></div>
+        <div className="street-hero-stamp" aria-hidden="true"><span>LR7</span><strong>EDICIÓN<br />DE ESTILO<br />01 / 26</strong></div>
         <div className="street-hero-copy">
-          <p>LR7 / FOOTBALL-INSPIRED STREETWEAR / BOGOTÁ</p>
+          <p>LR7 / STREETWEAR INSPIRADO EN EL FÚTBOL / BOGOTÁ</p>
           <h1 className="font-display">EL FÚTBOL<br /><span>SE VISTE.</span></h1>
           <div className="street-hero-bottom">
             <p>Camisetas inspiradas en el juego, pensadas para construir el look. Fuera de la cancha, dentro de tu estilo.</p>
-            <Link href="#street-looks">VER CÓMO LLEVARLA <span aria-hidden="true">↓</span></Link>
+            <Link href="#street-looks">VER CÓMO LLEVARLA</Link>
           </div>
         </div>
-        <p className="street-hero-side" aria-hidden="true">FOOTBALL / FASHION / YOUR STYLE · LR7 EDITORIAL 01</p>
+        <p className="street-hero-side" aria-hidden="true">FÚTBOL / MODA / TU ESTILO · EDITORIAL LR7 01</p>
       </header>
 
       <nav className="street-chapters" aria-label="Capítulos de la campaña">
-        <Link href="#street-culture"><span>01</span><strong>THE IDEA</strong><small>La inspiración</small></Link>
-        <Link href="#street-products"><span>02</span><strong>THE PIECES</strong><small>Las oversize</small></Link>
-        <Link href="#street-looks"><span>03</span><strong>HOW TO WEAR</strong><small>Arma el look</small></Link>
-        <Link href="#street-drops"><span>04</span><strong>NEW ARRIVALS</strong><small>Lo más nuevo</small></Link>
+        <Link href="#street-culture"><span>01</span><strong>LA IDEA</strong><small>La inspiración</small></Link>
+        <Link href="#street-products"><span>02</span><strong>LAS PIEZAS</strong><small>Las oversize</small></Link>
+        <Link href="#street-looks"><span>03</span><strong>CÓMO LLEVARLA</strong><small>Arma el look</small></Link>
+        <Link href="#street-drops"><span>04</span><strong>NOVEDADES</strong><small>Lo más nuevo</small></Link>
       </nav>
 
       <div className="street-manifesto-tape" aria-hidden="true">
         <div aria-hidden="true">
-          <span>FOOTBALL, BUT MAKE IT FASHION</span><i>✦</i><span>OVERSIZE FIT</span><i>✦</i><span>MADE FOR THE OUTFIT</span><i>✦</i><span>WEAR THE GAME</span><i>✦</i>
-          <span>FOOTBALL, BUT MAKE IT FASHION</span><i>✦</i><span>OVERSIZE FIT</span><i>✦</i><span>MADE FOR THE OUTFIT</span><i>✦</i><span>WEAR THE GAME</span><i>✦</i>
+          <span>EL FÚTBOL SE VISTE</span><i>✦</i><span>FIT OVERSIZE</span><i>✦</i><span>HECHA PARA EL OUTFIT</span><i>✦</i><span>LLEVA EL JUEGO</span><i>✦</i>
         </div>
       </div>
 
       <section id="street-culture" className="street-culture" aria-labelledby="street-culture-title">
-        <div className="street-culture-image" data-street-reveal>
+        <div className="street-culture-image">
           <Image src={STREET_IMAGES.culture.src} alt={STREET_IMAGES.culture.alt} fill sizes="(max-width: 800px) 100vw, 50vw" />
-          <span aria-hidden="true">STYLE NOTE / 01</span>
+          <span aria-hidden="true">NOTA DE ESTILO / 01</span>
         </div>
-        <div className="street-culture-copy" data-street-reveal>
-          <p>01 / THE IDEA</p>
+        <div className="street-culture-copy">
+          <p>01 / LA IDEA</p>
           <h2 id="street-culture-title" className="font-display">DEL JUEGO<br /><span>AL LOOK.</span></h2>
-          <blockquote>“Nos inspiran sus colores, sus escudos y su historia. Tú decides cómo llevarlos.”</blockquote>
+          <blockquote>“Nos inspiran sus colores, sus números y su historia. Tú decides cómo llevarlos.”</blockquote>
           <div className="street-culture-code" aria-label="Código de estilo LR7">
             <span>01 / OVERSIZE</span><span>02 / BAGGY</span><span>03 / SNEAKERS</span><span>04 / ACCESORIOS</span>
           </div>
           <p>El fútbol es la referencia, no el uniforme. Reinterpretamos la camiseta como una pieza de moda para combinar con denim, cargos, shorts y tus sneakers favoritos.</p>
-          <Link href="#street-products">DESCUBRIR LAS PIEZAS <span aria-hidden="true">→</span></Link>
+          <Link href="#street-products">DESCUBRIR LAS PIEZAS</Link>
         </div>
       </section>
 
       <nav className="street-category-rail" aria-label="Categorías streetwear">
         {QUICK_CATEGORIES.map((category) => (
           <Link href={category.href} key={category.label}>
-            <span>{category.number}</span><strong>{category.label}</strong><i aria-hidden="true">↗</i>
+            <span>{category.number}</span><strong>{category.label}</strong>
           </Link>
         ))}
       </nav>
 
       <section id="street-products" className="street-products" aria-labelledby="street-products-title">
-        <header className="street-section-header" data-street-reveal>
-          <div><span>02 / THE PIECES</span><p>Siluetas amplias. Referencias futboleras.<br />Diseñadas para vestir y combinar.</p></div>
+        <header className="street-section-header">
+          <div><span>02 / LAS PIEZAS</span><p>Siluetas amplias. Referencias futboleras.<br />Diseñadas para vestir y combinar.</p></div>
           <h2 id="street-products-title" className="font-display">FÚTBOL PARA<br /><em>VESTIR.</em></h2>
         </header>
         <div className="street-products-grid">
@@ -237,13 +219,13 @@ export function StreetwearExperience({ products }: StreetwearPageProps) {
       </section>
 
       <section id="street-looks" className="street-looks" aria-labelledby="street-looks-title">
-        <header data-street-reveal>
-          <p>03 / HOW TO WEAR IT</p>
+        <header>
+          <p>03 / CÓMO LLEVARLA</p>
           <h2 id="street-looks-title" className="font-display">UNA CAMISETA.<br /><span>TODO EL OUTFIT.</span></h2>
         </header>
         <div className="street-look-grid" role="region" aria-label="Looks de streetwear" tabIndex={0}>
           {LOOKS.map((look, index) => (
-            <article key={look.number} className="street-look" data-street-reveal>
+            <article key={look.number} className="street-look">
               <div><Image src={STREET_IMAGES.looks[index].src} alt={STREET_IMAGES.looks[index].alt} fill sizes="(max-width: 700px) 84vw, 33vw" /></div>
               <span>{look.number}</span><h3 className="font-display">{look.title}</h3><p>{look.detail}</p>
             </article>
@@ -252,24 +234,24 @@ export function StreetwearExperience({ products }: StreetwearPageProps) {
       </section>
 
       <section id="street-drops" className="street-drops" aria-labelledby="street-drops-title">
-        <header data-street-reveal><p>04 / NEW ARRIVALS</p><h2 id="street-drops-title" className="font-display">NUEVAS <span>PIEZAS.</span></h2><Link href="/colecciones">VER NOVEDADES <span aria-hidden="true">→</span></Link></header>
+        <header><p>04 / NOVEDADES</p><h2 id="street-drops-title" className="font-display">NUEVAS <span>PIEZAS.</span></h2><Link href="/colecciones">VER NOVEDADES</Link></header>
         <div className="street-drop-list">
           {drops.map((product, index) => (
-            <Link href={`/productos/${product.slug}`} key={product.id} data-street-reveal>
-              <span>DROP / {String(index + 1).padStart(2, "0")}</span>
+            <Link href={`/productos/${product.slug}`} key={product.id}>
+              <span>NUEVO / {String(index + 1).padStart(2, "0")}</span>
               <div><Image src={product.images[0].src} alt="" fill sizes="96px" /></div>
               <h3 className="font-display">{product.name}</h3>
-              <p>{product.team}</p><strong>${formatCurrency(product.price.amount)}</strong><i aria-hidden="true">↗</i>
+              <p>{product.team}</p><strong>${formatCurrency(product.price.amount)}</strong>
             </Link>
           ))}
         </div>
       </section>
 
-      <section className="street-final" data-street-reveal>
+      <section className="street-final">
         <p>NO NECESITAS ESTAR JUGANDO PARA VESTIR FÚTBOL.</p>
         <h2 className="font-display">TU PASIÓN.<br /><span>TU ESTILO.</span></h2>
-        <Link href="/tienda?brand=FUTBOL">COMPRAR LA COLECCIÓN <span aria-hidden="true">→</span></Link>
+        <Link href="/tienda?brand=FUTBOL">COMPRAR LA COLECCIÓN</Link>
       </section>
-    </main>
+    </div>
   );
 }
