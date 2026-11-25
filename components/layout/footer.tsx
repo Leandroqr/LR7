@@ -1,92 +1,165 @@
 import Link from "next/link";
-import { getWhatsAppUrl, SITE_CONFIG } from "@/lib/site";
+import type { ReactNode } from "react";
+import { useSiteScope } from "@/components/providers/site-scope-context";
 import type { NavigationItem } from "@/lib/content";
+import { legalHref, SIC_URL } from "@/lib/legal-pages";
+import { getWhatsAppUrl, PAYMENT_METHODS, SITE_CONFIG, SOCIAL_LINKS } from "@/lib/site";
 
 type FooterLink = { label: string; href: string };
 
-// Columnas del pie. Los enlaces del CMS se colocan en la columna que les corresponde por su dirección
-// (antes se repartían por posición y podían caer bajo un título que no era el suyo); los desconocidos van a LR7.
-const COLUMNS: ReadonlyArray<{ title: string; hrefs: string[] }> = [
-  { title: "Tienda", hrefs: ["/tienda", "/futbol", "/training", "/colecciones", "/personaliza", "/streetwear", "/favoritos"] },
-  { title: "Ayuda", hrefs: ["/envios", "/cambios-y-devoluciones", "/guia-de-tallas", "/preguntas-frecuentes", "/contacto"] },
-  { title: "LR7", hrefs: ["/nosotros"] },
+// Tienda: solo camisetas de fútbol (alcance comercial 2026-11-24). Las categorías vacías no se enlazan.
+const SHOP_LINKS: FooterLink[] = [
+  { label: "Camisetas de fútbol", href: "/tienda" },
+  { label: "Clubes", href: "/categorias/futbol-clubes" },
+  { label: "Selecciones", href: "/categorias/futbol-selecciones" },
+  { label: "Retro", href: "/categorias/futbol-retro" },
+  { label: "Personalización", href: "/personaliza" },
 ];
 
-// Respaldo si el CMS no tiene enlaces de pie.
-const FALLBACK_LINKS: FooterLink[] = [
-  { label: "Tienda", href: "/tienda" },
-  { label: "Novedades", href: "/colecciones" },
-  { label: "Personaliza", href: "/personaliza" },
-  { label: "Favoritos", href: "/favoritos" },
-  { label: "Envíos", href: "/envios" },
-  { label: "Cambios y devoluciones", href: "/cambios-y-devoluciones" },
-  { label: "Guía de tallas", href: "/guia-de-tallas" },
-  { label: "Preguntas frecuentes", href: "/preguntas-frecuentes" },
+const SERVICE_LINKS: FooterLink[] = [
   { label: "Contacto", href: "/contacto" },
+  { label: "Preguntas frecuentes", href: "/preguntas-frecuentes" },
+  { label: "Guía de tallas", href: "/guia-de-tallas" },
+  { label: "Envíos y entregas", href: "/envios" },
+  { label: "Cambios y garantías", href: "/cambios-y-devoluciones" },
   { label: "Nosotros", href: "/nosotros" },
 ];
 
-/** Agrupa los enlaces por columna, sin repetir una misma dirección (exportado para el test). */
-export function groupFooterLinks(links: FooterLink[]) {
-  const seen = new Set<string>();
-  const unique = links.filter((link) => {
-    const key = link.href.split(/[?#]/)[0].replace(/\/$/, "") || "/";
-    if (seen.has(key)) return false;
-    seen.add(key);
+// Documentos que van en Servicio al cliente; el resto de los legales va en la franja inferior.
+const SERVICE_LEGAL_SLUGS = new Set(["derecho-de-retracto", "pqr"]);
+
+/**
+ * Une los enlaces fijos con los del CMS sin repetir direcciones (exportado para el test). Los enlaces del
+ * CMS que no son de la tienda se añaden a Servicio al cliente, así no se pierde lo que configure el admin.
+ */
+export function mergeFooterLinks(base: FooterLink[], extra: FooterLink[], skip: ReadonlySet<string>) {
+  const seen = new Set(base.map((link) => link.href.split(/[?#]/)[0]));
+  const added = extra.filter((link) => {
+    const path = link.href.split(/[?#]/)[0];
+    if (seen.has(path) || skip.has(path)) return false;
+    seen.add(path);
     return true;
   });
-  return COLUMNS.map((column, index) => ({
-    title: column.title,
-    links: unique.filter((link) => {
-      const path = link.href.split(/[?#]/)[0];
-      const owner = COLUMNS.findIndex((candidate) => candidate.hrefs.includes(path));
-      return owner === index || (owner === -1 && index === COLUMNS.length - 1);
-    }),
-  })).filter((column) => column.links.length > 0);
+  return [...base, ...added];
 }
 
-// Datos publicados en el CMS y en PRODUCT.md; no se anuncian medios de pago ni datos legales aún sin definir.
-const PROMISES = ["Envíos a toda Colombia en 2 a 5 días hábiles", "Cambios en 5 días hábiles", "Personalización con tu nombre y número"];
+const ICONS: Record<"instagram" | "tiktok", ReactNode> = {
+  instagram: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true" focusable="false">
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+    </svg>
+  ),
+  tiktok: (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+      <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z" />
+    </svg>
+  ),
+};
 
+const HEADING = "m-0 mb-3 text-body-sm font-semibold text-white";
+const LINK = "footer-link text-body-sm text-white/75 no-underline hover:text-white hover:underline hover:underline-offset-3 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-action-on-dark";
+
+function LinkColumn({ title, links }: Readonly<{ title: string; links: FooterLink[] }>) {
+  if (!links.length) return null;
+  return (
+    <nav aria-label={title}>
+      <h2 className={HEADING}>{title}</h2>
+      <ul className="footer-links m-0 grid list-none p-0">
+        {links.map((link) => (
+          <li key={link.href}>
+            <Link href={link.href} className={LINK}>{link.label}</Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
+
+/**
+ * Pie (2026-11-24): fondo noche y cinco columnas. Redes, medios de pago y documentos legales solo aparecen
+ * cuando están configurados o publicados; nada de perfiles, medios o textos legales inventados.
+ */
 export function Footer({ navigation }: Readonly<{ navigation: NavigationItem[] }>) {
-  const columns = groupFooterLinks(navigation.length ? navigation.map((item) => ({ label: item.label, href: item.href })) : FALLBACK_LINKS);
-  const whatsappUrl = getWhatsAppUrl("Hola LR7, tengo una pregunta.");
+  const { canLink, legalPages } = useSiteScope();
+  const shopPaths = new Set(SHOP_LINKS.map((link) => link.href));
+  const shopLinks = SHOP_LINKS.filter((link) => canLink(link.href));
+  const cmsLinks = navigation.map((item) => ({ label: item.label, href: item.href })).filter((link) => canLink(link.href));
+  const serviceLegal = legalPages.filter((page) => SERVICE_LEGAL_SLUGS.has(page.slug)).map((page) => ({ label: page.label, href: legalHref(page) }));
+  const serviceLinks = mergeFooterLinks([...SERVICE_LINKS, ...serviceLegal], cmsLinks, shopPaths);
+  const bottomLegal = legalPages.filter((page) => !SERVICE_LEGAL_SLUGS.has(page.slug));
+  const whatsappUrl = getWhatsAppUrl("Hola LR7, tengo una pregunta sobre sus camisetas.");
 
   return (
-    <footer className="border-0 border-t border-solid border-gray-200 bg-white text-night">
-      <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-4 pt-14 pb-8 md:px-8 lg:grid-cols-[1.3fr_repeat(3,1fr)] lg:gap-12 lg:pt-16">
+    <footer className="bg-night text-white">
+      <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-4 pt-14 pb-10 md:grid-cols-2 md:px-8 lg:grid-cols-[1.4fr_repeat(4,1fr)] lg:gap-10 lg:pt-16">
         <div className="grid content-start gap-4">
-          <Link href="/" className="footer-brand font-display inline-flex min-h-11 min-w-11 w-fit items-center text-[1.75rem] font-black tracking-[0.06em] text-night no-underline" aria-label="LR7, ir al inicio">
-            LR<span className="text-action">7</span>
+          <Link href="/" className="font-display inline-flex min-h-11 min-w-11 w-fit items-center text-[1.75rem] font-black tracking-[0.06em] text-white no-underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-action-on-dark" aria-label="LR7, ir al inicio">
+            LR<span className="text-action-on-dark">7</span>
           </Link>
-          <p className="m-0 max-w-[34ch] text-body-sm leading-relaxed text-gray-600">Camisetas de fútbol de diseño propio, personalizables con tu nombre y tu número.</p>
-          <ul className="m-0 grid list-none gap-1.5 p-0 text-body-sm text-gray-600">
-            {PROMISES.map((promise) => <li key={promise}>{promise}</li>)}
-          </ul>
+          <p className="m-0 max-w-[34ch] text-body-sm leading-relaxed text-white/75">Camisetas de fútbol de diseño propio, inspiradas en la historia del juego y personalizables con tu nombre y tu número.</p>
+          <Link href="/tienda" className="inline-flex min-h-11 w-fit items-center text-body-sm font-semibold text-action-on-dark underline underline-offset-4 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-action-on-dark">
+            Ver las camisetas
+          </Link>
           {whatsappUrl ? (
-            <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 w-fit items-center text-body-sm font-semibold text-action underline underline-offset-4">
+            <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 w-fit items-center text-body-sm text-white/75 underline underline-offset-4 hover:text-white focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-action-on-dark">
               Escríbenos por WhatsApp
             </a>
           ) : null}
         </div>
-        {columns.map((column) => (
-          <nav key={column.title} aria-label={column.title}>
-            <h2 className="m-0 mb-3 text-body-sm font-semibold text-night">{column.title}</h2>
-            <ul className="footer-links m-0 grid list-none p-0">
-              {column.links.map((link) => (
-                <li key={link.href}>
-                  <Link href={link.href} className="footer-link text-body-sm text-gray-600 no-underline hover:text-night hover:underline hover:underline-offset-3">
-                    {link.label}
-                  </Link>
+
+        <LinkColumn title="Tienda" links={shopLinks} />
+        <LinkColumn title="Servicio al cliente" links={serviceLinks} />
+
+        {SOCIAL_LINKS.length ? (
+          <div>
+            <h2 className={HEADING}>Síguenos</h2>
+            <ul className="m-0 flex list-none gap-2 p-0">
+              {SOCIAL_LINKS.map((social) => (
+                <li key={social.id}>
+                  <a
+                    href={social.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${social.label} de LR7 (se abre en una pestaña nueva)`}
+                    className="grid size-11 place-items-center rounded-full border border-solid border-white/20 text-white transition-colors duration-200 hover:border-white/60 hover:bg-white/10 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-action-on-dark [&>svg]:size-5"
+                  >
+                    {ICONS[social.id]}
+                  </a>
                 </li>
               ))}
             </ul>
-          </nav>
-        ))}
+          </div>
+        ) : null}
+
+        {PAYMENT_METHODS.length ? (
+          <div>
+            <h2 className={HEADING}>Medios de pago</h2>
+            <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
+              {PAYMENT_METHODS.map((method) => (
+                <li key={method.id} className="rounded-button border border-solid border-white/20 px-3 py-1.5 text-caption font-semibold text-white">{method.label}</li>
+              ))}
+            </ul>
+            <p className="m-0 mt-3 text-caption text-white/60">Pagos procesados por Wompi.</p>
+          </div>
+        ) : null}
       </div>
-      <div className="mx-auto flex w-full max-w-[1440px] flex-wrap items-center justify-between gap-3 border-0 border-t border-solid border-gray-200 px-4 py-6 text-caption text-gray-600 md:px-8">
-        <p className="m-0">© {new Date().getFullYear()} {SITE_CONFIG.legalName}. Todos los derechos reservados.</p>
-        <p className="m-0">Hecho en Colombia</p>
+
+      <div className="border-0 border-t border-solid border-white/10">
+        <div className="footer-bottom mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-4 py-6 md:px-8 lg:flex-row lg:items-center lg:justify-between [body:has(.whatsapp-float)_&]:pb-[88px] lg:[body:has(.whatsapp-float)_&]:pr-[100px] lg:[body:has(.whatsapp-float)_&]:pb-6">
+          <ul className="m-0 flex list-none flex-wrap items-center gap-x-5 gap-y-1 p-0">
+            {bottomLegal.map((page) => (
+              <li key={page.slug}><Link href={legalHref(page)} className={`${LINK} inline-flex min-h-11 items-center text-caption`}>{page.label}</Link></li>
+            ))}
+            <li>
+              <a href={SIC_URL} target="_blank" rel="noopener noreferrer" className={`${LINK} inline-flex min-h-11 items-center text-caption`}>
+                Superintendencia de Industria y Comercio (SIC)<span className="sr-only"> (se abre en una pestaña nueva)</span>
+              </a>
+            </li>
+          </ul>
+          <p className="m-0 text-caption text-white/60">© {new Date().getFullYear()} {SITE_CONFIG.legalName}. Hecho en Colombia.</p>
+        </div>
       </div>
     </footer>
   );

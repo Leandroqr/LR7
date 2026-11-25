@@ -209,9 +209,9 @@ test("secondary pages (UX8): Spanish, no section reveals or added arrows, no lab
   assert.match(faq, /<details/);
   assert.doesNotMatch(faq, /maxHeight|"#fff"/);
   const footer = readFileSync("components/layout/footer.tsx", "utf8");
-  const fallback = footer.slice(footer.indexOf("const FALLBACK_LINKS"), footer.indexOf("];", footer.indexOf("const FALLBACK_LINKS")));
-  const hrefs = [...fallback.matchAll(/href: "([^"]+)"/g)].map((match) => match[1]);
-  assert.equal(hrefs.length, new Set(hrefs).size, "el pie de respaldo no repite enlaces");
-  assert.match(footer, /export function groupFooterLinks/);
-  assert.doesNotMatch(footer, /NIT|Visa|Mastercard|PSE|Nequi/, "sin datos legales ni medios de pago aún no definidos");
+  const fixed = footer.slice(footer.indexOf("const SHOP_LINKS"), footer.indexOf("// Documentos que van"));
+  const hrefs = [...fixed.matchAll(/href: "([^"]+)"/g)].map((match) => match[1]);
+  assert.equal(hrefs.length, new Set(hrefs).size, "el pie no repite enlaces");
+  assert.match(footer, /export function mergeFooterLinks/);
+  assert.doesNotMatch(footer, /NIT|Visa|Mastercard/, "sin datos legales ni medios de pago escritos a mano");
 });

@@ -2,7 +2,11 @@ import type { Metadata } from "next";
 import { Barlow, Barlow_Condensed } from "next/font/google";
 import { AppProviders } from "@/components/providers/app-providers";
 import { SiteShell } from "@/components/layout/site-shell";
+import { getPublicProducts } from "@/lib/catalog";
 import { getPublicNavigation } from "@/lib/content";
+import { getPublishedLegalPages } from "@/lib/legal";
+import { CATEGORIES, getProductsByCategorySlug } from "@/lib/products";
+import { isPublicHrefEnabled } from "@/lib/store-scope";
 import { SITE_CONFIG } from "@/lib/site";
 import "@/app/styles.css";
 
@@ -26,7 +30,7 @@ const bodyFont = Barlow({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_CONFIG.baseUrl),
   title: {
-    default: `${SITE_CONFIG.name} — Fútbol & Training en Colombia`,
+    default: `${SITE_CONFIG.name} — Camisetas de fútbol en Colombia`,
     template: `%s | ${SITE_CONFIG.name}`,
   },
   description: SITE_CONFIG.description,
@@ -37,7 +41,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: SITE_CONFIG.locale,
     url: "/",
-    title: `${SITE_CONFIG.name} — Fútbol & Training en Colombia`,
+    title: `${SITE_CONFIG.name} — Camisetas de fútbol en Colombia`,
     description: SITE_CONFIG.description,
     siteName: SITE_CONFIG.name,
     images: [
@@ -51,7 +55,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: `${SITE_CONFIG.name} — Fútbol & Training en Colombia`,
+    title: `${SITE_CONFIG.name} — Camisetas de fútbol en Colombia`,
     description: SITE_CONFIG.description,
     images: ["/icon.svg"],
   },
@@ -67,12 +71,16 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const navigation = await getPublicNavigation();
+  const [navigation, products, legalPages] = await Promise.all([getPublicNavigation(), getPublicProducts(), getPublishedLegalPages()]);
+  // Alcance comercial: no se enlazan categorías vacías ni secciones ocultas (también los enlaces del CMS).
+  const hiddenHrefs = CATEGORIES.filter((category) => getProductsByCategorySlug(category.slug, products).length === 0).map((category) => `/categorias/${category.slug}`);
+  const visibleNavigation = navigation.filter((item) => isPublicHrefEnabled(item.href) && !hiddenHrefs.includes(item.href.split("?")[0]));
+  const whatsappProducts = products.map((product) => ({ slug: product.slug, name: product.name }));
   return (
     <html lang="es" className={`${displayFont.variable} ${bodyFont.variable}`}>
       <body>
         <AppProviders>
-          <SiteShell navigation={navigation}>{children}</SiteShell>
+          <SiteShell navigation={visibleNavigation} hiddenHrefs={hiddenHrefs} legalPages={legalPages} whatsappProducts={whatsappProducts}>{children}</SiteShell>
         </AppProviders>
       </body>
     </html>

@@ -6,15 +6,20 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useStore } from "@/components/providers/store-provider";
 import { WhatsAppLink } from "@/components/commerce/whatsapp-link";
 import { getGeneralWhatsAppMessage } from "@/lib/whatsapp";
+import { useSiteScope } from "@/components/providers/site-scope-context";
 import type { NavigationItem } from "@/lib/content";
 
 // Navegación principal (DESIGN.md → Navigation). El logo lleva a Inicio; "Tienda" sustituye al
 // antiguo botón CATÁLOGO. Si el CMS define enlaces de cabecera, sustituyen a estos.
+// Alcance comercial (2026-11-24): solo camisetas de fútbol. Training y Streetwear siguen en la lista pero
+// solo se muestran si se activan (lib/store-scope.ts); las categorías vacías tampoco se enlazan.
 const NAV_LINKS = [
   { href: "/tienda", label: "Tienda" },
-  { href: "/futbol", label: "Fútbol" },
-  { href: "/training", label: "Training" },
+  { href: "/categorias/futbol-clubes", label: "Clubes" },
+  { href: "/categorias/futbol-selecciones", label: "Selecciones" },
+  { href: "/categorias/futbol-retro", label: "Retro" },
   { href: "/personaliza", label: "Personaliza" },
+  { href: "/training", label: "Training" },
   { href: "/streetwear", label: "Streetwear" },
 ];
 
@@ -48,7 +53,8 @@ export function Navbar({ navigation }: Readonly<{ navigation: NavigationItem[] }
   const pathname = usePathname();
   const router = useRouter();
   const whatsappMessage = getGeneralWhatsAppMessage(pathname);
-  const navigationLinks = navigation.length ? navigation : NAV_LINKS;
+  const { canLink } = useSiteScope();
+  const navigationLinks = (navigation.length ? navigation : NAV_LINKS).filter((link) => canLink(link.href));
 
   // Al abrir el buscador, el foco va al campo (el panel deja de estar oculto en este mismo render).
   useEffect(() => {
@@ -181,7 +187,7 @@ export function Navbar({ navigation }: Readonly<{ navigation: NavigationItem[] }
               className="site-search-input"
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Busca camisetas y training"
+              placeholder="Busca equipo, selección o camiseta"
               aria-label="Buscar producto"
               enterKeyHint="search"
             />

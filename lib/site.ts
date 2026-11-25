@@ -9,7 +9,7 @@ export const SITE_CONFIG = {
   name: "LR7",
   legalName: "LR7",
   description:
-    "Camisetas de fútbol premium y ropa de training LR7 en Colombia. Explora prendas para la cancha, el entrenamiento y personalización.",
+    "Camisetas de fútbol LR7 en Colombia: diseño propio inspirado en la historia del juego, personalizables con tu nombre y tu número.",
   baseUrl: siteUrl,
   locale: "es_CO",
   keywords: [
@@ -40,3 +40,34 @@ export const COMPANY = {
   country: "CO",
   currency: "COP" as const,
 };
+
+// Redes sociales (2026-11-24): solo se enlazan si la URL está configurada y es un perfil del dominio correcto.
+// Nunca se inventa un perfil.
+function profileUrl(value: string | undefined, hosts: readonly string[]) {
+  try {
+    const url = new URL(value ?? "");
+    return url.protocol === "https:" && hosts.includes(url.hostname) && url.pathname.length > 1 ? url.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
+export const SOCIAL_LINKS = [
+  { id: "instagram", label: "Instagram", url: profileUrl(process.env.NEXT_PUBLIC_INSTAGRAM_URL, ["instagram.com", "www.instagram.com"]) },
+  { id: "tiktok", label: "TikTok", url: profileUrl(process.env.NEXT_PUBLIC_TIKTOK_URL, ["tiktok.com", "www.tiktok.com"]) },
+].filter((link): link is { id: "instagram" | "tiktok"; label: string; url: string } => link.url !== null);
+
+// Medios de pago: solo los que el dueño confirme como habilitados en su cuenta de Wompi en producción
+// (NEXT_PUBLIC_PAYMENT_METHODS=card,pse,nequi,bancolombia). Vacío: el pie no muestra medios de pago.
+const PAYMENT_METHOD_LABELS = {
+  card: "Tarjeta de crédito o débito",
+  pse: "PSE",
+  nequi: "Nequi",
+  bancolombia: "Botón Bancolombia",
+} as const;
+
+export const PAYMENT_METHODS = (process.env.NEXT_PUBLIC_PAYMENT_METHODS ?? "")
+  .split(",")
+  .map((value) => value.trim().toLowerCase())
+  .filter((value): value is keyof typeof PAYMENT_METHOD_LABELS => value in PAYMENT_METHOD_LABELS)
+  .map((id) => ({ id, label: PAYMENT_METHOD_LABELS[id] }));

@@ -6,7 +6,8 @@ export type WhatsAppEventName =
   | "cart_whatsapp_click";
 
 type ProductMessageOptions = {
-  product: Product;
+  // Solo hace falta el nombre: así sirve también con el catálogo de Supabase y con el resumen que llega al botón flotante.
+  product: Pick<Product, "name">;
   productUrl: string;
   size?: string;
   quantity?: number;
@@ -24,7 +25,13 @@ type CartMessageItem = {
 
 export function getGeneralWhatsAppMessage(pathname: string) {
   if (pathname === "/" || pathname === "") {
-    return "Hola LR7, tengo una pregunta sobre sus productos.";
+    return "Hola LR7, tengo una pregunta sobre sus camisetas.";
+  }
+
+  // Consulta sobre un pedido: la referencia es el identificador que el cliente ya ve en la página de estado.
+  const order = pathname.match(/^\/checkout\/estado\/([A-Za-z0-9-]{1,64})(?:[/?#]|$)/);
+  if (order) {
+    return `Hola LR7, tengo una consulta sobre mi pedido ${order[1]}.`;
   }
 
   if (pathname.startsWith("/training")) {

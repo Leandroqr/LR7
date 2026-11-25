@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { WhatsAppLink } from "@/components/commerce/whatsapp-link";
 import { CheckoutPanel } from "@/components/commerce/checkout-panel";
+import { useSiteScope } from "@/components/providers/site-scope-context";
+import { legalHref } from "@/lib/legal-pages";
 import { type CartItem, useStore } from "@/components/providers/store-provider";
 import { getItemUnitPrice } from "@/lib/cart-pricing";
 import { CUSTOM_PRICE, formatCurrency, getCategoryDisplayName, PRODUCTS } from "@/lib/products";
@@ -22,6 +24,7 @@ function hasCartVariant(item: CartItem) {
 export default function CartPage() {
   const { cart, hydrated, addToCart, removeFromCart, updateQty, clearCart } = useStore();
   const [removedItem, setRemovedItem] = useState<CartItem | null>(null);
+  const { legalPages } = useSiteScope();
   const currentCart = cart.map((item) => ({
     ...item,
     product: PRODUCTS.find((product) => product.id === item.product.id) ?? item.product,
@@ -193,6 +196,19 @@ export default function CartPage() {
               <Link href="/cambios-y-devoluciones"><strong>Cambios</strong><span>Consulta las condiciones</span></Link>
               <Link href="/contacto"><strong>Atención LR7</strong><span>Escríbenos</span></Link>
             </div>
+
+            {/* Condiciones de compra antes de pagar (Ley 1480): solo documentos con texto publicado en el CMS. */}
+            {legalPages.length ? (
+              <nav aria-label="Condiciones de compra" className="mt-1">
+                <ul className="m-0 flex list-none flex-wrap gap-x-4 p-0">
+                  {legalPages.filter((page) => page.slug !== "aviso-de-privacidad").map((page) => (
+                    <li key={page.slug}>
+                      <Link href={legalHref(page)} className="inline-flex min-h-11 items-center text-body-sm text-gray-600 underline underline-offset-3 hover:text-night">{page.label}</Link>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            ) : null}
 
             {isWhatsAppConfigured() ? (
               <div className="cart-whatsapp-support">

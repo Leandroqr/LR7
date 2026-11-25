@@ -5,9 +5,11 @@ import test from "node:test";
 const navbar = readFileSync("components/layout/navbar.tsx", "utf8");
 const css = readFileSync("app/globals.css", "utf8");
 
-test("main navigation uses the five agreed links in Spanish", () => {
+test("main navigation: football-only scope, Training and Streetwear kept but filtered by configuration", () => {
   const links = [...navbar.matchAll(/\{ href: "([^"]+)", label: "([^"]+)" \}/g)].map((match) => `${match[1]} ${match[2]}`);
-  assert.deepEqual(links, ["/tienda Tienda", "/futbol Fútbol", "/training Training", "/personaliza Personaliza", "/streetwear Streetwear"]);
+  assert.deepEqual(links, ["/tienda Tienda", "/categorias/futbol-clubes Clubes", "/categorias/futbol-selecciones Selecciones", "/categorias/futbol-retro Retro", "/personaliza Personaliza", "/training Training", "/streetwear Streetwear"]);
+  // Todos los enlaces (fijos o del CMS) pasan por canLink: secciones ocultas y categorías vacías no se muestran.
+  assert.match(navbar, /\(navigation\.length \? navigation : NAV_LINKS\)\.filter\(\(link\) => canLink\(link\.href\)\)/);
   const code = navbar.replace(/\/\/.*$/gm, "").replace(/\{\/\*[\s\S]*?\*\/\}/g, "");
   assert.doesNotMatch(code, /CATÁLOGO|"STREET"|INICIO/);
 });
