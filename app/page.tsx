@@ -7,21 +7,21 @@ import { SITE_CONFIG } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: {
-    absolute: `${SITE_CONFIG.name} — Fútbol & Training en Colombia`,
+    absolute: `${SITE_CONFIG.name} — Camisetas de fútbol en Colombia`,
   },
   description: SITE_CONFIG.description,
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: `${SITE_CONFIG.name} — Fútbol & Training en Colombia`,
+    title: `${SITE_CONFIG.name} — Camisetas de fútbol en Colombia`,
     description: SITE_CONFIG.description,
     url: "/",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: `${SITE_CONFIG.name} — Fútbol & Training en Colombia`,
+    title: `${SITE_CONFIG.name} — Camisetas de fútbol en Colombia`,
     description: SITE_CONFIG.description,
   },
 };

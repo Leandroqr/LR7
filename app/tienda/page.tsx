@@ -5,21 +5,21 @@ import { serializeJsonLd } from "@/lib/seo";
 import { SITE_CONFIG } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Tienda de camisetas de fútbol y training",
-  description: "Compra camisetas de fútbol, ediciones retro y ropa de training LR7. Elige tu talla, personaliza productos seleccionados y recibe en Colombia.",
+  title: "Tienda de camisetas de fútbol",
+  description: "Compra camisetas de fútbol LR7: clubes, selecciones y retro. Elige tu talla, personalízala con tu nombre y tu número y recíbela en Colombia.",
   alternates: {
     canonical: "/tienda",
   },
   openGraph: {
-    title: "Tienda de camisetas de fútbol y training | LR7",
-    description: "Fútbol primero: camisetas, ediciones retro y ropa técnica de training LR7.",
+    title: "Tienda de camisetas de fútbol | LR7",
+    description: "Camisetas de fútbol LR7: clubes, selecciones y retro.",
     url: "/tienda",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Tienda de camisetas de fútbol y training | LR7",
-    description: "Explora camisetas de fútbol, retro y training LR7.",
+    title: "Tienda de camisetas de fútbol | LR7",
+    description: "Explora las camisetas de fútbol LR7.",
   },
 };
 

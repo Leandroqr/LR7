@@ -4,6 +4,7 @@ import { getPublicProducts } from "@/lib/catalog";
 import { getStockedPersonalizationSkus } from "@/lib/catalog/personalization-stock";
 import { sanitizeDorsalName, sanitizeDorsalNumber } from "@/lib/dorsal";
 import { PRODUCTS } from "@/lib/products";
+import { filterActiveProducts } from "@/lib/store-scope";
 import { SITE_CONFIG } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -33,7 +34,7 @@ export default async function PersonalizaPage({ searchParams }: Readonly<Persona
   const catalogProducts = catalog.filter((product) => product.personalizable);
   const products = catalogProducts.length
     ? catalogProducts
-    : PRODUCTS.filter((product) => product.personalizable);
+    : filterActiveProducts(PRODUCTS).filter((product) => product.personalizable);
   const stockedVariantSkus = await getStockedPersonalizationSkus(products.map((product) => product.slug));
 
   return (

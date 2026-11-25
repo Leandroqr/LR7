@@ -4,6 +4,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { unstable_cache } from "next/cache";
 import { CACHE_TAGS, PUBLIC_DATA_REVALIDATE_SECONDS } from "@/lib/cache-tags";
 import { PRODUCTS } from "@/lib/products";
+import { filterActiveProducts } from "@/lib/store-scope";
 import { createSupabasePublicClient } from "@/lib/supabase/public";
 import type { Database } from "@/types/database";
 import type {
@@ -62,7 +63,12 @@ function rowsByProduct<Row extends { product_id: string }>(rows: Row[]) {
   }, new Map());
 }
 
+/** Catálogo público: solo las líneas a la venta (lib/store-scope.ts). El admin no usa esta función. */
 export async function getPublicProducts(): Promise<Product[]> {
+  return filterActiveProducts(await loadPublicProducts());
+}
+
+async function loadPublicProducts(): Promise<Product[]> {
   if (process.env.CATALOG_SOURCE !== "supabase") return PRODUCTS;
 
   try {

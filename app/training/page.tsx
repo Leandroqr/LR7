@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { isLineActive } from "@/lib/store-scope";
 import { CatalogPage } from "@/components/pages/catalog-page";
 import { getPublicProducts } from "@/lib/catalog";
 import { SITE_CONFIG } from "@/lib/site";
@@ -24,6 +26,8 @@ type TrainingPageProps = {
 };
 
 export default async function TrainingPage({ searchParams }: Readonly<TrainingPageProps>) {
+  // Training está fuera del alcance comercial actual: la ruta se conserva, pero responde 404 hasta activarla.
+  if (!isLineActive("TRAINING")) notFound();
   const [{ cat }, products] = await Promise.all([searchParams, getPublicProducts()]);
   return <CatalogPage initialCategory={cat} brand="TRAINING" products={products} />;
 }

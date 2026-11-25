@@ -20,17 +20,18 @@ const LINES: ReadonlyArray<{ label: string; href: string; matches: (product: Pro
 
 function LinesSection({ products }: Readonly<{ products: Product[] }>) {
   // Se prefiere un producto cuya foto no sea la del hero, para no repetirla dos pantallas seguidas.
+  // Solo líneas con productos a la venta: Training (oculta por alcance) o una categoría vacía no se muestran.
   const lines = LINES.map((line) => {
     const candidates = products.filter(line.matches);
     return { ...line, product: candidates.find((product) => !product.images[0]?.src.includes(HERO_PHOTO_ID)) ?? candidates[0] };
-  });
+  }).filter((line) => line.product);
   return (
     <section className="home-lines" aria-labelledby="home-lines-title">
       <div className="home-section-head">
         <h2 id="home-lines-title" className="home-headline font-display">Elige tu línea</h2>
         <Link href="/tienda" className="btn-text">Ver toda la tienda</Link>
       </div>
-      <ul className="home-lines-grid">
+      <ul className="home-lines-grid" data-count={lines.length}>
         {lines.map((line) => (
           <li key={line.href}>
             <Link href={line.href} className="home-line-card">

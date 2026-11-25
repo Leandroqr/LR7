@@ -46,7 +46,9 @@ test("/personaliza reads nombre and numero through the shared sanitizers", () =>
 
 test("hero carousel: CMS slides or real products, accessible controls, no timers, motion only when allowed", () => {
   assert.match(hero, /HERO_PHOTO_ID = "photo-1516948900-c5137d2bf399"/);
-  assert.match(hero, /cmsSlides\?\.length \? fromCms\(cmsSlides\) : fromCatalog\(products, customPrice\)/);
+  // Las diapositivas del CMS que enlazan a secciones ocultas (alcance comercial) se descartan.
+  assert.match(hero, /\(cmsSlides \?\? \[\]\)\.filter\(\(slide\) => isPublicHrefEnabled\(slide\.cta_href\)\)/);
+  assert.match(hero, /visibleCmsSlides\.length \? fromCms\(visibleCmsSlides\) : fromCatalog\(products, customPrice\)/);
   assert.match(home, /<HomeHero products=\{products\} slides=\{homeSlides\}/);
   // WCAG 2.2.2: se puede pausar; se pausa con hover y foco; avanza al terminar la barra (sin setInterval).
   assert.match(hero, /aria-label=\{userPaused \? "Reanudar el carrusel" : "Pausar el carrusel"\}/);

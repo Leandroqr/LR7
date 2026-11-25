@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ProductCard } from "@/components/product/product-card";
+import { isLineActive } from "@/lib/store-scope";
 import type { Product } from "@/types/ecommerce";
 
 type ShopSection = "all" | "football" | "new" | "retro" | "accessories" | "training" | "f678";
@@ -215,13 +216,13 @@ export function ShopPage({ products, initialCategory, initialBrand }: Readonly<S
           <Link href="/">Inicio</Link><span aria-hidden="true">/</span><span aria-current="page">Tienda</span>
         </nav>
         <h1 className="font-display">Tienda</h1>
-        <p>Camisetas de fútbol de diseño propio, retro y ropa de training, con envío a toda Colombia.</p>
+        <p>Camisetas de fútbol de diseño propio: clubes, selecciones y retro, con envío a toda Colombia.</p>
       </header>
 
       <nav className="shop-category-nav" aria-label="Categorías de tienda">
         <div>
           {/* Las líneas sin productos no se anuncian (antes salían tachadas como "Próximamente"). */}
-          {SECTIONS.filter((item) => item.id === "all" || item.id === section || sectionCounts[item.id] > 0).map((item) => (
+          {SECTIONS.filter((item) => (item.id !== "training" || isLineActive("TRAINING")) && (item.id === "all" || item.id === section || sectionCounts[item.id] > 0)).map((item) => (
             <button
               type="button"
               key={item.id}

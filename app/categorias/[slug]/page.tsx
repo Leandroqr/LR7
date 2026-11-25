@@ -54,6 +54,8 @@ export default async function CategoryPage({ params }: Readonly<CategoryPageProp
 
   const categoryName = getCategoryDisplayName(category.name);
   const products = getProductsByCategorySlug(slug, await getPublicProducts());
+  // No se muestran categorías vacías (por ejemplo, las de Training mientras esa línea esté oculta).
+  if (!products.length) notFound();
 
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",

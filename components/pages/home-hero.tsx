@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState, type CSSProperties } from "react";
 import { formatCurrency } from "@/lib/products";
+import { isPublicHrefEnabled } from "@/lib/store-scope";
 import type { Product } from "@/types/ecommerce";
 import type { Database } from "@/types/database";
 
@@ -90,7 +91,9 @@ const CONTROL =
  * con movimiento reducido no hay animación, así que el carrusel no avanza solo (WCAG 2.2.2).
  */
 export function HomeHero({ products, slides: cmsSlides, customPrice }: Readonly<{ products: Product[]; slides?: CmsSlide[]; customPrice: number }>) {
-  const slides = cmsSlides?.length ? fromCms(cmsSlides) : fromCatalog(products, customPrice);
+  // Diapositivas del CMS que enlazan a secciones ocultas (Training, Streetwear) no se muestran.
+  const visibleCmsSlides = (cmsSlides ?? []).filter((slide) => isPublicHrefEnabled(slide.cta_href));
+  const slides = visibleCmsSlides.length ? fromCms(visibleCmsSlides) : fromCatalog(products, customPrice);
   const [active, setActive] = useState(0);
   const [userPaused, setUserPaused] = useState(false);
   const [hovered, setHovered] = useState(false);
@@ -181,7 +184,7 @@ export function HomeHero({ products, slides: cmsSlides, customPrice }: Readonly<
 
       {count > 1 ? (
         <div className="absolute inset-x-0 bottom-0 z-20">
-          <div className="mx-auto flex w-full max-w-[1440px] items-center gap-4 px-4 pb-6 md:px-8 lg:pb-10">
+          <div className="home-hero-controls mx-auto flex w-full max-w-[1440px] items-center gap-4 px-4 pb-6 md:px-8 lg:pb-10 [body:has(.whatsapp-float)_&]:pr-[84px] lg:[body:has(.whatsapp-float)_&]:pr-[100px]">
             <ol className="m-0 flex flex-1 list-none items-center gap-2 p-0">
               {slides.map((slide, index) => (
                 <li key={slide.id} className="max-w-28 flex-1">

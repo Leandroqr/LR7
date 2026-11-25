@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ProductCard } from "@/components/product/product-card";
+import { isLineActive } from "@/lib/store-scope";
 import { formatCurrency } from "@/lib/products";
 import type { Product } from "@/types/ecommerce";
 
@@ -62,8 +63,11 @@ export function CollectionsExperience({ products }: Readonly<CollectionsPageProp
     (product) => product.category === "FUTBOL_CLUBES" || product.category === "FUTBOL_SELECCIONES",
     heroProduct,
   );
+  const hasRetro = football.some((product) => product.category === "FUTBOL_RETRO");
+  // Alcance comercial: Training solo aparece si su línea está activa y tiene productos; Retro, si hay retro.
+  const showTraining = isLineActive("TRAINING") && training.length > 0;
   const trainingProduct = training[0] ?? heroProduct;
-  const collections: EditorialCollection[] = [
+  const allCollections: EditorialCollection[] = [
     {
       id: "season",
       eyebrow: "01 / RECIÉN LLEGADAS",
@@ -101,6 +105,7 @@ export function CollectionsExperience({ products }: Readonly<CollectionsPageProp
       product: trainingProduct,
     },
   ];
+  const collections = allCollections.filter((collection) => (collection.id !== "training" || showTraining) && (collection.id !== "retro" || hasRetro));
 
   // UX8: sin aparición por secciones (DESIGN.md, sección Motion: prohibida); el contenido está visible desde el principio.
 
@@ -124,7 +129,7 @@ export function CollectionsExperience({ products }: Readonly<CollectionsPageProp
         <div className="collections-hero-copy">
           <p>LR7 / NOVEDADES</p>
           <h1 className="font-display">LLEGÓ LA<br /><span>NUEVA TEMPORADA.</span></h1>
-          <div><span>CAMISETAS DE FÚTBOL</span><span>RETRO</span><span>TRAINING</span></div>
+          <div><span>CAMISETAS DE FÚTBOL</span>{hasRetro ? <span>RETRO</span> : null}{showTraining ? <span>TRAINING</span> : null}</div>
           <Link href="#new-arrivals" className="collections-primary-cta">
             EXPLORAR NOVEDADES
           </Link>
@@ -137,8 +142,8 @@ export function CollectionsExperience({ products }: Readonly<CollectionsPageProp
       <nav className="collections-quick-nav" aria-label="Explorar novedades">
         <span>NOVEDADES</span>
         <Link href="/futbol">FÚTBOL</Link>
-        <Link href="/tienda?cat=FUTBOL_RETRO">RETRO</Link>
-        <Link href="/training">TRAINING</Link>
+        {hasRetro ? <Link href="/tienda?cat=FUTBOL_RETRO">RETRO</Link> : null}
+        {showTraining ? <Link href="/training">TRAINING</Link> : null}
         <Link href="/tienda">TIENDA</Link>
       </nav>
 
@@ -192,7 +197,7 @@ export function CollectionsExperience({ products }: Readonly<CollectionsPageProp
       <section className="collections-explore" aria-labelledby="collections-explore-title">
         <header className="collections-section-heading">
           <div><p>03 / COLECCIONES</p><h2 id="collections-explore-title" className="font-display">EXPLORA<br /><span>EL LANZAMIENTO.</span></h2></div>
-          <div><p>Cuatro formas de entrar al universo LR7. El fútbol dirige; Training acompaña.</p></div>
+          <div><p>Entra al universo LR7 por temporada, por época o por equipo.</p></div>
         </header>
         <div className="collections-editorial-grid">
           {collections.map((collection) => (

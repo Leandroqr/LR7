@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { STREETWEAR_ENABLED } from "@/lib/store-scope";
 import { StreetwearExperience } from "@/components/pages/streetwear-page";
 import { getPublicProducts } from "@/lib/catalog";
 import { serializeJsonLd } from "@/lib/seo";
@@ -26,6 +28,8 @@ export const metadata: Metadata = {
 };
 
 export default async function StreetwearPage() {
+  // Sección editorial oculta por ahora: se activa con NEXT_PUBLIC_STREETWEAR_ENABLED=true.
+  if (!STREETWEAR_ENABLED) notFound();
   const products = await getPublicProducts();
   const footballProducts = products.filter((product) => product.brand === "FUTBOL");
   const baseUrl = SITE_CONFIG.baseUrl.replace(/\/$/, "");
