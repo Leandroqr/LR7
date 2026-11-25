@@ -80,6 +80,7 @@ export const SOCIAL_LINKS: ReadonlyArray<{ id: "instagram" | "tiktok"; label: st
 
 // Medios de pago: los confirmados en producción (NEXT_PUBLIC_PAYMENT_METHODS=card,pse,nequi,bancolombia,addi);
 // sin configurar, los marcadores temporales con el aviso de que el pago en línea aún no está activo.
+// Todos se cobran a través de Wompi, Addi incluido (confirmado por el dueño, 2026-11-25).
 const PAYMENT_METHOD_LABELS = {
   card: "Tarjeta de crédito o débito",
   pse: "PSE",

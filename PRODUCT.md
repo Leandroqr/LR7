@@ -49,6 +49,7 @@ Lo que LR7 comunica y otra tienda no puede copiar tal cual es la combinación de
   - Sin número de WhatsApp, el botón flotante y el CTA del pie llevan a `/contacto` y dicen "Contáctanos".
   - Instagram y TikTok enlazan a la portada de cada red.
   - Tarjeta, PSE, Nequi y Addi aparecen con el aviso "Pago en línea próximamente".
+  - Todos los medios de pago, Addi incluido, se cobran a través de Wompi (confirmado por el dueño, 2026-11-25); no hace falta otra integración ni cambiar el checkout.
   - Nunca se escribe un número, un perfil ni un medio de pago inventado que pueda ser de otra persona. Al configurar las variables reales, los marcadores desaparecen solos.
 - **Legal (2026-11-24):** los documentos legales se cargan desde el admin y solo se publican cuando tienen texto. Ver `docs/LEGAL_PENDIENTE.md` para los datos que faltan y lo que requiere aprobación.
 
