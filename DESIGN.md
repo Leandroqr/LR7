@@ -360,10 +360,17 @@ Envío, cambios y pago con datos reales del CMS (nunca inventados), en body smal
   - Todo en español, según la tabla aprobada de `docs/PROPUESTA_COPY_A6.md`.
   - Sin aparición por secciones ni flechas añadidas al texto.
   - La cinta de Streetwear es fija. Las entradas del hero usan `--duration-hero` y `--ease-out`.
-- **Pie:**
-  - Columnas Tienda, Ayuda y LR7. Los enlaces del CMS van a su columna según su dirección, sin repetirse.
-  - Muestra envíos, cambios y personalización, y WhatsApp solo si hay número configurado.
-  - No muestra medios de pago ni datos legales mientras sigan sin definirse (`PRODUCT.md` → Decisiones abiertas).
+- **Pie (2026-11-24):**
+  - Fondo noche y cinco columnas: marca, Tienda, Servicio al cliente, Síguenos y Medios de pago.
+  - Tienda solo enlaza camisetas de fútbol y categorías con productos. Los enlaces extra del CMS se añaden a Servicio al cliente sin repetirse.
+  - Síguenos (Instagram y TikTok) y Medios de pago solo aparecen si están configurados (`NEXT_PUBLIC_INSTAGRAM_URL`, `NEXT_PUBLIC_TIKTOK_URL` y `NEXT_PUBLIC_PAYMENT_METHODS`).
+  - La franja inferior lleva los documentos legales publicados, el enlace a la SIC y el copyright.
+  - Sin el lema en inglés.
+- **Botón flotante de WhatsApp:**
+  - Círculo noche de 52 px con el icono verde y borde claro fino, abajo a la derecha (16 px en móvil, 24 px en escritorio).
+  - En escritorio, al pasar el ratón sube 2 px y muestra "Escríbenos por WhatsApp"; se pulsa con escala 0,94.
+  - Queda por debajo del menú móvil y oculto donde hay una barra de compra fija (ficha y carrito en móvil). Los controles del hero y el final del pie le reservan su esquina.
+  - Solo se pinta con un número válido.
 
 ## Pulido final (UX9, 2026-11-24)
 

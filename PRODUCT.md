@@ -29,6 +29,11 @@ Lo que LR7 comunica y otra tienda no puede copiar tal cual es la combinación de
 ## Operating Context
 
 - **Líneas de producto:** Fútbol (clubes, selecciones y retro, todo como diseño inspirado) y Training (camisetas, camisillas, pantalonetas, buzos y conjuntos).
+- **Alcance comercial actual (decisión del dueño, 2026-11-24):** LR7 vende **solo camisetas de fútbol** (clubes, selecciones y retro).
+  - Training y Streetwear se conservan completos, pero no se muestran en ningún sitio público: menú, home, pie, filtros, búsqueda, fichas, sitemap ni WhatsApp.
+  - `/training` y `/streetwear` responden 404, igual que las categorías sin productos.
+  - Se activan sin tocar código, con `NEXT_PUBLIC_STORE_LINES=FUTBOL,TRAINING` y `NEXT_PUBLIC_STREETWEAR_ENABLED=true` (`lib/store-scope.ts`).
+  - El lema "FOOTBALL FIRST. PREMIUM STYLE." sigue siendo interno: no se muestra en el sitio.
 - **Streetwear:** no es una línea de producto. Es una sección editorial sobre cómo llevar las camisetas de fútbol fuera de la cancha y combinarlas.
 - **Compra:**
   - Carrito en el navegador y checkout con Wompi (precio, stock, cupón y envío se recalculan en el servidor).
@@ -39,7 +44,8 @@ Lo que LR7 comunica y otra tienda no puede copiar tal cual es la combinación de
   - Cambios dentro de 5 días hábiles.
   - Las camisetas personalizadas no aplican para cambio, salvo defecto de fábrica.
 - **Tallas:** S a XXL, con guía de medidas en centímetros (pecho, largo, hombro).
-- **Atención:** WhatsApp previsto como canal principal (pendiente de configurar el número).
+- **Atención:** WhatsApp previsto como canal principal (pendiente de configurar el número). El botón flotante y los enlaces aparecen solos cuando se define `NEXT_PUBLIC_WHATSAPP_NUMBER`.
+- **Legal (2026-11-24):** los documentos legales se cargan desde el admin y solo se publican cuando tienen texto. Ver `docs/LEGAL_PENDIENTE.md` para los datos que faltan y lo que requiere aprobación.
 
 ## Capabilities and Constraints
 
