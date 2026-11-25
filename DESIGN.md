@@ -366,11 +366,14 @@ Envío, cambios y pago con datos reales del CMS (nunca inventados), en body smal
   - Síguenos (Instagram y TikTok) y Medios de pago solo aparecen si están configurados (`NEXT_PUBLIC_INSTAGRAM_URL`, `NEXT_PUBLIC_TIKTOK_URL` y `NEXT_PUBLIC_PAYMENT_METHODS`).
   - La franja inferior lleva los documentos legales publicados, el enlace a la SIC y el copyright.
   - Sin el lema en inglés.
-- **Botón flotante de WhatsApp:**
-  - Círculo noche de 52 px con el icono verde y borde claro fino, abajo a la derecha (16 px en móvil, 24 px en escritorio).
-  - En escritorio, al pasar el ratón sube 2 px y muestra "Escríbenos por WhatsApp"; se pulsa con escala 0,94.
-  - Queda por debajo del menú móvil y oculto donde hay una barra de compra fija (ficha y carrito en móvil). Los controles del hero y el final del pie le reservan su esquina.
-  - Solo se pinta con un número válido.
+- **Franja de atención (CTA A):**
+  - Al inicio del pie, en navy, con el titular "¿Dudas con tu talla o tu pedido?".
+  - Botón principal "ESCRÍBENOS POR WHATSAPP", o "CONTÁCTANOS" hacia `/contacto` si no hay número, y botón secundario "PREGUNTAS FRECUENTES".
+- **Botón flotante de atención (CTA B):**
+  - En móvil, círculo noche de 52 px con el icono verde; en escritorio, píldora con la etiqueta visible "¿Te ayudamos?". Borde claro fino y sombra ligera.
+  - En escritorio, al pasar el ratón sube 2 px; se pulsa con escala 0,96.
+  - Queda por debajo del menú móvil y oculto donde hay una barra de compra fija (ficha y carrito en móvil). Los controles del hero y el final del pie le reservan su esquina: 84 px en móvil y 220 px en escritorio.
+  - Sin número de WhatsApp lleva a `/contacto`.
 
 ## Pulido final (UX9, 2026-11-24)
 

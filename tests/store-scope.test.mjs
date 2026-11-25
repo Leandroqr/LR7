@@ -42,7 +42,13 @@ test("WhatsApp: contextual messages, no number invented, no link when it is not 
   // lib/site.ts importa ./site-url sin extensión (no se resuelve con strip-types): se comprueba su código.
   const site = readFileSync("lib/site.ts", "utf8");
   assert.match(site, /if \(!isWhatsAppConfigured\(\)\) return null;/, "sin número no hay enlace");
-  assert.match(site, /=> link\.url !== null\);/, "sin URL no hay enlace social");
+  // Datos temporales seguros (2026-11-24): sin URL, cada red enlaza a su portada, nunca a un perfil inventado;
+  // sin número de WhatsApp, los botones llevan a /contacto; sin medios confirmados, aviso "próximamente".
+  assert.match(site, /PLACEHOLDER_SOCIAL = \{ instagram: "https:\/\/www\.instagram\.com\/", tiktok: "https:\/\/www\.tiktok\.com\/" \}/);
+  assert.match(site, /PLACEHOLDER_CONTACT_HREF = "\/contacto"/);
+  assert.doesNotMatch(site, /wa\.me\/\d/, "ningún número de WhatsApp escrito en el código");
+  assert.match(readFileSync("components/layout/footer.tsx", "utf8"), /PAYMENT_METHODS_PLACEHOLDER \? "Pago en línea próximamente\." : "Pagos procesados por Wompi\."/);
+  assert.match(readFileSync("components/layout/support-band.tsx", "utf8"), /support\.whatsapp \?/, "el CTA solo promete WhatsApp si hay número");
   assert.match(site, /hosts\.includes\(url\.hostname\)/, "solo perfiles del dominio de cada red");
   assert.match(site, /process\.env\.NEXT_PUBLIC_PAYMENT_METHODS \?\? ""/, "sin configuración, ningún medio de pago");
   assert.match(readFileSync("components/commerce/whatsapp-link.tsx", "utf8"), /if \(!whatsappUrl\) return null;/);

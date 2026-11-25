@@ -4129,19 +4129,22 @@ input:disabled {
   }
 }
 
-/* Botón flotante de WhatsApp (2026-11-24). Discreto: círculo noche de 52 px con el icono verde reconocible,
-   por debajo del menú móvil (z-index 80 < 90) y oculto donde hay una barra de compra fija (ficha y carrito
-   en móvil). Solo se pinta si NEXT_PUBLIC_WHATSAPP_NUMBER es válido (components/commerce/whatsapp-link.tsx). */
+/* Botón flotante de atención (CTA B, 2026-11-24). Móvil: círculo noche de 52 px con el icono verde.
+   Escritorio: píldora con la etiqueta visible "¿Te ayudamos?". Queda por debajo del menú móvil (z-index 80 < 90)
+   y oculto donde hay una barra de compra fija (ficha y carrito en móvil). Sin número de WhatsApp lleva a
+   /contacto (marcador temporal, lib/site.ts). */
 .whatsapp-float {
   position: fixed;
   right: max(16px, env(safe-area-inset-right));
   bottom: max(16px, env(safe-area-inset-bottom));
   z-index: 80;
-  display: grid;
-  place-items: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   width: 52px;
   height: 52px;
-  border-radius: 50%;
+  border-radius: 26px;
   border: 1px solid rgba(255, 255, 255, 0.18);
   background: var(--color-night);
   color: #25d366;
@@ -4149,44 +4152,22 @@ input:disabled {
   text-decoration: none;
   transition: transform var(--duration-press) var(--ease-out), box-shadow var(--duration-state) ease, background-color var(--duration-state) ease;
 }
-.whatsapp-float svg { width: 26px; height: 26px; }
-.whatsapp-float:active { transform: scale(0.94); }
+.whatsapp-float svg { flex: none; width: 26px; height: 26px; }
+.whatsapp-float-label { display: none; color: var(--color-white); font-family: var(--font-body), sans-serif; font-size: var(--text-body-sm); font-weight: 600; white-space: nowrap; }
+.whatsapp-float:active { transform: scale(0.96); }
 .whatsapp-float:focus-visible { outline: 3px solid var(--color-action); outline-offset: 3px; }
-.whatsapp-float-tooltip {
-  position: absolute;
-  top: 50%;
-  right: calc(100% + 10px);
-  padding: 8px 12px;
-  border-radius: var(--radius-button);
-  background: var(--color-night);
-  color: var(--color-white);
-  font-family: var(--font-body), sans-serif;
-  font-size: var(--text-body-sm);
-  font-weight: 600;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transform: translate(4px, -50%);
-  transition: opacity 150ms ease, transform var(--duration-state) var(--ease-out);
-}
-.whatsapp-float:focus-visible .whatsapp-float-tooltip { opacity: 1; transform: translate(0, -50%); }
 @media (hover: hover) and (pointer: fine) {
   .whatsapp-float:hover { background: var(--color-navy); box-shadow: 0 10px 24px rgba(7, 20, 38, 0.28); }
-  .whatsapp-float:hover .whatsapp-float-tooltip { opacity: 1; transform: translate(0, -50%); }
 }
 @media (min-width: 901px) {
-  .whatsapp-float { right: max(24px, env(safe-area-inset-right)); bottom: max(24px, env(safe-area-inset-bottom)); }
-}
-@media (max-width: 600px) {
-  .whatsapp-float-tooltip { display: none; }
+  .whatsapp-float { right: max(24px, env(safe-area-inset-right)); bottom: max(24px, env(safe-area-inset-bottom)); width: auto; padding: 0 20px 0 14px; }
+  .whatsapp-float-label { display: inline; }
 }
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   .whatsapp-float:hover { transform: translateY(-2px); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .whatsapp-float:active,
-  .whatsapp-float-tooltip { transform: none !important; }
-  .whatsapp-float-tooltip { top: auto; bottom: calc(100% + 8px); right: 0; }
+  .whatsapp-float:active { transform: none; }
 }
 
 /* Cart */

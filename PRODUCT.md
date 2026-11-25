@@ -45,6 +45,11 @@ Lo que LR7 comunica y otra tienda no puede copiar tal cual es la combinación de
   - Las camisetas personalizadas no aplican para cambio, salvo defecto de fábrica.
 - **Tallas:** S a XXL, con guía de medidas en centímetros (pecho, largo, hombro).
 - **Atención:** WhatsApp previsto como canal principal (pendiente de configurar el número). El botón flotante y los enlaces aparecen solos cuando se define `NEXT_PUBLIC_WHATSAPP_NUMBER`.
+- **Datos temporales (decisión del dueño, 2026-11-24):** hasta tener los reales, la tienda muestra marcadores seguros, definidos en un solo bloque de `lib/site.ts`:
+  - Sin número de WhatsApp, el botón flotante y el CTA del pie llevan a `/contacto` y dicen "Contáctanos".
+  - Instagram y TikTok enlazan a la portada de cada red.
+  - Tarjeta, PSE, Nequi y Addi aparecen con el aviso "Pago en línea próximamente".
+  - Nunca se escribe un número, un perfil ni un medio de pago inventado que pueda ser de otra persona. Al configurar las variables reales, los marcadores desaparecen solos.
 - **Legal (2026-11-24):** los documentos legales se cargan desde el admin y solo se publican cuando tienen texto. Ver `docs/LEGAL_PENDIENTE.md` para los datos que faltan y lo que requiere aprobación.
 
 ## Capabilities and Constraints

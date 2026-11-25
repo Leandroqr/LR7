@@ -41,8 +41,26 @@ export const COMPANY = {
   currency: "COP" as const,
 };
 
-// Redes sociales (2026-11-24): solo se enlazan si la URL está configurada y es un perfil del dominio correcto.
-// Nunca se inventa un perfil.
+// ============================================================================================================
+// DATOS TEMPORALES (decisión del dueño, 2026-11-24). Mientras no estén los reales, la tienda muestra
+// marcadores SEGUROS: nunca un número ni un perfil inventado que pueda ser de otra persona.
+// - WhatsApp sin número: los botones llevan a /contacto.
+// - Redes sin URL: cada icono lleva a la portada de su red.
+// - Medios de pago sin confirmar: tarjeta, PSE, Nequi y Addi con el aviso "Pago en línea próximamente".
+// Para poner los reales, definir en Vercel (o aquí) NEXT_PUBLIC_WHATSAPP_NUMBER, NEXT_PUBLIC_INSTAGRAM_URL,
+// NEXT_PUBLIC_TIKTOK_URL y NEXT_PUBLIC_PAYMENT_METHODS: en cuanto existen, sustituyen a los marcadores.
+// ============================================================================================================
+export const PLACEHOLDER_CONTACT_HREF = "/contacto";
+const PLACEHOLDER_SOCIAL = { instagram: "https://www.instagram.com/", tiktok: "https://www.tiktok.com/" } as const;
+const PLACEHOLDER_PAYMENT_METHODS = ["card", "pse", "nequi", "addi"] as const;
+
+/** Enlace de atención: WhatsApp con el mensaje si hay número; si no, la página de contacto (temporal). */
+export function getSupportLink(message: string): { href: string; external: boolean; whatsapp: boolean } {
+  const whatsappUrl = getWhatsAppUrl(message);
+  return whatsappUrl ? { href: whatsappUrl, external: true, whatsapp: true } : { href: PLACEHOLDER_CONTACT_HREF, external: false, whatsapp: false };
+}
+
+// Redes sociales: la URL configurada si es un perfil del dominio correcto; si no, el marcador temporal.
 function profileUrl(value: string | undefined, hosts: readonly string[]) {
   try {
     const url = new URL(value ?? "");
@@ -52,22 +70,28 @@ function profileUrl(value: string | undefined, hosts: readonly string[]) {
   }
 }
 
-export const SOCIAL_LINKS = [
-  { id: "instagram", label: "Instagram", url: profileUrl(process.env.NEXT_PUBLIC_INSTAGRAM_URL, ["instagram.com", "www.instagram.com"]) },
-  { id: "tiktok", label: "TikTok", url: profileUrl(process.env.NEXT_PUBLIC_TIKTOK_URL, ["tiktok.com", "www.tiktok.com"]) },
-].filter((link): link is { id: "instagram" | "tiktok"; label: string; url: string } => link.url !== null);
+const instagramUrl = profileUrl(process.env.NEXT_PUBLIC_INSTAGRAM_URL, ["instagram.com", "www.instagram.com"]);
+const tiktokUrl = profileUrl(process.env.NEXT_PUBLIC_TIKTOK_URL, ["tiktok.com", "www.tiktok.com"]);
 
-// Medios de pago: solo los que el dueño confirme como habilitados en su cuenta de Wompi en producción
-// (NEXT_PUBLIC_PAYMENT_METHODS=card,pse,nequi,bancolombia). Vacío: el pie no muestra medios de pago.
+export const SOCIAL_LINKS: ReadonlyArray<{ id: "instagram" | "tiktok"; label: string; url: string; placeholder: boolean }> = [
+  { id: "instagram", label: "Instagram", url: instagramUrl ?? PLACEHOLDER_SOCIAL.instagram, placeholder: !instagramUrl },
+  { id: "tiktok", label: "TikTok", url: tiktokUrl ?? PLACEHOLDER_SOCIAL.tiktok, placeholder: !tiktokUrl },
+];
+
+// Medios de pago: los confirmados en producción (NEXT_PUBLIC_PAYMENT_METHODS=card,pse,nequi,bancolombia,addi);
+// sin configurar, los marcadores temporales con el aviso de que el pago en línea aún no está activo.
 const PAYMENT_METHOD_LABELS = {
   card: "Tarjeta de crédito o débito",
   pse: "PSE",
   nequi: "Nequi",
   bancolombia: "Botón Bancolombia",
+  addi: "Addi",
 } as const;
 
-export const PAYMENT_METHODS = (process.env.NEXT_PUBLIC_PAYMENT_METHODS ?? "")
+const configuredPaymentMethods = (process.env.NEXT_PUBLIC_PAYMENT_METHODS ?? "")
   .split(",")
   .map((value) => value.trim().toLowerCase())
-  .filter((value): value is keyof typeof PAYMENT_METHOD_LABELS => value in PAYMENT_METHOD_LABELS)
-  .map((id) => ({ id, label: PAYMENT_METHOD_LABELS[id] }));
+  .filter((value): value is keyof typeof PAYMENT_METHOD_LABELS => value in PAYMENT_METHOD_LABELS);
+
+export const PAYMENT_METHODS_PLACEHOLDER = configuredPaymentMethods.length === 0;
+export const PAYMENT_METHODS = (PAYMENT_METHODS_PLACEHOLDER ? [...PLACEHOLDER_PAYMENT_METHODS] : configuredPaymentMethods).map((id) => ({ id, label: PAYMENT_METHOD_LABELS[id] }));

@@ -3,7 +3,8 @@ import type { ReactNode } from "react";
 import { useSiteScope } from "@/components/providers/site-scope-context";
 import type { NavigationItem } from "@/lib/content";
 import { legalHref, SIC_URL } from "@/lib/legal-pages";
-import { getWhatsAppUrl, PAYMENT_METHODS, SITE_CONFIG, SOCIAL_LINKS } from "@/lib/site";
+import { PAYMENT_METHODS, PAYMENT_METHODS_PLACEHOLDER, SITE_CONFIG, SOCIAL_LINKS } from "@/lib/site";
+import { SupportBand } from "@/components/layout/support-band";
 
 type FooterLink = { label: string; href: string };
 
@@ -89,10 +90,9 @@ export function Footer({ navigation }: Readonly<{ navigation: NavigationItem[] }
   const serviceLegal = legalPages.filter((page) => SERVICE_LEGAL_SLUGS.has(page.slug)).map((page) => ({ label: page.label, href: legalHref(page) }));
   const serviceLinks = mergeFooterLinks([...SERVICE_LINKS, ...serviceLegal], cmsLinks, shopPaths);
   const bottomLegal = legalPages.filter((page) => !SERVICE_LEGAL_SLUGS.has(page.slug));
-  const whatsappUrl = getWhatsAppUrl("Hola LR7, tengo una pregunta sobre sus camisetas.");
-
   return (
     <footer className="bg-night text-white">
+      <SupportBand />
       <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-4 pt-14 pb-10 md:grid-cols-2 md:px-8 lg:grid-cols-[1.4fr_repeat(4,1fr)] lg:gap-10 lg:pt-16">
         <div className="grid content-start gap-4">
           <Link href="/" className="font-display inline-flex min-h-11 min-w-11 w-fit items-center text-[1.75rem] font-black tracking-[0.06em] text-white no-underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-action-on-dark" aria-label="LR7, ir al inicio">
@@ -102,11 +102,6 @@ export function Footer({ navigation }: Readonly<{ navigation: NavigationItem[] }
           <Link href="/tienda" className="inline-flex min-h-11 w-fit items-center text-body-sm font-semibold text-action-on-dark underline underline-offset-4 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-action-on-dark">
             Ver las camisetas
           </Link>
-          {whatsappUrl ? (
-            <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 w-fit items-center text-body-sm text-white/75 underline underline-offset-4 hover:text-white focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-action-on-dark">
-              Escríbenos por WhatsApp
-            </a>
-          ) : null}
         </div>
 
         <LinkColumn title="Tienda" links={shopLinks} />
@@ -122,7 +117,7 @@ export function Footer({ navigation }: Readonly<{ navigation: NavigationItem[] }
                     href={social.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label={`${social.label} de LR7 (se abre en una pestaña nueva)`}
+                    aria-label={social.placeholder ? `${social.label} (se abre en una pestaña nueva)` : `${social.label} de LR7 (se abre en una pestaña nueva)`}
                     className="grid size-11 place-items-center rounded-full border border-solid border-white/20 text-white transition-colors duration-200 hover:border-white/60 hover:bg-white/10 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-action-on-dark [&>svg]:size-5"
                   >
                     {ICONS[social.id]}
@@ -141,13 +136,14 @@ export function Footer({ navigation }: Readonly<{ navigation: NavigationItem[] }
                 <li key={method.id} className="rounded-button border border-solid border-white/20 px-3 py-1.5 text-caption font-semibold text-white">{method.label}</li>
               ))}
             </ul>
-            <p className="m-0 mt-3 text-caption text-white/60">Pagos procesados por Wompi.</p>
+            {/* Mientras el checkout no esté activo en producción no se promete que ya se pueda pagar en línea. */}
+            <p className="m-0 mt-3 text-caption text-white/60">{PAYMENT_METHODS_PLACEHOLDER ? "Pago en línea próximamente." : "Pagos procesados por Wompi."}</p>
           </div>
         ) : null}
       </div>
 
       <div className="border-0 border-t border-solid border-white/10">
-        <div className="footer-bottom mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-4 py-6 md:px-8 lg:flex-row lg:items-center lg:justify-between [body:has(.whatsapp-float)_&]:pb-[88px] lg:[body:has(.whatsapp-float)_&]:pr-[100px] lg:[body:has(.whatsapp-float)_&]:pb-6">
+        <div className="footer-bottom mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-4 py-6 md:px-8 lg:flex-row lg:items-center lg:justify-between [body:has(.whatsapp-float)_&]:pb-[88px] lg:[body:has(.whatsapp-float)_&]:pr-[220px] lg:[body:has(.whatsapp-float)_&]:pb-6">
           <ul className="m-0 flex list-none flex-wrap items-center gap-x-5 gap-y-1 p-0">
             {bottomLegal.map((page) => (
               <li key={page.slug}><Link href={legalHref(page)} className={`${LINK} inline-flex min-h-11 items-center text-caption`}>{page.label}</Link></li>
