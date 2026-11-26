@@ -5,6 +5,7 @@ import type { NavigationItem } from "@/lib/content";
 import { legalHref, SIC_URL } from "@/lib/legal-pages";
 import { PAYMENT_METHODS, PAYMENT_METHODS_PLACEHOLDER, SITE_CONFIG, SOCIAL_LINKS } from "@/lib/site";
 import { SupportBand } from "@/components/layout/support-band";
+import { CONSENT_OPEN_EVENT, isAnalyticsConfigured } from "@/lib/analytics";
 
 type FooterLink = { label: string; href: string };
 
@@ -148,6 +149,13 @@ export function Footer({ navigation }: Readonly<{ navigation: NavigationItem[] }
             {bottomLegal.map((page) => (
               <li key={page.slug}><Link href={legalHref(page)} className={`${LINK} inline-flex min-h-11 items-center text-caption`}>{page.label}</Link></li>
             ))}
+            {isAnalyticsConfigured() ? (
+              <li>
+                <button type="button" className={`${LINK} inline-flex min-h-11 cursor-pointer items-center border-0 bg-transparent p-0 text-caption`} onClick={() => window.dispatchEvent(new Event(CONSENT_OPEN_EVENT))}>
+                  Preferencias de cookies
+                </button>
+              </li>
+            ) : null}
             <li>
               <a href={SIC_URL} target="_blank" rel="noopener noreferrer" className={`${LINK} inline-flex min-h-11 items-center text-caption`}>
                 Superintendencia de Industria y Comercio (SIC)<span className="sr-only"> (se abre en una pestaña nueva)</span>

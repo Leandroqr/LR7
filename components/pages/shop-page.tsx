@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { TrackItemList } from "@/components/analytics/track-item-list";
 import { ProductCard } from "@/components/product/product-card";
+import { toAnalyticsItem } from "@/lib/analytics";
 import { isLineActive } from "@/lib/store-scope";
 import type { Product } from "@/types/ecommerce";
 
@@ -286,6 +288,7 @@ export function ShopPage({ products, initialCategory, initialBrand }: Readonly<S
 
             {filteredProducts.length ? (
               <>
+                <TrackItemList listId="tienda" listName="Tienda" items={filteredProducts.slice(0, visible).map((product, index) => toAnalyticsItem(product, { index }))} />
                 <div className="product-grid">
                   {filteredProducts.slice(0, visible).map((product, index) => <ProductCard key={product.id} product={product} imageLoading={index === 0 ? "eager" : "lazy"} />)}
                 </div>

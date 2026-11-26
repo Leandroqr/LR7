@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { WhatsAppLink } from "@/components/commerce/whatsapp-link";
 import { CheckoutPanel } from "@/components/commerce/checkout-panel";
 import { useSiteScope } from "@/components/providers/site-scope-context";
 import { legalHref } from "@/lib/legal-pages";
-import { type CartItem, useStore } from "@/components/providers/store-provider";
+import { type CartItem, cartLineToAnalyticsItem, useStore } from "@/components/providers/store-provider";
+import { type AnalyticsItem, trackEcommerce } from "@/lib/analytics";
 import { getItemUnitPrice } from "@/lib/cart-pricing";
 import { CUSTOM_PRICE, formatCurrency, getCategoryDisplayName, PRODUCTS } from "@/lib/products";
 import { ProductVisual } from "@/components/product/product-visual";
@@ -42,6 +43,37 @@ export default function CartPage() {
     return () => document.body.classList.remove("cart-route");
   }, []);
 
+  // Analítica: ver el carrito, empezar el checkout (primer campo del formulario) y enviar los datos de
+  // entrega. Se escucha el formulario desde aquí para no modificar el checkout (#lr7-checkout-form).
+  const analyticsItems = useRef<AnalyticsItem[]>([]);
+  const viewCartTracked = useRef(false);
+  useEffect(() => {
+    analyticsItems.current = currentCart.map((item) => cartLineToAnalyticsItem(item));
+    if (hydrated && !viewCartTracked.current && analyticsItems.current.length) {
+      viewCartTracked.current = true;
+      trackEcommerce("view_cart", analyticsItems.current);
+    }
+  });
+
+  useEffect(() => {
+    let checkoutStarted = false;
+    const isCheckoutForm = (target: EventTarget | null) => target instanceof Element && Boolean(target.closest("#lr7-checkout-form"));
+    const onFocus = (event: FocusEvent) => {
+      if (checkoutStarted || !isCheckoutForm(event.target)) return;
+      checkoutStarted = true;
+      trackEcommerce("begin_checkout", analyticsItems.current);
+    };
+    const onSubmit = (event: SubmitEvent) => {
+      if (isCheckoutForm(event.target)) trackEcommerce("add_shipping_info", analyticsItems.current);
+    };
+    document.addEventListener("focusin", onFocus);
+    document.addEventListener("submit", onSubmit, true);
+    return () => {
+      document.removeEventListener("focusin", onFocus);
+      document.removeEventListener("submit", onSubmit, true);
+    };
+  }, []);
+
   useEffect(() => {
     if (!removedItem) return;
     const timeout = window.setTimeout(() => setRemovedItem(null), 5000);
@@ -57,7 +89,7 @@ export default function CartPage() {
 
   const restoreItem = () => {
     if (!removedItem) return;
-    addToCart(removedItem);
+    addToCart(removedItem, { track: false });
     setRemovedItem(null);
   };
 

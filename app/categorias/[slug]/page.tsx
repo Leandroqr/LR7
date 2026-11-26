@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { TrackItemList } from "@/components/analytics/track-item-list";
 import { ProductCard } from "@/components/product/product-card";
+import { toAnalyticsItem } from "@/lib/analytics";
 import { PageHero } from "@/components/layout/page-hero";
 import { getPublicProducts } from "@/lib/catalog";
 import { getCategoryBySlug, getCategoryDisplayName, getProductsByCategorySlug } from "@/lib/products";
@@ -104,6 +106,7 @@ export default async function CategoryPage({ params }: Readonly<CategoryPageProp
           <p className="listing-count">
             Explora {categoryName.toLowerCase()} con diseños exclusivos, diferentes tallas y opciones para compra en Colombia.
           </p>
+          <TrackItemList listId={`categoria-${slug}`} listName={categoryName} items={products.slice(0, 30).map((product, index) => toAnalyticsItem(product, { index }))} />
           <div className="product-grid">
             {products.map((product, index) => (
               <ProductCard key={product.id} product={product} imageLoading={index === 0 ? "eager" : "lazy"} />

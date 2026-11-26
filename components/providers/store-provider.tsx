@@ -7,6 +7,9 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { toAnalyticsItem, trackEcommerce } from "@/lib/analytics";
+import { getItemUnitPrice } from "@/lib/cart-pricing";
+import { CUSTOM_PRICE } from "@/lib/products";
 import type { Product, ProductId, ProductVariant } from "@/types/ecommerce";
 
 export type CartCustomization = {
@@ -34,7 +37,15 @@ export type CartNotice = Readonly<{ id: number; item: CartItem }>;
 type AddToCartOptions = Readonly<{
   /** Abre el mini-carrito. Solo para botones de "agregar"; "comprar ahora" y "deshacer" no avisan. */
   notify?: boolean;
+  /** false para "deshacer": devolver una línea quitada no cuenta como nueva adición en la analítica. */
+  track?: boolean;
 }>;
+
+/** Línea del carrito en formato de artículo de GA4 (precio por unidad con personalización). */
+export function cartLineToAnalyticsItem(item: CartItem, quantity = item.quantity) {
+  const variant = [item.size, item.variant?.color].filter(Boolean).join(" / ");
+  return toAnalyticsItem(item.product, { price: getItemUnitPrice(item, CUSTOM_PRICE), quantity, variant: variant || undefined });
+}
 
 type StoreContextValue = {
   cart: CartItem[];
@@ -89,6 +100,7 @@ export function StoreProvider({ children }: Readonly<{ children: ReactNode }>) {
 
   const addToCart = (item: CartItem, options?: AddToCartOptions) => {
     if (options?.notify) setCartNotice((current) => ({ id: (current?.id ?? 0) + 1, item }));
+    if (options?.track !== false) trackEcommerce("add_to_cart", [cartLineToAnalyticsItem(item)]);
     setCart((previous) => {
       const existingIndex = previous.findIndex(
         (entry) =>
@@ -115,6 +127,8 @@ export function StoreProvider({ children }: Readonly<{ children: ReactNode }>) {
   };
 
   const removeFromCart = (index: number) => {
+    const removed = cart[index];
+    if (removed) trackEcommerce("remove_from_cart", [cartLineToAnalyticsItem(removed)]);
     setCart((previous) => previous.filter((_, current) => current !== index));
   };
 
@@ -122,6 +136,12 @@ export function StoreProvider({ children }: Readonly<{ children: ReactNode }>) {
     if (quantity < 1) {
       removeFromCart(index);
       return;
+    }
+
+    const current = cart[index];
+    if (current && quantity !== current.quantity) {
+      const difference = quantity - current.quantity;
+      trackEcommerce(difference > 0 ? "add_to_cart" : "remove_from_cart", [cartLineToAnalyticsItem(current, Math.abs(difference))]);
     }
 
     setCart((previous) => {

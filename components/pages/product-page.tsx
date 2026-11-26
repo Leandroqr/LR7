@@ -10,6 +10,7 @@ import { sanitizeDorsalName, sanitizeDorsalNumber } from "@/lib/dorsal";
 import { jerseyNumberFor, jerseyPaletteFor } from "@/lib/product-visual";
 import { isWhatsAppConfigured, SITE_CONFIG } from "@/lib/site";
 import { getProductWhatsAppMessage } from "@/lib/whatsapp";
+import { toAnalyticsItem, trackEcommerce } from "@/lib/analytics";
 import { WhatsAppLink } from "@/components/commerce/whatsapp-link";
 import { useStore } from "@/components/providers/store-provider";
 import { DorsalJersey, JERSEY_PALETTES } from "@/components/graphics/dorsal-jersey";
@@ -52,6 +53,10 @@ export function ProductPage({ product, relatedProducts, purchaseInfo = [], sizeG
   const [customNumber, setCustomNumber] = useState("");
   const [added, setAdded] = useState(false);
   const { addToCart } = useStore();
+
+  useEffect(() => {
+    trackEcommerce("view_item", [toAnalyticsItem(product)]);
+  }, [product]);
 
   useEffect(() => {
     document.body.classList.add("product-detail-route");

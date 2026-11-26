@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getPublicProducts } from "@/lib/catalog";
+import { TrackItemList } from "@/components/analytics/track-item-list";
 import { ProductCard } from "@/components/product/product-card";
+import { toAnalyticsItem } from "@/lib/analytics";
 
 export const metadata: Metadata = {
   title: "Buscar",
@@ -49,6 +51,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     resultsContent = (
       <>
         <p className="listing-count">{results.length} {results.length === 1 ? "resultado" : "resultados"}</p>
+        <TrackItemList listId="busqueda" listName="Búsqueda" items={results.slice(0, 30).map((product, index) => toAnalyticsItem(product, { index }))} />
         <div className="product-grid">
           {results.map((product, index) => (
             <ProductCard key={product.id} product={product} imageLoading={index === 0 ? "eager" : "lazy"} />

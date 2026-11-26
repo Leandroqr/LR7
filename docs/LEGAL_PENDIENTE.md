@@ -55,3 +55,12 @@ El enlace a la Superintendencia de Industria y Comercio (https://www.sic.gov.co/
 - **PQR con constancia:** dejar constancia de cada solicitud (número de radicado y seguimiento) necesita guardar las solicitudes. Opciones: una tabla nueva en Supabase (migración) o un servicio de correo. Hoy solo hay contacto por WhatsApp, que no deja radicado.
 - **Correo de confirmación del pedido:** no hay proveedor de correo configurado.
 - **Registro Nacional de Bases de Datos:** comprobar con el abogado si LR7 está obligada a inscribirse.
+
+## Cookies de analítica (2026-11-26)
+
+Con `NEXT_PUBLIC_GA_MEASUREMENT_ID` configurado, la tienda muestra un aviso de cookies y solo carga Google Analytics si el visitante acepta. "Rechazar" y "Aceptar" tienen el mismo peso, la decisión se puede cambiar en "Preferencias de cookies" (pie) y la publicidad personalizada queda desactivada.
+
+Pendiente de revisión legal:
+- **Texto del aviso** (`components/analytics/analytics.tsx`): "Con tu permiso usamos Google Analytics para saber cómo se usa la tienda y mejorarla. No las activamos si no aceptas." Es un borrador, no un texto aprobado.
+- **Aviso de privacidad / política de tratamiento:** deben mencionar Google Analytics como encargado (Google LLC, transferencia internacional a EE. UU.), la finalidad (estadística), los datos (identificador del navegador, páginas vistas, dispositivo, ubicación aproximada) y cómo retirar el consentimiento. Cuando se publique, el aviso enlaza al documento automáticamente.
+- **Retención de datos** en Google Analytics (Administrar → Recopilación y conservación de datos): fijarla según lo que diga la política.
