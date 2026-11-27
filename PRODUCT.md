@@ -54,7 +54,7 @@ Lo que LR7 comunica y otra tienda no puede copiar tal cual es la combinación de
 - **Analítica (2026-11-26):**
   - Google Analytics 4 con los eventos estándar de ecommerce: listados, ficha, carrito, inicio del pago y envío de datos de entrega (`lib/analytics.ts`).
   - Solo se activa con `NEXT_PUBLIC_GA_MEASUREMENT_ID` y solo para quien acepta las cookies; sin publicidad personalizada.
-  - `purchase` (compra confirmada) queda pendiente: se envía desde la página de estado del pedido, que es parte del checkout y requiere aprobación.
+  - `purchase` (compra confirmada, aprobado el 2026-11-26): se envía desde la página de estado del pedido cuando el servidor confirma el pago (paid, processing, shipped o delivered), una sola vez por pedido y navegador. `transaction_id` es el número de pedido y `item_id` es el SKU de la variante.
   - El admin tiene "Métricas": el embudo de pago calculado con los pedidos de Supabase (iniciados, pagados, rechazados, abandonados, en curso) y la lista de pagos sin completar con los datos de contacto.
 - **Legal (2026-11-24):** los documentos legales se cargan desde el admin y solo se publican cuando tienen texto. Ver `docs/LEGAL_PENDIENTE.md` para los datos que faltan y lo que requiere aprobación.
 

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { CONSENT_STORAGE_KEY, itemsValue, parseConsent, parseMeasurementId, toAnalyticsItem, trackEcommerce } from "../lib/analytics.ts";
+import { buildPurchaseEvent, CONSENT_STORAGE_KEY, itemsValue, parseConsent, parseMeasurementId, toAnalyticsItem, trackEcommerce, trackPurchase } from "../lib/analytics.ts";
 import { classifyOrder, periodStart, summarizeCheckoutFunnel } from "../lib/admin/checkout-funnel.ts";
 
 test("GA4: only a well-formed measurement ID enables analytics; consent is an explicit choice", () => {
@@ -71,4 +71,43 @@ test("admin funnel classifies orders without new schema", () => {
   assert.equal(summary.abandonmentRate, 3 / 5);
   assert.equal(summarizeCheckoutFunnel([], new Set(), now).conversionRate, null);
   assert.equal(periodStart("7", now).toISOString(), "2026-11-19T12:00:00.000Z");
+});
+
+test("GA4 purchase: only for orders the server confirmed as paid, once per order", () => {
+  const order = { number: "LR7-0001", status: "paid", total: 393000, shipping: 15000, discount: 0, currency: "COP" };
+  const lines = [{ product_name: "Colombia Local", sku: "colombia-local-M", size: "M", color: null, quantity: 2, unit_price: 189000 }];
+  assert.deepEqual(buildPurchaseEvent(order, lines), {
+    transaction_id: "LR7-0001", currency: "COP", value: 393000, shipping: 15000,
+    items: [{ item_id: "colombia-local-M", item_name: "Colombia Local", item_brand: "LR7", price: 189000, quantity: 2, item_variant: "M" }],
+  });
+  assert.equal(buildPurchaseEvent({ ...order, discount: 5000 }, lines).discount, 5000);
+  for (const status of ["pending", "payment_pending", "cancelled", "refunded"]) {
+    assert.equal(buildPurchaseEvent({ ...order, status }, lines), null, `${status} no es una compra`);
+  }
+  for (const status of ["processing", "shipped", "delivered"]) assert.ok(buildPurchaseEvent({ ...order, status }, lines));
+  assert.equal(buildPurchaseEvent(order, []), null);
+  assert.doesNotThrow(() => trackPurchase(order, lines), "sin navegador no hace nada");
+  assert.match(readFileSync("components/commerce/order-status-client.tsx", "utf8"), /trackPurchase\(data\.order, data\.items\)/);
+});
+
+test("GA4 purchase is sent once per order and only with gtag loaded", () => {
+  const calls = [];
+  const store = new Map();
+  globalThis.window = {};
+  globalThis.localStorage = { getItem: (k) => store.get(k) ?? null, setItem: (k, v) => store.set(k, v) };
+  try {
+    const order = { number: "LR7-0002", status: "paid", total: 100, shipping: 0, discount: 0, currency: "COP" };
+    const lines = [{ product_name: "X", sku: "x-M", size: "M", color: null, quantity: 1, unit_price: 100 }];
+    trackPurchase(order, lines);
+    assert.equal(store.size, 0, "sin consentimiento no se marca como enviada");
+    window.gtag = (...args) => calls.push(args);
+    trackPurchase(order, lines);
+    trackPurchase(order, lines);
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0][1], "purchase");
+    assert.equal(calls[0][2].transaction_id, "LR7-0002");
+  } finally {
+    delete globalThis.window;
+    delete globalThis.localStorage;
+  }
 });

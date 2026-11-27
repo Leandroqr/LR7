@@ -30,6 +30,7 @@ const GA_EVENTS = [
   ["Fichas vistas", "view_item"],
   ["Carrito", "add_to_cart, remove_from_cart y view_cart"],
   ["Inicio del pago", "begin_checkout (primer campo del formulario) y add_shipping_info (envío de los datos)"],
+  ["Compra confirmada", "purchase, con el número de pedido, cuando el servidor confirma el pago"],
   ["WhatsApp", "whatsapp_click"],
 ] as const;
 

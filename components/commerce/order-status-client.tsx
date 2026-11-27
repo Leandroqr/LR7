@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { WompiCheckout } from "@/components/commerce/wompi-checkout";
 import { useStore } from "@/components/providers/store-provider";
 import { CHECKOUT_ATTEMPT_STORAGE_KEY, serializeCheckoutCart } from "@/lib/checkout/cart";
+import { trackPurchase } from "@/lib/analytics";
 import { formatCurrency } from "@/lib/products";
 import { getOrderStatusLabel, getPaymentStatusLabel } from "@/lib/order-labels";
 
@@ -260,6 +261,11 @@ export function OrderStatusClient({ orderId, transactionId }: Readonly<{ orderId
       localStorage.removeItem(CHECKOUT_ATTEMPT_STORAGE_KEY);
     }
   }, [cart, clearCart, data]);
+
+  // Analítica: la compra se cuenta cuando el servidor confirma el pago, no al volver de Wompi.
+  useEffect(() => {
+    if (data) trackPurchase(data.order, data.items);
+  }, [data]);
 
   async function retryPayment() {
     if (!data || retrying) return;
