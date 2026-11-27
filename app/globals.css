@@ -3533,6 +3533,36 @@ body {
   .home-line-card:hover .home-line-name { color: var(--color-action); }
 }
 
+/* Destacados: parrilla de la tienda bajo el hero, con filtros rápidos (mismo patrón que la tienda). */
+.home-featured { max-width: 1440px; margin: 0 auto; padding: var(--space-8) var(--space-4); }
+.home-featured-head { flex-wrap: wrap; }
+.home-featured-filters { display: flex; gap: var(--space-5); overflow-x: auto; scrollbar-width: none; max-width: 100%; }
+.home-featured-filters::-webkit-scrollbar { display: none; }
+.home-featured-filters button {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--color-gray-600);
+  flex: 0 0 auto;
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color var(--duration-press) ease, border-color var(--duration-press) ease;
+}
+.home-featured-filters button.is-active { border-bottom-color: var(--color-action); color: var(--color-night); font-weight: 600; }
+.home-featured-filters button:focus-visible { outline: 3px solid var(--color-action); outline-offset: 2px; }
+@media (hover: hover) and (pointer: fine) {
+  .home-featured-filters button:hover { color: var(--color-night); }
+}
+.home-featured-footer { display: flex; justify-content: center; margin-top: var(--space-7); }
+@media (max-width: 600px) {
+  .home-featured-head { flex-direction: column; align-items: flex-start; }
+  .home-featured-footer .btn-outline { width: 100%; justify-content: center; }
+}
+
 /* Fila de confianza: datos reales, sin animación. */
 .home-trust { border-top: 1px solid var(--color-gray-200); border-bottom: 1px solid var(--color-gray-200); background: var(--color-white); }
 .home-trust-list { max-width: 1440px; margin: 0 auto; padding: var(--space-6) var(--space-4); list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5) var(--space-4); }
@@ -3553,6 +3583,7 @@ body {
 .featured-carousel-title { font-size: var(--text-headline); line-height: 0.92; text-transform: uppercase; }
 
 @media (min-width: 901px) {
+  .home-featured { padding: var(--space-9) var(--space-6); }
   .home-lines { padding: var(--space-9) var(--space-6); }
   .home-lines-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-4); }
   .home-trust-list { grid-template-columns: repeat(4, minmax(0, 1fr)); padding: var(--space-7) var(--space-6); }

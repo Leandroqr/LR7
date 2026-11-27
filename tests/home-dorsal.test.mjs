@@ -30,8 +30,8 @@ test("personalize link carries only non-empty, sanitized values", () => {
   assert.equal(personalizeHref("x", "", "retro-82"), "/personaliza?producto=retro-82&nombre=X");
 });
 
-test("search by team sits right below the hero, built only from real catalog teams, without crests", async () => {
-  assert.match(home, /<HomeHero[\s\S]*<HomeTeams products=\{products\} \/>/);
+test("featured grid sits right below the hero, then search by team (real catalog teams, without crests)", async () => {
+  assert.match(home, /<HomeHero[^>]*\/>\s*\{\/\*[^*]*\*\/\}\s*<HomeFeaturedGrid products=\{products\} \/>\s*<HomeTeams products=\{products\} \/>/);
   assert.doesNotMatch(home, /HeroCarousel|BenefitsStrip|NewDropSection|HomeDorsal/);
   assert.match(teams, /href=\{`\/buscar\?q=\$\{encodeURIComponent\(team\.name\)\}`\}/);
   assert.match(teams, /if \(product\.brand !== "FUTBOL"\) continue;/);
@@ -48,7 +48,7 @@ test("hero carousel: CMS slides or real products, accessible controls, no timers
   assert.match(hero, /HERO_PHOTO_ID = "photo-1516948900-c5137d2bf399"/);
   // Las diapositivas del CMS que enlazan a secciones ocultas (alcance comercial) se descartan.
   assert.match(hero, /\(cmsSlides \?\? \[\]\)\.filter\(\(slide\) => isPublicHrefEnabled\(slide\.cta_href\)\)/);
-  assert.match(hero, /visibleCmsSlides\.length \? fromCms\(visibleCmsSlides\) : fromCatalog\(products, customPrice\)/);
+  assert.match(hero, /visibleCmsSlides\.length \? fromCms\(visibleCmsSlides, products\) : fromCatalog\(products, customPrice\)/);
   assert.match(home, /<HomeHero products=\{products\} slides=\{homeSlides\}/);
   // WCAG 2.2.2: se puede pausar; se pausa con hover y foco; avanza al terminar la barra (sin setInterval).
   assert.match(hero, /aria-label=\{userPaused \? "Reanudar el carrusel" : "Pausar el carrusel"\}/);

@@ -2,8 +2,8 @@ import Link from "next/link";
 import type { Product } from "@/types/ecommerce";
 import type { Database } from "@/types/database";
 import { HERO_PHOTO_ID, HomeHero } from "@/components/pages/home-hero";
+import { HomeFeaturedGrid } from "@/components/pages/home-featured-grid";
 import { HomeTeams } from "@/components/pages/home-teams";
-import { FeaturedCarousel } from "@/components/product/featured-carousel";
 import { ProductVisual } from "@/components/product/product-visual";
 import { CUSTOM_PRICE, formatCurrency } from "@/lib/products";
 
@@ -91,21 +91,16 @@ function TrainingSection({ product }: Readonly<{ product: Product }>) {
 }
 
 export function HomePage({ products, homeSlides }: Readonly<{ products: Product[]; homeSlides?: HomeSlide[]; homeSections?: HomeSection[] }>) {
-  const footballProducts = products.filter((product) => product.brand === "FUTBOL");
-  const trainingProducts = products.filter((product) => product.brand === "TRAINING");
-  const newDropProducts = footballProducts.filter((product) => product.badge === "NUEVO");
-  const retroProducts = footballProducts.filter((product) => product.category === "FUTBOL_RETRO");
-  const remainingFootballProducts = footballProducts.filter((product) => product.badge !== "NUEVO" && product.category !== "FUTBOL_RETRO");
-  const featuredProducts = [...newDropProducts, ...retroProducts, ...remainingFootballProducts, ...trainingProducts];
-  const trainingProduct = trainingProducts[0];
+  const trainingProduct = products.find((product) => product.brand === "TRAINING");
 
   return (
     <>
       {/* Hero en carrusel: todas las diapositivas activas del CMS o, si no hay, generadas con productos reales. */}
       <HomeHero products={products} slides={homeSlides} customPrice={CUSTOM_PRICE} />
+      {/* Destacados justo debajo del hero: la tienda en la primera pantalla, con filtros rápidos. */}
+      <HomeFeaturedGrid products={products} />
       <HomeTeams products={products} />
       <LinesSection products={products} />
-      <FeaturedCarousel products={featuredProducts} title="Elige tu camiseta" href="/futbol" cta="VER TODO FÚTBOL" />
       <TrustRow />
       {trainingProduct ? <TrainingSection product={trainingProduct} /> : null}
     </>

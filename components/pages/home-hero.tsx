@@ -3,20 +3,26 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState, type CSSProperties } from "react";
-import { formatCurrency } from "@/lib/products";
+import { productSlugFromHref } from "@/lib/home-featured";
+import { formatCurrency, getCategoryDisplayName } from "@/lib/products";
 import { isPublicHrefEnabled } from "@/lib/store-scope";
 import type { Product } from "@/types/ecommerce";
 import type { Database } from "@/types/database";
 
 type CmsSlide = Database["public"]["Tables"]["home_slides"]["Row"];
 
+/** Camiseta que protagoniza una diapositiva de producto: foto, nombre, línea y precio reales. */
+type HeroProduct = Readonly<{ name: string; detail: string; price: number; image: string; alt: string }>;
+
 type HeroSlide = Readonly<{
   id: string;
+  eyebrow?: string;
   lines: string[];
   subtitle: string;
   cta: { label: string; href: string };
   image: string;
   position?: string;
+  product?: HeroProduct;
 }>;
 
 // Foto de ambiente con licencia de Unsplash: estadio de noche, aficionado de espaldas con nombre y
@@ -29,14 +35,31 @@ function splitLines(text: string) {
   return text.split(/(?<=[.!?])\s+/).map((line) => line.trim()).filter(Boolean);
 }
 
-function fromCms(slides: CmsSlide[]): HeroSlide[] {
-  return slides.map((slide) => ({
-    id: slide.id,
-    lines: splitLines([slide.title, slide.accent_text].filter(Boolean).join(" ")),
-    subtitle: slide.subtitle ?? "",
-    cta: { label: slide.cta_label, href: slide.cta_href },
-    image: slide.image_path || DEFAULT_IMAGE,
-  }));
+function toHeroProduct(product: Product | undefined): HeroProduct | undefined {
+  const photo = product?.images[0];
+  if (!product || !photo?.src) return undefined;
+  return { name: product.name, detail: getCategoryDisplayName(product.category), price: product.price.amount, image: photo.src, alt: photo.alt || product.name };
+}
+
+/**
+ * Diapositivas del CMS. Si el botón enlaza a la ficha de una camiseta del catálogo, la diapositiva pasa a
+ * ser de producto: muestra esa camiseta con su nombre y su precio reales (no se escriben a mano).
+ */
+function fromCms(slides: CmsSlide[], products: Product[]): HeroSlide[] {
+  return slides.map((slide) => {
+    const slug = productSlugFromHref(slide.cta_href);
+    const product = slug ? toHeroProduct(products.find((item) => item.slug === slug)) : undefined;
+    return {
+      id: slide.id,
+      // La etiqueta solo se muestra en las de producto: en las de campaña nunca se publicó.
+      eyebrow: product ? slide.eyebrow || undefined : undefined,
+      lines: splitLines([slide.title, slide.accent_text].filter(Boolean).join(" ")),
+      subtitle: slide.subtitle ?? "",
+      cta: { label: slide.cta_label, href: slide.cta_href },
+      image: slide.image_path || DEFAULT_IMAGE,
+      product,
+    };
+  });
 }
 
 /** Sin diapositivas en el CMS: la de personalización y una por línea, con productos reales del catálogo. */
@@ -59,7 +82,7 @@ function fromCatalog(products: Product[], customPrice: number): HeroSlide[] {
       position: "62% center",
     },
     newSeason
-      ? { id: "nueva-temporada", lines: ["Nuevo en", "la cancha."], subtitle: `${newSeason.name}, $${formatCurrency(newSeason.price.amount)}.`, cta: { label: "VER LA CAMISETA", href: `/productos/${newSeason.slug}` }, image: newSeason.images[0].src }
+      ? { id: "nueva-temporada", eyebrow: "Nueva temporada", lines: ["Nuevo en", "la cancha."], subtitle: "Camisetas de diseño propio para jugar, vestir y coleccionar.", cta: { label: "VER LA CAMISETA", href: `/productos/${newSeason.slug}` }, image: newSeason.images[0].src, product: toHeroProduct(newSeason) }
       : null,
     retro
       ? { id: "retro", lines: ["Historia", "que se viste."], subtitle: "Camisetas retro inspiradas en las épocas que marcaron el fútbol.", cta: { label: "VER RETRO", href: "/categorias/futbol-retro" }, image: retro.images[0].src }
@@ -80,6 +103,29 @@ const ICONS = {
   play: <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" className="size-5 fill-current"><path d="M8 5v14l11-7z" /></svg>,
 };
 
+/**
+ * La camiseta de una diapositiva de producto: foto en marco 4:5 y, al lado, nombre, línea y precio.
+ * La foto también lleva a la ficha con el ratón; con teclado se usa el botón principal, así no hay dos
+ * paradas de tabulación hacia el mismo sitio.
+ */
+function HeroProductFigure({ product, href, animate }: Readonly<{ product: HeroProduct; href: string; animate: boolean }>) {
+  return (
+    <div className={`flex items-end gap-4 sm:gap-6 lg:justify-end ${animate ? "motion-safe:animate-hero-fade" : ""}`}>
+      <Link href={href} tabIndex={-1} aria-hidden="true" className="relative block aspect-[4/5] w-[46%] max-w-[22rem] shrink-0 overflow-hidden rounded-button bg-white/5 max-lg:w-auto max-lg:h-[min(28svh,15rem)] lg:w-[62%] lg:max-w-[26rem]">
+        <Image src={product.image} alt="" fill sizes="(max-width: 1023px) 45vw, 26rem" className="object-cover" />
+      </Link>
+      <div className="grid gap-1 pb-1 text-white">
+        <p className="m-0 font-heading text-[clamp(1.125rem,2.4vw,1.5rem)] leading-tight font-bold uppercase">{product.name}</p>
+        <p className="m-0 text-body-sm text-white/70">{product.detail}</p>
+        <span className="mt-2 block h-px w-8 bg-white/40" aria-hidden="true" />
+        <p className="m-0 mt-2 font-heading text-[1.375rem] font-bold">
+          <span className="sr-only">Precio: </span>${formatCurrency(product.price)}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 const CONTROL =
   "grid size-11 cursor-pointer place-items-center rounded-button border border-solid border-white/40 bg-night/30 p-0 text-white transition-colors duration-(--duration-press) hover:border-white hover:bg-white/10 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-action-on-dark motion-safe:active:scale-[0.96]";
 
@@ -93,7 +139,7 @@ const CONTROL =
 export function HomeHero({ products, slides: cmsSlides, customPrice }: Readonly<{ products: Product[]; slides?: CmsSlide[]; customPrice: number }>) {
   // Diapositivas del CMS que enlazan a secciones ocultas (Training, Streetwear) no se muestran.
   const visibleCmsSlides = (cmsSlides ?? []).filter((slide) => isPublicHrefEnabled(slide.cta_href));
-  const slides = visibleCmsSlides.length ? fromCms(visibleCmsSlides) : fromCatalog(products, customPrice);
+  const slides = visibleCmsSlides.length ? fromCms(visibleCmsSlides, products) : fromCatalog(products, customPrice);
   const [active, setActive] = useState(0);
   const [userPaused, setUserPaused] = useState(false);
   const [hovered, setHovered] = useState(false);
@@ -107,7 +153,7 @@ export function HomeHero({ products, slides: cmsSlides, customPrice }: Readonly<
 
   return (
     <section
-      className="relative isolate min-h-[88svh] touch-pan-y overflow-hidden bg-night text-white lg:min-h-[min(100svh,56rem)]"
+      className="relative isolate min-h-[88svh] touch-pan-y overflow-hidden bg-night text-white lg:min-h-[min(82svh,46rem)]"
       aria-roledescription="carrusel"
       aria-label="Destacados de LR7"
       onPointerEnter={(event) => { if (event.pointerType === "mouse") setHovered(true); }}
@@ -143,6 +189,10 @@ export function HomeHero({ products, slides: cmsSlides, customPrice }: Readonly<
             inert={!isActive}
             className={`absolute inset-0 flex items-end transition-opacity duration-700 ease-out motion-reduce:transition-none ${isActive ? "z-10 opacity-100" : "z-0 opacity-0"}`}
           >
+            {slide.product ? (
+              // Diapositiva de producto: fondo de marca liso; la camiseta va en su propio marco.
+              <div className="absolute inset-0 -z-20 bg-night bg-[radial-gradient(ellipse_at_72%_45%,rgb(23_74_126/0.55),transparent_60%)]" aria-hidden="true" />
+            ) : (
             <div className="absolute inset-0 -z-20 overflow-hidden" aria-hidden="true">
               <Image
                 src={slide.image}
@@ -155,13 +205,19 @@ export function HomeHero({ products, slides: cmsSlides, customPrice }: Readonly<
                 style={{ objectPosition: slide.position ?? "center" }}
               />
             </div>
+            )}
             {/* Velo funcional: oscurece donde va el texto (abajo en móvil, a la izquierda en escritorio) y bajo la cabecera. */}
-            <div className="absolute inset-0 -z-10 bg-linear-to-t from-night via-night/70 to-night/20 lg:bg-linear-to-r lg:from-night/95 lg:via-night/65 lg:to-night/10" aria-hidden="true" />
+            {slide.product ? null : <div className="absolute inset-0 -z-10 bg-linear-to-t from-night via-night/70 to-night/20 lg:bg-linear-to-r lg:from-night/95 lg:via-night/65 lg:to-night/10" aria-hidden="true" />}
             <div className="absolute inset-x-0 top-0 -z-10 h-40 bg-linear-to-b from-night/80 to-transparent" aria-hidden="true" />
 
             {/* key: al activarse, el bloque se monta de nuevo y la entrada del titular se repite. */}
-            <div key={isActive ? `on-${active}` : "off"} className="mx-auto w-full max-w-[1440px] px-4 pt-32 pb-32 md:px-8 lg:pb-36">
-              <Heading id={index === 0 ? "home-hero-title" : undefined} className="m-0 max-w-[12ch] font-heading text-[clamp(3.25rem,11vw,7rem)] leading-[0.88] font-black tracking-[-0.01em] uppercase italic">
+            <div key={isActive ? `on-${active}` : "off"} className={`mx-auto w-full max-w-[1440px] px-4 pb-32 md:px-8 lg:pb-36 ${slide.product ? "grid content-end gap-5 pt-24 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:content-center lg:items-center lg:gap-12 lg:pt-28" : "pt-32"}`}>
+              {slide.product ? <HeroProductFigure product={slide.product} href={slide.cta.href} animate={isActive} /> : null}
+              <div className={slide.product ? "lg:order-first" : undefined}>
+              {slide.eyebrow ? (
+                <p className={`m-0 mb-4 font-heading text-label font-bold tracking-[0.14em] text-white/75 uppercase ${isActive ? "motion-safe:animate-hero-fade" : ""}`}>{slide.eyebrow}</p>
+              ) : null}
+              <Heading id={index === 0 ? "home-hero-title" : undefined} className={`m-0 max-w-[12ch] font-heading leading-[0.88] ${slide.product ? "text-[clamp(2.75rem,9vw,6rem)]" : "text-[clamp(3.25rem,11vw,7rem)]"} font-black tracking-[-0.01em] uppercase italic`}>
                 {slide.lines.map((line, lineIndex) => (
                   <span key={line} className="block overflow-hidden pb-[0.04em]">
                     <span className={`block ${isActive ? "motion-safe:animate-hero-line" : ""}`} style={delay(lineIndex * 60)}>{line}</span>
@@ -176,6 +232,7 @@ export function HomeHero({ products, slides: cmsSlides, customPrice }: Readonly<
               <div className={`mt-8 flex flex-wrap gap-3 max-sm:flex-col ${isActive ? "motion-safe:animate-hero-fade" : ""}`} style={delay(textDelay + 100)}>
                 <Link href={slide.cta.href} className="btn-primary min-h-13 justify-center px-8">{slide.cta.label}</Link>
                 <Link href="/tienda" className="btn-on-dark min-h-13 justify-center px-8">VER LA TIENDA</Link>
+              </div>
               </div>
             </div>
           </div>
